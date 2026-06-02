@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Landmark } from "lucide-react";
 import { SplashScreen } from "@capacitor/splash-screen";
 
 export function AnimatedSplash() {
@@ -44,18 +43,20 @@ export function AnimatedSplash() {
 
   return (
     <div className="fixed inset-0 z-[100] overflow-hidden pointer-events-none">
-      {/* Left Door */}
+      {/* Top Left Triangle */}
       <div
-        className={`absolute top-0 left-0 w-1/2 h-full bg-background border-r border-border transition-transform duration-700 ease-in-out z-10
-          ${stage === "splitting" ? "-translate-x-full" : "translate-x-0"}
+        className={`absolute inset-0 bg-background transition-transform duration-[800ms] ease-in-out z-10
+          ${stage === "splitting" ? "-translate-x-full -translate-y-full" : "translate-x-0 translate-y-0"}
         `}
+        style={{ clipPath: 'polygon(0 0, 100% 0, 0 100%)' }}
       />
       
-      {/* Right Door */}
+      {/* Bottom Right Triangle */}
       <div
-        className={`absolute top-0 right-0 w-1/2 h-full bg-background transition-transform duration-700 ease-in-out z-10
-          ${stage === "splitting" ? "translate-x-full" : "translate-x-0"}
+        className={`absolute inset-0 bg-background transition-transform duration-[800ms] ease-in-out z-10
+          ${stage === "splitting" ? "translate-x-full translate-y-full" : "translate-x-0 translate-y-0"}
         `}
+        style={{ clipPath: 'polygon(100% 0, 100% 100%, 0 100%)' }}
       />
 
       {/* Center Logo container (Sits above the doors during loading, fades/zooms during split) */}
@@ -67,7 +68,11 @@ export function AnimatedSplash() {
         `}
       >
         <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-2xl">
-          <Landmark className="h-10 w-10" />
+          <svg viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-10 w-10">
+            <path d="M64 176L112 112L144 144L192 80" stroke="currentColor" strokeWidth="24" strokeLinecap="round" strokeLinejoin="round"/>
+            <circle cx="192" cy="80" r="16" fill="currentColor"/>
+            <circle cx="64" cy="176" r="16" fill="currentColor"/>
+          </svg>
         </div>
       </div>
     </div>
