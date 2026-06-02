@@ -44,6 +44,7 @@ import {
 import { useExpenseStore } from "@/store/expense-store";
 import { EXPENSE_CATEGORIES, CATEGORY_COLORS } from "@/lib/constants";
 import type { Expense, ExpenseCategory } from "@/types";
+import { ReceiptScanner } from "@/components/dashboard/receipt-scanner";
 
 const ITEMS_PER_PAGE = 8;
 
@@ -134,6 +135,16 @@ export default function ExpensesPage() {
       setIsDeleteOpen(false);
       setDeleteTarget(null);
     }
+  };
+
+  const handleScanComplete = (data: { amount: string; merchant: string; date: string }) => {
+    setFormData({
+      ...formData,
+      amount: data.amount,
+      title: data.merchant,
+      date: data.date,
+      category: formData.category || "Other" as ExpenseCategory,
+    });
   };
 
   return (
@@ -324,6 +335,11 @@ export default function ExpensesPage() {
                   </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
+                  {!editingExpense && (
+                    <div className="mb-2">
+                      <ReceiptScanner onScanComplete={handleScanComplete} />
+                    </div>
+                  )}
                   <div className="grid gap-2">
                     <Label htmlFor="title">Title</Label>
                     <Input

@@ -31,10 +31,17 @@ import { useThemeStore } from "@/store/theme-store";
 export default function SettingsPage() {
   const { theme, setTheme } = useThemeStore();
   const [mounted, setMounted] = React.useState(false);
+  const [biometrics, setBiometrics] = React.useState(false);
 
   React.useEffect(() => {
     setMounted(true);
+    setBiometrics(localStorage.getItem('biometrics_enabled') === 'true');
   }, []);
+
+  const handleBiometricsChange = (checked: boolean) => {
+    setBiometrics(checked);
+    localStorage.setItem('biometrics_enabled', checked ? 'true' : 'false');
+  };
 
   return (
     <PageTransition>
@@ -284,7 +291,7 @@ export default function SettingsPage() {
                       Use fingerprint or face recognition
                     </p>
                   </div>
-                  <Switch defaultChecked />
+                  <Switch checked={biometrics} onCheckedChange={handleBiometricsChange} />
                 </div>
               </div>
             </Card>
@@ -298,6 +305,18 @@ export default function SettingsPage() {
                 Choose what notifications you receive
               </p>
               <Separator className="my-6" />
+              
+              <div className="mb-6 rounded-lg bg-primary/10 p-4 flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-bold text-primary">Daily Reminders (Native)</p>
+                  <p className="text-xs text-muted-foreground mt-1">Get an OS-level push notification to log expenses at 8 PM</p>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => {
+                  import("@/services/native.service").then(m => m.NativeService.scheduleDailyReminder());
+                }}>
+                  Enable Push
+                </Button>
+              </div>
 
               <div className="space-y-5">
                 {[
