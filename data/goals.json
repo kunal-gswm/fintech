@@ -1,24 +1,35 @@
 [
   {
     "id": "1",
-    "title": "Emergency Fund",
-    "targetAmount": 300000,
-    "currentAmount": 120000,
-    "deadline": "2025-12-31",
-    "category": "Safety Net",
-    "icon": "Shield",
-    "color": "#10B981",
-    "monthlyTarget": 15000
+    "title": "New Laptop",
+    "targetAmount": 45000,
+    "currentAmount": 8000,
+    "deadline": "2026-12-31",
+    "category": "Technology",
+    "icon": "Laptop",
+    "color": "#3B82F6",
+    "monthlyTarget": 5000
   },
   {
     "id": "2",
-    "title": "Europe Trip",
-    "targetAmount": 250000,
-    "currentAmount": 50000,
-    "deadline": "2024-10-01",
-    "category": "Travel",
-    "icon": "Plane",
-    "color": "#3B82F6",
-    "monthlyTarget": 25000
+    "title": "Emergency Fund",
+    "targetAmount": 20000,
+    "currentAmount": 4805,
+    "deadline": "2026-08-31",
+    "category": "Safety Net",
+    "icon": "Shield",
+    "color": "#10B981",
+    "monthlyTarget": 2500
+  },
+  {
+    "id": "3",
+    "title": "Advanced Web Dev Course",
+    "targetAmount": 5000,
+    "currentAmount": 0,
+    "deadline": "2026-07-15",
+    "category": "Education",
+    "icon": "Book",
+    "color": "#8B5CF6",
+    "monthlyTarget": 2500
   }
 ]

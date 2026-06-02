@@ -77,7 +77,7 @@ export function ActivityFeed() {
             const Icon = iconMap[activity.icon] || CreditCard;
             return (
               <div
-                key={activity.id}
+                key={`${activity.type}-${activity.id}`}
                 className="flex items-start gap-3 rounded-lg border border-border p-3 transition-colors hover:bg-muted/50"
               >
                 <div

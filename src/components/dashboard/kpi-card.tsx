@@ -15,6 +15,7 @@ import { useState, useEffect } from "react";
 import { getProfile } from "@/services/profile.service";
 import { getHealth } from "@/services/health.service";
 import { getAnalytics } from "@/services/analytics.service";
+import { useExpenseStore } from "@/store/expense-store";
 import { cn } from "@/lib/utils";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -35,12 +36,21 @@ const colorMap: Record<string, { icon: string; bg: string }> = {
 
 export function KPICards() {
   const [data, setData] = useState<{title: string; value: number; prefix?: string; suffix?: string; trend: number; trendLabel: string; icon: string;}[]>([]);
+  
+  // [FIX: DESYNC-001] Subscribe to expense store changes to trigger KPI refetch
+  // We only care about the length to avoid deep object comparisons
+  const expenseCount = useExpenseStore(state => state.expenses.length);
 
   useEffect(() => {
+    let cancelled = false;
+
     Promise.all([getProfile(), getHealth(), getAnalytics()])
       .then(([profile, health, analytics]) => {
-        const income = profile.monthlyIncome || 85000;
-        const expenses = analytics.totalSpent || 42350;
+        if (cancelled) return;
+        
+        const currentMonthData = analytics.monthlyTrend?.[analytics.monthlyTrend.length - 1];
+        const income = currentMonthData ? currentMonthData.income : (profile.monthlyIncome || 85000);
+        const expenses = currentMonthData ? currentMonthData.expenses : (analytics.totalSpent || 42350);
         const savingsRate = income > 0 ? ((income - expenses) / income) * 100 : 0;
         
         setData([
@@ -87,7 +97,11 @@ export function KPICards() {
         ]);
       })
       .catch(console.error);
-  }, []);
+
+      return () => {
+        cancelled = true;
+      };
+  }, [expenseCount]); // Depend on expenseCount so mutations trigger a sync
 
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">

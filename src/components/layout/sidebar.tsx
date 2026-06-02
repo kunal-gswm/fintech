@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils";
 import { useSidebarStore } from "@/store/sidebar-store";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -124,7 +124,11 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       {/* Logo */}
       <div className="flex h-16 items-center gap-3 px-4">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-          <Landmark className="h-5 w-5" />
+          <svg viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-5 w-5">
+            <path d="M64 176L112 112L144 144L192 80" stroke="currentColor" strokeWidth="24" strokeLinecap="round" strokeLinejoin="round"/>
+            <circle cx="192" cy="80" r="16" fill="currentColor"/>
+            <circle cx="64" cy="176" r="16" fill="currentColor"/>
+          </svg>
         </div>
         <AnimatePresence>
           {!isCollapsed && (

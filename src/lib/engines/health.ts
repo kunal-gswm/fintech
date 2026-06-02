@@ -5,7 +5,13 @@ export function calculateHealthScore(
   totalGoalProgress: number
 ) {
   // 1. Savings Rate
-  const savingsRate = (monthlyIncome - monthlyExpenses) / monthlyIncome;
+  let savingsRate = 0;
+  if (monthlyIncome > 0) {
+    savingsRate = (monthlyIncome - monthlyExpenses) / monthlyIncome;
+  } else if (monthlyExpenses > 0) {
+    savingsRate = -1; // Negative savings rate
+  }
+  
   let savingsScore = 0;
   if (savingsRate >= 0.2) savingsScore = 40;
   else if (savingsRate >= 0.1) savingsScore = 20;
@@ -31,5 +37,13 @@ export function calculateHealthScore(
   return {
     score: totalScore,
     riskLevel,
+    details: {
+      savingsRate,
+      savingsScore,
+      emergencyMonths: monthlyExpenses > 0 ? totalEmergencySavings / monthlyExpenses : 0,
+      emergencyScore,
+      goalProgress: totalGoalProgress,
+      goalScore
+    }
   };
 }

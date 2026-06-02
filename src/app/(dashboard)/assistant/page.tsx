@@ -18,12 +18,7 @@ import {
 import { useChatStore } from "@/store/chat-store";
 import { cn } from "@/lib/utils";
 
-const suggestedPrompts = [
-  "How can I save more money?",
-  "Should I invest in mutual funds or ETFs?",
-  "How can I optimize my taxes?",
-  "Review my spending habits",
-];
+
 
 function TypingIndicator() {
   return (
@@ -45,7 +40,7 @@ function TypingIndicator() {
 }
 
 export default function AssistantPage() {
-  const { messages, isTyping, addMessage, setTyping, clearMessages } =
+  const { messages, isTyping, clearMessages } =
     useChatStore();
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -104,7 +99,7 @@ export default function AssistantPage() {
 
         {/* Chat Area */}
         <Card className="flex flex-1 flex-col overflow-hidden">
-          <ScrollArea className="flex-1 px-4 py-4" ref={scrollRef}>
+          <ScrollArea className="flex-1 min-h-0 px-4 py-4" ref={scrollRef}>
             <div className="space-y-4">
               <AnimatePresence initial={false}>
                 {messages.map((msg) => (
@@ -166,25 +161,7 @@ export default function AssistantPage() {
             </div>
           </ScrollArea>
 
-          {/* Suggested Prompts */}
-          {messages.length <= 3 && (
-            <div className="border-t px-4 py-3">
-              <p className="mb-2 text-xs font-medium text-muted-foreground">
-                Suggested
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {suggestedPrompts.map((prompt) => (
-                  <button
-                    key={prompt}
-                    onClick={() => handleSend(prompt)}
-                    className="rounded-full border border-border bg-background px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                  >
-                    {prompt}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+
 
           {/* Input Area */}
           <div className="border-t p-4">

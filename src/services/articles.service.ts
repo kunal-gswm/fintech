@@ -6,5 +6,12 @@ export const getArticles = () => {
 };
 
 export const getArticle = (slug: string) => {
-  return apiClient<Article>(`/api/articles/${slug}`);
+  return apiClient<{ article: Article; related: Article[] }>(`/api/articles/${slug}`);
+};
+
+export const updateArticle = (slug: string, data: Partial<Article>) => {
+  return apiClient<Article>(`/api/articles/${slug}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
 };

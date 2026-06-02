@@ -14,13 +14,23 @@ export const EXPENSE_CATEGORIES = [
 ] as const;
 
 export const ARTICLE_CATEGORIES = [
+  "Personal Finance",
+  "Budgeting",
+  "Emergency Funds",
+  "Savings Accounts",
+  "Fixed Deposits (FD)",
+  "Recurring Deposits (RD)",
   "Stocks",
   "ETFs",
   "Mutual Funds",
-  "SIP",
-  "Banking",
+  "SIPs",
+  "Index Funds",
+  "Gold Investments",
+  "Bonds",
+  "Credit Cards",
+  "Loans",
   "Taxes",
-  "Budgeting",
+  "Financial Planning",
 ] as const;
 
 export const CATEGORY_COLORS: Record<string, string> = {

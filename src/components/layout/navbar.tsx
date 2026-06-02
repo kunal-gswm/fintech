@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   Search,
   Bell,
@@ -15,10 +15,11 @@ import {
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -63,7 +64,12 @@ const mockNotifications = [
 export function Navbar() {
   const { setMobileOpen } = useSidebarStore();
   const { theme, toggleTheme } = useThemeStore();
+  const [mounted, setMounted] = useState(false);
   const unreadCount = mockNotifications.filter((n) => !n.read).length;
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
@@ -104,10 +110,14 @@ export function Navbar() {
           onClick={toggleTheme}
           className="h-9 w-9"
         >
-          {theme === "light" ? (
-            <Moon className="h-4 w-4" />
+          {mounted ? (
+            theme === "light" ? (
+              <Moon className="h-4 w-4" />
+            ) : (
+              <Sun className="h-4 w-4" />
+            )
           ) : (
-            <Sun className="h-4 w-4" />
+            <div className="h-4 w-4" />
           )}
           <span className="sr-only">Toggle theme</span>
         </Button>
@@ -170,14 +180,16 @@ export function Navbar() {
             </Avatar>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>
-              <div className="flex flex-col">
-                <span className="text-sm font-medium">Arjun Kumar</span>
-                <span className="text-xs text-muted-foreground">
-                  arjun@example.com
-                </span>
-              </div>
-            </DropdownMenuLabel>
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium">Arjun Kumar</span>
+                  <span className="text-xs text-muted-foreground">
+                    arjun@example.com
+                  </span>
+                </div>
+              </DropdownMenuLabel>
+            </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
               <User className="mr-2 h-4 w-4" />

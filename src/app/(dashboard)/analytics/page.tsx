@@ -21,6 +21,13 @@ import {
 import { getAnalytics } from "@/services/analytics.service";
 import { Sparkles, TrendingUp, AlertCircle } from "lucide-react";
 import { motion } from "framer-motion";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const barColors = ["#2563EB", "#10B981", "#F59E0B", "#8B5CF6", "#EC4899", "#EF4444", "#84CC16"];
 
@@ -64,29 +71,45 @@ const insightIconStyles = {
 };
 
 export default function AnalyticsPage() {
-  const [data, setData] = useState<{categoryBreakdown: {name: string; value: number; color: string}[]; monthlyTrend: {month: string; income: number; expenses: number}[]} | null>(null);
+  const [selectedMonth, setSelectedMonth] = useState<string>("All");
+  const [data, setData] = useState<{ categoryBreakdown: { name: string; value: number; color: string }[]; monthlyTrend: { month: string; income: number; expenses: number }[] } | null>(null);
 
   useEffect(() => {
-    getAnalytics().then((res) => {
-      const categories = res.categoryBreakdown.map((c: {name: string; value: number}, i: number) => ({
+    getAnalytics(selectedMonth).then((res) => {
+      const categories = res.categoryBreakdown.map((c: { name: string; value: number }, i: number) => ({
         ...c,
         color: barColors[i % barColors.length],
       }));
       setData({ ...res, categoryBreakdown: categories });
     }).catch(console.error);
-  }, []);
+  }, [selectedMonth]);
 
   if (!data) return <div className="flex h-64 items-center justify-center">Loading analytics...</div>;
 
-  const total = data.categoryBreakdown.reduce((s: number, d: {value: number}) => s + d.value, 0);
+  const total = data.categoryBreakdown.reduce((s: number, d: { value: number }) => s + d.value, 0);
+  const currentMonthDisplay = selectedMonth === "All" ? "All Time" : selectedMonth;
 
   return (
     <PageTransition>
       <div className="space-y-6">
         <PageHeader
           title="Analytics"
-          description="Deep insights into your spending patterns."
-        />
+          description={`Deep insights into your spending patterns for ${currentMonthDisplay}.`}
+        >
+          <Select value={selectedMonth} onValueChange={(val) => val && setSelectedMonth(val)}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select Month" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="All">All Time</SelectItem>
+              {data.monthlyTrend.map((t) => (
+                <SelectItem key={t.month} value={t.month}>
+                  {t.month}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </PageHeader>
 
         {/* Charts Grid */}
         <div className="grid gap-6 lg:grid-cols-2">
@@ -110,7 +133,7 @@ export default function AnalyticsPage() {
                       dataKey="value"
                       stroke="none"
                     >
-                      {data.categoryBreakdown.map((entry: {color: string}, i: number) => (
+                      {data.categoryBreakdown.map((entry: { color: string }, i: number) => (
                         <Cell key={i} fill={entry.color} />
                       ))}
                     </Pie>
@@ -136,7 +159,7 @@ export default function AnalyticsPage() {
                 </div>
               </div>
               <div className="flex-1 space-y-3 w-full">
-                {data.categoryBreakdown.map((item: {name: string; color: string; value: number}) => (
+                {data.categoryBreakdown.map((item: { name: string; color: string; value: number }) => (
                   <div key={item.name} className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div
@@ -200,7 +223,7 @@ export default function AnalyticsPage() {
                     ]}
                   />
                   <Bar dataKey="value" radius={[0, 6, 6, 0]} barSize={20}>
-                    {data.categoryBreakdown.map((entry: {color: string}, i: number) => (
+                    {data.categoryBreakdown.map((entry: { color: string }, i: number) => (
                       <Cell key={i} fill={entry.color} />
                     ))}
                   </Bar>

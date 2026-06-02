@@ -5,7 +5,7 @@ import { FAQSection } from "@/components/landing/faq";
 import { Footer } from "@/components/landing/footer";
 import Link from "next/link";
 import { Landmark } from "lucide-react";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 
 export default function LandingPage() {
   return (

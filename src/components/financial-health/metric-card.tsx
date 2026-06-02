@@ -65,7 +65,7 @@ export function MetricCard({
               className="h-2"
             />
             <span className="text-sm font-bold">
-              {metric.score}/{metric.maxScore}
+              {metric.displayValue || `${metric.score}/${metric.maxScore}`}
             </span>
           </div>
           <p className="mt-3 text-xs leading-relaxed text-muted-foreground">

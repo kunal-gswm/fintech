@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { PageHeader } from "@/components/shared/page-header";
 import { PageTransition } from "@/components/shared/page-transition";
 import { Card } from "@/components/ui/card";
@@ -15,21 +16,17 @@ import {
   Clock,
   Bookmark,
   BookmarkCheck,
-  User,
+  TrendingUp,
 } from "lucide-react";
-import { getArticles } from "@/services/articles.service";
-import { ARTICLE_CATEGORIES } from "@/lib/constants";
+import { getArticles, updateArticle } from "@/services/articles.service";
+import { ARTICLE_CATEGORIES, CATEGORY_COLORS } from "@/lib/constants";
 import type { Article } from "@/types";
 import { cn } from "@/lib/utils";
 
-const categoryColors: Record<string, string> = {
-  Stocks: "bg-blue-500/10 text-blue-700",
-  ETFs: "bg-emerald-500/10 text-emerald-700",
-  "Mutual Funds": "bg-violet-500/10 text-violet-700",
-  SIP: "bg-amber-500/10 text-amber-700",
-  Banking: "bg-cyan-500/10 text-cyan-700",
-  Taxes: "bg-pink-500/10 text-pink-700",
-  Budgeting: "bg-orange-500/10 text-orange-700",
+const difficultyColors = {
+  Beginner: "text-emerald-600 bg-emerald-500/10",
+  Intermediate: "text-amber-600 bg-amber-500/10",
+  Advanced: "text-rose-600 bg-rose-500/10",
 };
 
 export default function LearningPage() {
@@ -56,12 +53,21 @@ export default function LearningPage() {
     return matchesSearch && matchesCategory;
   });
 
-  const toggleBookmark = (id: string) => {
+  const toggleBookmark = async (article: Article, e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent navigating to the article
+    e.stopPropagation();
+    
+    const newStatus = !article.bookmarked;
+    // Optimistic update
     setArticles((prev) =>
       prev.map((a) =>
-        a.id === id ? { ...a, bookmarked: !a.bookmarked } : a
+        a.id === article.id ? { ...a, bookmarked: newStatus } : a
       )
     );
+    
+    if (article.slug) {
+      await updateArticle(article.slug, { bookmarked: newStatus }).catch(console.error);
+    }
   };
 
   return (
@@ -77,17 +83,18 @@ export default function LearningPage() {
           <div className="relative max-w-md">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              placeholder="Search articles..."
+              placeholder="Search articles (e.g. ETF, Stocks, SIP)..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-9"
+              className="pl-9 bg-background"
             />
           </div>
           <div className="flex flex-wrap gap-2">
             <Button
               size="sm"
               variant={selectedCategory === "All" ? "default" : "outline"}
-              className="h-8 rounded-full text-xs"
+              className="h-8 rounded-full text-xs bg-background data-[active=true]:bg-primary"
+              data-active={selectedCategory === "All"}
               onClick={() => setSelectedCategory("All")}
             >
               All
@@ -97,7 +104,8 @@ export default function LearningPage() {
                 key={cat}
                 size="sm"
                 variant={selectedCategory === cat ? "default" : "outline"}
-                className="h-8 rounded-full text-xs"
+                className="h-8 rounded-full text-xs bg-background data-[active=true]:bg-primary"
+                data-active={selectedCategory === cat}
                 onClick={() => setSelectedCategory(cat)}
               >
                 {cat}
@@ -115,79 +123,86 @@ export default function LearningPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
             >
-              <Card className="group flex h-full flex-col overflow-hidden transition-all duration-300 hover:shadow-md">
-                {/* Article header bar */}
-                <div className="flex items-center justify-between border-b px-5 py-3">
-                  <Badge
-                    variant="secondary"
-                    className={cn(
-                      "text-xs font-normal",
-                      categoryColors[article.category]
-                    )}
-                  >
-                    {article.category}
-                  </Badge>
-                  <button
-                    onClick={() => toggleBookmark(article.id)}
-                    className="text-muted-foreground transition-colors hover:text-foreground"
-                  >
-                    {article.bookmarked ? (
-                      <BookmarkCheck className="h-4 w-4 text-primary" />
-                    ) : (
-                      <Bookmark className="h-4 w-4" />
-                    )}
-                  </button>
-                </div>
+              <Link href={`/learning/${article.slug || ""}`} className="block h-full">
+                <Card className="group flex h-full flex-col overflow-hidden transition-all duration-300 hover:shadow-md hover:border-primary/30">
+                  {/* Article header bar */}
+                  <div className="flex items-center justify-between border-b px-5 py-3 bg-muted/30">
+                    <Badge
+                      variant="secondary"
+                      className={cn(
+                        "text-xs font-normal border-transparent",
+                        CATEGORY_COLORS[article.category] || "bg-slate-500/10 text-slate-700 dark:bg-slate-500/20 dark:text-slate-300"
+                      )}
+                    >
+                      {article.category}
+                    </Badge>
+                    <button
+                      onClick={(e) => toggleBookmark(article, e)}
+                      className="text-muted-foreground transition-colors hover:text-primary z-10 p-1"
+                    >
+                      {article.bookmarked ? (
+                        <BookmarkCheck className="h-4 w-4 text-primary" />
+                      ) : (
+                        <Bookmark className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
 
-                <div className="flex flex-1 flex-col p-5">
-                  <h3 className="text-sm font-semibold leading-snug group-hover:text-primary transition-colors">
-                    {article.title}
-                  </h3>
-                  <p className="mt-2 flex-1 text-xs leading-relaxed text-muted-foreground line-clamp-3">
-                    {article.description}
-                  </p>
+                  <div className="flex flex-1 flex-col p-5 bg-card">
+                    <h3 className="text-base font-semibold leading-snug group-hover:text-primary transition-colors">
+                      {article.title}
+                    </h3>
+                    <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground line-clamp-3">
+                      {article.description}
+                    </p>
 
-                  {/* Reading progress */}
-                  {article.progress > 0 && (
-                    <div className="mt-4">
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-muted-foreground">
-                          {article.progress === 100
-                            ? "Completed"
-                            : `${article.progress}% read`}
-                        </span>
-                        <BookOpen className="h-3 w-3 text-muted-foreground" />
+                    {/* Reading progress */}
+                    {article.progress > 0 && (
+                      <div className="mt-5">
+                        <div className="flex items-center justify-between text-xs font-medium mb-1.5">
+                          <span className={article.progress === 100 ? "text-primary" : "text-muted-foreground"}>
+                            {article.progress === 100
+                              ? "Completed"
+                              : `${article.progress}% read`}
+                          </span>
+                        </div>
+                        <Progress
+                          value={article.progress}
+                          className="h-1.5"
+                        />
                       </div>
-                      <Progress
-                        value={article.progress}
-                        className="mt-1.5 h-1.5"
-                      />
-                    </div>
-                  )}
+                    )}
 
-                  {/* Meta */}
-                  <div className="mt-4 flex items-center justify-between border-t pt-3">
-                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                      <User className="h-3 w-3" />
-                      {article.author}
-                    </div>
-                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                      <Clock className="h-3 w-3" />
-                      {article.readTime} min read
+                    {/* Meta */}
+                    <div className="mt-5 flex items-center justify-between border-t pt-4">
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
+                          <Clock className="h-3.5 w-3.5" />
+                          {article.readTime} min
+                        </div>
+                        {article.difficulty && (
+                          <div className={cn("flex items-center gap-1.5 text-xs font-medium px-2 py-0.5 rounded-md", difficultyColors[article.difficulty] || "")}>
+                            <TrendingUp className="h-3 w-3" />
+                            {article.difficulty}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Card>
+                </Card>
+              </Link>
             </motion.div>
           ))}
         </div>
 
         {filtered.length === 0 && (
-          <div className="flex flex-col items-center justify-center rounded-xl border border-dashed py-16 text-center">
-            <BookOpen className="h-8 w-8 text-muted-foreground" />
-            <h3 className="mt-3 text-sm font-medium">No articles found</h3>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Try adjusting your search or filter
+          <div className="flex flex-col items-center justify-center rounded-xl border border-dashed py-16 text-center bg-card">
+            <div className="bg-primary/10 p-3 rounded-full mb-3">
+              <BookOpen className="h-6 w-6 text-primary" />
+            </div>
+            <h3 className="text-base font-medium">No articles found</h3>
+            <p className="mt-1 text-sm text-muted-foreground max-w-sm">
+              We couldn&apos;t find any articles matching your search or filter. Try a different term like &quot;ETF&quot; or &quot;Stocks&quot;.
             </p>
           </div>
         )}

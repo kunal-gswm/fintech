@@ -1,4 +1,5 @@
 "use client";
+import * as React from "react";
 
 import { PageHeader } from "@/components/shared/page-header";
 import { PageTransition } from "@/components/shared/page-transition";
@@ -29,6 +30,11 @@ import { useThemeStore } from "@/store/theme-store";
 
 export default function SettingsPage() {
   const { theme, setTheme } = useThemeStore();
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <PageTransition>
@@ -195,7 +201,7 @@ export default function SettingsPage() {
                 <button
                   onClick={() => setTheme("light")}
                   className={`rounded-xl border-2 p-4 text-left transition-all ${
-                    theme === "light"
+                    mounted && theme === "light"
                       ? "border-primary bg-primary/5"
                       : "border-border hover:border-muted-foreground/30"
                   }`}
@@ -211,7 +217,7 @@ export default function SettingsPage() {
                 <button
                   onClick={() => setTheme("dark")}
                   className={`rounded-xl border-2 p-4 text-left transition-all ${
-                    theme === "dark"
+                    mounted && theme === "dark"
                       ? "border-primary bg-primary/5"
                       : "border-border hover:border-muted-foreground/30"
                   }`}

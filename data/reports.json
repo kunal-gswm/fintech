@@ -1,16 +1,122 @@
 [
   {
-    "id": "rep_2023_12",
+    "id": "rep_2026_06",
+    "month": "June",
+    "year": 2026,
+    "totalIncome": 7900,
+    "totalExpenses": 5100,
+    "totalSavings": 2800,
+    "savingsRate": 35.4,
+    "insights": ["Excellent savings rate this month, keeping expenses steady."]
+  },
+  {
+    "id": "rep_2026_05",
+    "month": "May",
+    "year": 2026,
+    "totalIncome": 7600,
+    "totalExpenses": 4900,
+    "totalSavings": 2700,
+    "savingsRate": 35.5,
+    "insights": ["Great month! Income is on the higher end and expenses are well managed."]
+  },
+  {
+    "id": "rep_2026_04",
+    "month": "April",
+    "year": 2026,
+    "totalIncome": 7100,
+    "totalExpenses": 5200,
+    "totalSavings": 1900,
+    "savingsRate": 26.8,
+    "insights": ["Solid performance. Savings rate is healthy."]
+  },
+  {
+    "id": "rep_2026_03",
+    "month": "March",
+    "year": 2026,
+    "totalIncome": 6200,
+    "totalExpenses": 4700,
+    "totalSavings": 1500,
+    "savingsRate": 24.2,
+    "insights": ["A balanced month. Try to aim for 30% savings next month."]
+  },
+  {
+    "id": "rep_2026_02",
+    "month": "February",
+    "year": 2026,
+    "totalIncome": 5900,
+    "totalExpenses": 4200,
+    "totalSavings": 1700,
+    "savingsRate": 28.8,
+    "insights": ["Kept expenses low this month, which is great for your savings!"]
+  },
+  {
+    "id": "rep_2026_01",
+    "month": "January",
+    "year": 2026,
+    "totalIncome": 6500,
+    "totalExpenses": 4800,
+    "totalSavings": 1700,
+    "savingsRate": 26.2,
+    "insights": ["Started the year with a consistent savings habit."]
+  },
+  {
+    "id": "rep_2025_12",
     "month": "December",
-    "year": 2023,
-    "totalIncome": 85000,
-    "totalExpenses": 42350,
-    "totalSavings": 42650,
-    "savingsRate": 50.2,
-    "insights": [
-      "You achieved a savings rate of over 50%, which is excellent.",
-      "Food delivery expenses were slightly higher than the previous month.",
-      "You successfully met your monthly target for the Emergency Fund."
-    ]
+    "year": 2025,
+    "totalIncome": 7800,
+    "totalExpenses": 6200,
+    "totalSavings": 1600,
+    "savingsRate": 20.5,
+    "insights": ["Holiday spending increased expenses, but you still managed to save."]
+  },
+  {
+    "id": "rep_2025_11",
+    "month": "November",
+    "year": 2025,
+    "totalIncome": 7200,
+    "totalExpenses": 5100,
+    "totalSavings": 2100,
+    "savingsRate": 29.2,
+    "insights": ["Good recovery on savings rate this month."]
+  },
+  {
+    "id": "rep_2025_10",
+    "month": "October",
+    "year": 2025,
+    "totalIncome": 5800,
+    "totalExpenses": 3900,
+    "totalSavings": 1900,
+    "savingsRate": 32.8,
+    "insights": ["Very efficient month. Expenses were kept under 4k."]
+  },
+  {
+    "id": "rep_2025_09",
+    "month": "September",
+    "year": 2025,
+    "totalIncome": 6100,
+    "totalExpenses": 4000,
+    "totalSavings": 2100,
+    "savingsRate": 34.4,
+    "insights": ["Excellent savings rate, one of the best this year!"]
+  },
+  {
+    "id": "rep_2025_08",
+    "month": "August",
+    "year": 2025,
+    "totalIncome": 5500,
+    "totalExpenses": 4100,
+    "totalSavings": 1400,
+    "savingsRate": 25.5,
+    "insights": ["Income dipped slightly but you maintained a decent savings buffer."]
+  },
+  {
+    "id": "rep_2025_07",
+    "month": "July",
+    "year": 2025,
+    "totalIncome": 5200,
+    "totalExpenses": 3500,
+    "totalSavings": 1700,
+    "savingsRate": 32.7,
+    "insights": ["A strong start to your financial tracking journey!"]
   }
 ]

@@ -51,18 +51,31 @@ export interface Article {
   bookmarked: boolean;
   author: string;
   date: string;
+  updatedAt?: string;
+  difficulty?: "Beginner" | "Intermediate" | "Advanced";
+  relatedSlugs?: string[];
   tags: string[];
   imageUrl?: string;
 }
 
 export type ArticleCategory =
+  | "Personal Finance"
+  | "Budgeting"
+  | "Emergency Funds"
+  | "Savings Accounts"
+  | "Fixed Deposits (FD)"
+  | "Recurring Deposits (RD)"
   | "Stocks"
   | "ETFs"
   | "Mutual Funds"
-  | "SIP"
-  | "Banking"
+  | "SIPs"
+  | "Index Funds"
+  | "Gold Investments"
+  | "Bonds"
+  | "Credit Cards"
+  | "Loans"
   | "Taxes"
-  | "Budgeting";
+  | "Financial Planning";
 
 export interface KPIData {
   title: string;
@@ -101,6 +114,7 @@ export interface HealthMetric {
   title: string;
   score: number;
   maxScore: number;
+  displayValue?: string;
   status: "excellent" | "good" | "fair" | "poor";
   description: string;
   icon: string;
