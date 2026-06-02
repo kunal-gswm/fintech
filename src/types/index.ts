@@ -41,8 +41,10 @@ export interface ChatMessage {
 
 export interface Article {
   id: string;
+  slug?: string;
   title: string;
   description: string;
+  content?: string;
   category: ArticleCategory;
   readTime: number;
   progress: number;

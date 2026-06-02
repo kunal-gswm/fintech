@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 import { useSidebarStore } from "@/store/sidebar-store";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -103,8 +104,8 @@ function NavLink({
 
   if (isCollapsed) {
     return (
-      <Tooltip delayDuration={0}>
-        <TooltipTrigger asChild>{link}</TooltipTrigger>
+      <Tooltip>
+        <TooltipTrigger className={buttonVariants({ variant: isActive ? "default" : "ghost", className: cn("h-11 w-full justify-start", isCollapsed && "justify-center px-0") })}>{link}</TooltipTrigger>
         <TooltipContent side="right" className="font-medium">
           {item.title}
         </TooltipContent>

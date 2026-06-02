@@ -10,7 +10,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const { isCollapsed } = useSidebarStore();
 
   return (
-    <TooltipProvider delayDuration={0}>
+    <TooltipProvider delay={0}>
       <div className="min-h-screen bg-background">
         <Sidebar />
         <motion.div

@@ -7,23 +7,24 @@ const EXPENSES_FILE = "expenses.json";
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
     const validatedData = expenseSchema.parse(body);
     
     const expenses = await readData<Expense[]>(EXPENSES_FILE);
-    const index = expenses.findIndex((e) => e.id === params.id);
+    const index = expenses.findIndex((e) => e.id === id);
     
     if (index === -1) {
       return NextResponse.json({ error: "Expense not found" }, { status: 404 });
     }
     
-    const updatedExpense: Expense = {
+    const updatedExpense = {
       ...expenses[index],
       ...validatedData,
-    };
+    } as Expense;
     
     expenses[index] = updatedExpense;
     await writeData(EXPENSES_FILE, expenses);
@@ -45,11 +46,12 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const expenses = await readData<Expense[]>(EXPENSES_FILE);
-    const filteredExpenses = expenses.filter((e) => e.id !== params.id);
+    const filteredExpenses = expenses.filter((e) => e.id !== id);
     
     if (expenses.length === filteredExpenses.length) {
       return NextResponse.json({ error: "Expense not found" }, { status: 404 });

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { readData, writeData } from "@/lib/db";
 import { chatRequestSchema } from "@/lib/validations";
+import type { ChatMessage, Expense } from "@/types";
 
 const CHAT_FILE = "chat-history.json";
 const PROFILE_FILE = "profile.json";
@@ -34,11 +35,11 @@ export async function POST(request: Request) {
 
     // Read context data
     const profile = await readData(PROFILE_FILE).catch(() => ({}));
-    const expenses = await readData(EXPENSES_FILE).catch(() => []);
-    const history = await readData<any[]>(CHAT_FILE).catch(() => []);
+    const expenses = await readData<Expense[]>(EXPENSES_FILE).catch(() => [] as Expense[]);
+    const history = await readData<ChatMessage[]>(CHAT_FILE).catch(() => [] as ChatMessage[]);
 
     // Save user message
-    const userMessage = {
+    const userMessage: ChatMessage = {
       id: Date.now().toString(),
       role: "user",
       content: message,
@@ -78,7 +79,7 @@ export async function POST(request: Request) {
     }
 
     // Save AI response
-    const aiMessage = {
+    const aiMessage: ChatMessage = {
       id: (Date.now() + 1).toString(),
       role: "assistant",
       content: aiResponseContent,

@@ -12,9 +12,9 @@ import {
   CreditCard,
   HelpCircle,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
@@ -88,16 +88,11 @@ export function Navbar() {
 
         {/* Notifications */}
         <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="ghost" size="icon" className="relative h-9 w-9">
-              <Bell className="h-4 w-4" />
-              {unreadCount > 0 && (
-                <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
-                  {unreadCount}
-                </span>
-              )}
-              <span className="sr-only">Notifications</span>
-            </Button>
+          <PopoverTrigger className={buttonVariants({ variant: "ghost", size: "icon", className: "relative h-9 w-9" })}>
+            <Bell className="h-4 w-4" />
+            {unreadCount > 0 && (
+              <span className="absolute top-2 right-2.5 h-2 w-2 rounded-full bg-red-500 ring-2 ring-background" />
+            )}
           </PopoverTrigger>
           <PopoverContent align="end" className="w-80 p-0">
             <div className="border-b px-4 py-3">
@@ -142,17 +137,11 @@ export function Navbar() {
 
         {/* Profile Dropdown */}
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-9 gap-2 pl-2 pr-3">
-              <Avatar className="h-7 w-7">
-                <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
-                  AK
-                </AvatarFallback>
-              </Avatar>
-              <span className="hidden text-sm font-medium md:block">
-                Arjun K.
-              </span>
-            </Button>
+          <DropdownMenuTrigger className={buttonVariants({ variant: "ghost", size: "icon", className: "h-9 w-9 rounded-full ring-2 ring-border overflow-hidden" })}>
+            <Avatar className="h-9 w-9">
+              <AvatarImage src="/avatar.jpg" alt="User Avatar" />
+              <AvatarFallback>S</AvatarFallback>
+            </Avatar>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>

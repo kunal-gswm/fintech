@@ -24,10 +24,10 @@ export async function POST(request: Request) {
     
     const expenses = await readData<Expense[]>(EXPENSES_FILE);
     
-    const newExpense: Expense = {
+    const newExpense = {
       id: Date.now().toString(),
       ...validatedData,
-    };
+    } as Expense;
     
     expenses.push(newExpense);
     await writeData(EXPENSES_FILE, expenses);

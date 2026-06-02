@@ -6,11 +6,12 @@ const ARTICLES_FILE = "articles.json";
 
 export async function GET(
   request: Request,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
+    const { slug } = await params;
     const articles = await readData<Article[]>(ARTICLES_FILE);
-    const article = articles.find((a) => a.slug === params.slug);
+    const article = articles.find((a) => a.slug === slug);
     
     if (!article) {
       return NextResponse.json({ error: "Article not found" }, { status: 404 });
