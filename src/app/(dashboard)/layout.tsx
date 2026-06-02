@@ -9,10 +9,12 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <BiometricLockProvider>
+    <>
       <UpdateNotifier />
       <AnimatedSplash />
-      <AppShell>{children}</AppShell>
-    </BiometricLockProvider>
+      <BiometricLockProvider>
+        <AppShell>{children}</AppShell>
+      </BiometricLockProvider>
+    </>
   );
 }

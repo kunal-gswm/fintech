@@ -2,11 +2,22 @@
 
 import { useEffect, useState } from "react";
 import { Landmark } from "lucide-react";
+import { SplashScreen } from "@capacitor/splash-screen";
 
 export function AnimatedSplash() {
   const [stage, setStage] = useState<"loading" | "zooming" | "splitting" | "done">("loading");
 
   useEffect(() => {
+    // Hide the native OS splash screen instantly once React is ready!
+    const hideNativeSplash = async () => {
+      try {
+        await SplashScreen.hide();
+      } catch (e) {
+        // Ignore if running in web browser
+      }
+    };
+    hideNativeSplash();
+
     // 1. Show logo for 1.2 seconds
     const t1 = setTimeout(() => {
       setStage("zooming");
