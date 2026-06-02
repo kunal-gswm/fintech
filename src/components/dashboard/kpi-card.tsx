@@ -104,7 +104,7 @@ export function KPICards() {
   }, [expenseCount]); // Depend on expenseCount so mutations trigger a sync
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+    <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
       {data.map((kpi, i) => {
         const Icon = iconMap[kpi.icon] || TrendingUp;
         const colors = colorMap[kpi.title] || {

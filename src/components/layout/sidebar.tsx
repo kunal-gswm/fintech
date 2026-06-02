@@ -116,8 +116,10 @@ function NavLink({
   return link;
 }
 
-function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
-  const { isCollapsed, toggle } = useSidebarStore();
+function SidebarContent({ onNavigate, forceExpanded }: { onNavigate?: () => void, forceExpanded?: boolean }) {
+  const store = useSidebarStore();
+  const isCollapsed = forceExpanded ? false : store.isCollapsed;
+  const toggle = store.toggle;
 
   return (
     <div className="flex h-full flex-col">
@@ -222,7 +224,7 @@ export function Sidebar() {
           <SheetHeader className="sr-only">
             <SheetTitle>Navigation Menu</SheetTitle>
           </SheetHeader>
-          <SidebarContent onNavigate={() => setMobileOpen(false)} />
+          <SidebarContent onNavigate={() => setMobileOpen(false)} forceExpanded={true} />
         </SheetContent>
       </Sheet>
     </>
