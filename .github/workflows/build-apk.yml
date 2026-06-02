@@ -2,8 +2,8 @@ name: Build Android APK
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
@@ -25,8 +25,14 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
+      - name: Generate Version Tag
+        id: version
+        run: echo "TAG=v1.2.${{ github.run_number }}" >> $GITHUB_ENV
+
       - name: Build Next.js App
         run: npm run build
+        env:
+          NEXT_PUBLIC_APP_VERSION: ${{ env.TAG }}
 
       - name: Sync Capacitor
         run: npx cap sync android
@@ -52,8 +58,9 @@ jobs:
 
       - name: Upload APK to Release
         uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/')
         with:
+          tag_name: ${{ env.TAG }}
+          name: Release ${{ env.TAG }}
           files: android/app/build/outputs/apk/debug/app-debug.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
