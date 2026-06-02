@@ -87,18 +87,11 @@ function NavLink({
           isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
         )}
       />
-      <AnimatePresence>
-        {!isCollapsed && (
-          <motion.span
-            initial={{ opacity: 0, width: 0 }}
-            animate={{ opacity: 1, width: "auto" }}
-            exit={{ opacity: 0, width: 0 }}
-            className="relative z-10 truncate"
-          >
-            {item.title}
-          </motion.span>
-        )}
-      </AnimatePresence>
+      {!isCollapsed && (
+        <span className="relative z-10 truncate">
+          {item.title}
+        </span>
+      )}
     </Link>
   );
 

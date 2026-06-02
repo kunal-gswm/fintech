@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/popover";
 import { useSidebarStore } from "@/store/sidebar-store";
 import { useThemeStore } from "@/store/theme-store";
+import { SearchDialog } from "@/components/shared/search-dialog";
 import { cn } from "@/lib/utils";
 
 const mockNotifications = [
@@ -65,6 +66,7 @@ export function Navbar() {
   const { setMobileOpen } = useSidebarStore();
   const { theme, toggleTheme } = useThemeStore();
   const [mounted, setMounted] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const unreadCount = mockNotifications.filter((n) => !n.read).length;
 
   useEffect(() => {
@@ -93,14 +95,18 @@ export function Navbar() {
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           placeholder="Search transactions, goals, articles..."
-          className="h-9 pl-9 bg-muted/50 border-0 focus-visible:ring-1"
+          className="h-9 pl-9 bg-muted/50 border-0 focus-visible:ring-1 cursor-pointer"
+          readOnly
+          onClick={() => setSearchOpen(true)}
         />
       </div>
 
       {/* Mobile search icon */}
-      <Button variant="ghost" size="icon" className="md:hidden">
+      <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setSearchOpen(true)}>
         <Search className="h-5 w-5" />
       </Button>
+
+      <SearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
 
       <div className="ml-auto flex items-center gap-1">
         {/* Theme Toggle */}

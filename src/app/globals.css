@@ -138,9 +138,20 @@
   }
   body {
     @apply bg-background text-foreground;
+    -webkit-tap-highlight-color: transparent;
   }
   html {
     @apply font-sans scroll-smooth;
+  }
+  /* Improve native feel on interactive elements */
+  button, a, input, [role="button"] {
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  /* Allow text selection only in areas where it makes sense */
+  .prose, p, h1, h2, h3, h4, h5, h6, span {
+    user-select: text;
+    -webkit-user-select: text;
   }
 }
 
