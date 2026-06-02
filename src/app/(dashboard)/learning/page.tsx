@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { PageHeader } from "@/components/shared/page-header";
 import { PageTransition } from "@/components/shared/page-transition";
@@ -17,7 +17,7 @@ import {
   BookmarkCheck,
   User,
 } from "lucide-react";
-import { mockArticles } from "@/lib/mock-data";
+import { getArticles } from "@/services/articles.service";
 import { ARTICLE_CATEGORIES } from "@/lib/constants";
 import type { Article } from "@/types";
 import { cn } from "@/lib/utils";
@@ -35,7 +35,17 @@ const categoryColors: Record<string, string> = {
 export default function LearningPage() {
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
-  const [articles, setArticles] = useState(mockArticles);
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    getArticles().then((data) => {
+      setArticles(data);
+      setIsLoading(false);
+    }).catch(console.error);
+  }, []);
+
+  if (isLoading) return <div className="flex h-64 items-center justify-center">Loading learning hub...</div>;
 
   const filtered = articles.filter((a) => {
     const matchesSearch =

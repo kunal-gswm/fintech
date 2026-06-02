@@ -11,7 +11,10 @@ import {
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { AnimatedCounter } from "@/components/shared/animated-counter";
-import { kpiData } from "@/lib/mock-data";
+import { useState, useEffect } from "react";
+import { getProfile } from "@/services/profile.service";
+import { getHealth } from "@/services/health.service";
+import { getAnalytics } from "@/services/analytics.service";
 import { cn } from "@/lib/utils";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -31,9 +34,64 @@ const colorMap: Record<string, { icon: string; bg: string }> = {
 };
 
 export function KPICards() {
+  const [data, setData] = useState<{title: string; value: number; prefix?: string; suffix?: string; trend: number; trendLabel: string; icon: string;}[]>([]);
+
+  useEffect(() => {
+    Promise.all([getProfile(), getHealth(), getAnalytics()])
+      .then(([profile, health, analytics]) => {
+        const income = profile.monthlyIncome || 85000;
+        const expenses = analytics.totalSpent || 42350;
+        const savingsRate = income > 0 ? ((income - expenses) / income) * 100 : 0;
+        
+        setData([
+          {
+            title: "Total Savings",
+            value: (income - expenses) * 12,
+            prefix: "₹",
+            trend: 12.5,
+            trendLabel: "vs last month",
+            icon: "PiggyBank",
+          },
+          {
+            title: "Monthly Expenses",
+            value: expenses,
+            prefix: "₹",
+            trend: -2.4,
+            trendLabel: "vs last month",
+            icon: "CreditCard",
+          },
+          {
+            title: "Monthly Income",
+            value: income,
+            prefix: "₹",
+            trend: 0,
+            trendLabel: "stable",
+            icon: "Wallet",
+          },
+          {
+            title: "Savings Rate",
+            value: savingsRate,
+            suffix: "%",
+            trend: 5.2,
+            trendLabel: "vs last month",
+            icon: "TrendingUp",
+          },
+          {
+            title: "Health Score",
+            value: health.score || 78,
+            suffix: "/100",
+            trend: 4,
+            trendLabel: "vs last month",
+            icon: "HeartPulse",
+          },
+        ]);
+      })
+      .catch(console.error);
+  }, []);
+
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-      {kpiData.map((kpi, i) => {
+      {data.map((kpi, i) => {
         const Icon = iconMap[kpi.icon] || TrendingUp;
         const colors = colorMap[kpi.title] || {
           icon: "text-blue-600",

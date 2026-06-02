@@ -7,10 +7,12 @@ export async function GET() {
   try {
     const reports = await readData(REPORTS_FILE);
     return NextResponse.json(reports);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to fetch reports" },
       { status: 500 }
     );
   }
 }
+
+

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { readData, writeData } from "@/lib/db";
+import { ZodError } from "zod";
 import { goalSchema } from "@/lib/validations";
 import type { Goal } from "@/types";
 
@@ -30,10 +31,10 @@ export async function PUT(
     await writeData(GOALS_FILE, goals);
     
     return NextResponse.json(updatedGoal);
-  } catch (error: any) {
-    if (error.name === "ZodError") {
+  } catch (error: unknown) {
+    if (error instanceof ZodError) {
       return NextResponse.json(
-        { error: "Validation failed", details: error.errors },
+        { error: "Validation failed", details: error.issues },
         { status: 400 }
       );
     }
@@ -60,7 +61,7 @@ export async function DELETE(
     await writeData(GOALS_FILE, filteredGoals);
     
     return new NextResponse(null, { status: 204 });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to delete goal" },
       { status: 500 }

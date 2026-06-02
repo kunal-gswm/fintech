@@ -1,3 +1,4 @@
+import { ZodError } from "zod";
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { readData, writeData } from "@/lib/db";
@@ -90,10 +91,10 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ message: aiMessage });
 
-  } catch (error: any) {
-    if (error.name === "ZodError") {
+  } catch (error: unknown) {
+    if (error instanceof ZodError) {
       return NextResponse.json(
-        { error: "Validation failed", details: error.errors },
+        { error: "Validation failed", details: error.issues },
         { status: 400 }
       );
     }
@@ -108,10 +109,13 @@ export async function GET() {
   try {
     const history = await readData(CHAT_FILE);
     return NextResponse.json(history);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
-      { error: "Failed to fetch chat history" },
+      { error: "Failed to generate AI response" },
       { status: 500 }
     );
   }
 }
+
+
+

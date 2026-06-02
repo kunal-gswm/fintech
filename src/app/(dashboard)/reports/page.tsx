@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { PageHeader } from "@/components/shared/page-header";
 import { PageTransition } from "@/components/shared/page-transition";
@@ -32,12 +32,33 @@ import {
   PiggyBank,
   Lightbulb,
 } from "lucide-react";
-import { mockReports, monthlyData } from "@/lib/mock-data";
+import { getReports } from "@/services/reports.service";
+import { getAnalytics } from "@/services/analytics.service";
+import type { Report, MonthlyData } from "@/types";
 
 export default function ReportsPage() {
-  const [selectedReport, setSelectedReport] = useState(mockReports[0]);
+  const [reports, setReports] = useState<Report[]>([]);
+  const [selectedReport, setSelectedReport] = useState<Report | null>(null);
+  const [chartData, setChartData] = useState<MonthlyData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const chartData = monthlyData.slice(-6);
+  useEffect(() => {
+    Promise.all([getReports(), getAnalytics()]).then(([reportsData, analyticsData]) => {
+      setReports(reportsData);
+      if (reportsData.length > 0) setSelectedReport(reportsData[0]);
+      setChartData(
+        (analyticsData.monthlyTrend || []).map((m: {month: string; income: number; expenses: number}) => ({
+          ...m,
+          savings: m.income - m.expenses,
+        }))
+      );
+      setIsLoading(false);
+    }).catch(console.error);
+  }, []);
+
+  if (isLoading || !selectedReport) {
+    return <div className="flex h-64 items-center justify-center">Loading reports...</div>;
+  }
 
   return (
     <PageTransition>
@@ -62,7 +83,7 @@ export default function ReportsPage() {
         <Select
           value={selectedReport.id}
           onValueChange={(v) => {
-            const report = mockReports.find((r) => r.id === v);
+            const report = reports.find((r) => r.id === v);
             if (report) setSelectedReport(report);
           }}
         >
@@ -70,7 +91,7 @@ export default function ReportsPage() {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {mockReports.map((r) => (
+            {reports.map((r) => (
               <SelectItem key={r.id} value={r.id}>
                 {r.month} {r.year}
               </SelectItem>

@@ -10,13 +10,29 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Card } from "@/components/ui/card";
-import { monthlyData } from "@/lib/mock-data";
+import { useState, useEffect } from "react";
+import { getAnalytics } from "@/services/analytics.service";
+import type { MonthlyData } from "@/types";
 
 export function SavingsGrowthChart() {
-  const cumulativeData = monthlyData.reduce(
+  const [data, setData] = useState<MonthlyData[]>([]);
+
+  useEffect(() => {
+    getAnalytics().then((res) => {
+      setData(
+        (res.monthlyTrend || []).map((m: {month: string; income: number; expenses: number}) => ({
+          ...m,
+          savings: m.income - m.expenses,
+        }))
+      );
+    }).catch(console.error);
+  }, []);
+
+  const cumulativeData = data.reduce(
     (acc, d) => {
       const prev = acc.length > 0 ? acc[acc.length - 1].cumulative : 0;
-      acc.push({ month: d.month, savings: d.savings, cumulative: prev + d.savings });
+      const savings = (d.income || 0) - (d.expenses || 0);
+      acc.push({ month: d.month, savings, cumulative: prev + savings });
       return acc;
     },
     [] as { month: string; savings: number; cumulative: number }[]

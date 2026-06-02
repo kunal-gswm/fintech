@@ -31,8 +31,34 @@ import {
 } from "@/components/ui/popover";
 import { useSidebarStore } from "@/store/sidebar-store";
 import { useThemeStore } from "@/store/theme-store";
-import { mockNotifications } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
+
+const mockNotifications = [
+  {
+    id: "1",
+    title: "Salary Credited",
+    description: "₹85,000 has been credited to your HDFC account",
+    time: "2 hours ago",
+    type: "success",
+    read: false,
+  },
+  {
+    id: "2",
+    title: "Budget Alert",
+    description: "You've exceeded your dining budget for this month",
+    time: "5 hours ago",
+    type: "warning",
+    read: false,
+  },
+  {
+    id: "3",
+    title: "New Insight",
+    description: "AI has generated a new tip to optimize your taxes",
+    time: "1 day ago",
+    type: "info",
+    read: true,
+  },
+];
 
 export function Navbar() {
   const { setMobileOpen } = useSidebarStore();

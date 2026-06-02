@@ -4,7 +4,9 @@ import { CreditCard, Target, Sparkles } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { mockActivities } from "@/lib/mock-data";
+import { useState, useEffect } from "react";
+import { getExpenses } from "@/services/expenses.service";
+import { getGoals } from "@/services/goals.service";
 import { cn } from "@/lib/utils";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -26,6 +28,36 @@ const typeIconColors = {
 };
 
 export function ActivityFeed() {
+  const [activities, setActivities] = useState<{id: string; title: string; description: string; amount?: number; type: "expense" | "goal" | "ai_recommendation"; icon: string; timestamp: string;}[]>([]);
+
+  useEffect(() => {
+    Promise.all([getExpenses(), getGoals()]).then(([expenses, goals]) => {
+      const feed: {id: string; title: string; description: string; amount?: number; type: "expense" | "goal" | "ai_recommendation"; icon: string; timestamp: string;}[] = expenses.map((e) => ({
+        id: e.id,
+        title: e.title,
+        description: e.category as string,
+        amount: e.amount,
+        type: "expense" as const,
+        icon: "CreditCard",
+        timestamp: new Date(e.date).toLocaleDateString(),
+      }));
+      
+      goals.forEach((g) => {
+        feed.push({
+          id: g.id,
+          title: g.title,
+          description: "Goal target set",
+          amount: undefined,
+          type: "goal" as const,
+          icon: "Target",
+          timestamp: new Date(g.deadline).toLocaleDateString(),
+        });
+      });
+
+      setActivities(feed.sort(() => Math.random() - 0.5)); // shuffle for visual variety
+    }).catch(console.error);
+  }, []);
+
   return (
     <Card className="p-6">
       <div className="mb-4 flex items-center justify-between">
@@ -36,12 +68,12 @@ export function ActivityFeed() {
           </p>
         </div>
         <Badge variant="secondary" className="text-xs">
-          {mockActivities.length} items
+          {activities.length} items
         </Badge>
       </div>
       <ScrollArea className="h-[360px]">
         <div className="space-y-3 pr-4">
-          {mockActivities.map((activity) => {
+          {activities.map((activity) => {
             const Icon = iconMap[activity.icon] || CreditCard;
             return (
               <div

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { readData, writeData } from "@/lib/db";
 import { profileSchema } from "@/lib/validations";
+import { ZodError } from "zod";
 
 const PROFILE_FILE = "profile.json";
 
@@ -8,7 +9,7 @@ export async function GET() {
   try {
     const profile = await readData(PROFILE_FILE);
     return NextResponse.json(profile);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to fetch profile" },
       { status: 500 }
@@ -24,7 +25,7 @@ export async function PUT(request: Request) {
     const validatedData = profileSchema.parse(body);
     
     // Read existing profile to preserve id and email if not in update
-    const existingProfile = await readData<any>(PROFILE_FILE);
+    const existingProfile = await readData<Record<string, unknown>>(PROFILE_FILE);
     
     const updatedProfile = {
       ...existingProfile,
@@ -34,10 +35,10 @@ export async function PUT(request: Request) {
     await writeData(PROFILE_FILE, updatedProfile);
     
     return NextResponse.json(updatedProfile);
-  } catch (error: any) {
-    if (error.name === "ZodError") {
+  } catch (error: unknown) {
+    if (error instanceof ZodError) {
       return NextResponse.json(
-        { error: "Validation failed", details: error.errors },
+        { error: "Validation failed", details: error.issues },
         { status: 400 }
       );
     }
@@ -47,3 +48,5 @@ export async function PUT(request: Request) {
     );
   }
 }
+
+

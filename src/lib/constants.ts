@@ -1,18 +1,3 @@
-import type { NavItem } from "@/types";
-
-export const APP_NAME = "AI Finance";
-
-export const NAV_ITEMS: NavItem[] = [
-  { title: "Dashboard", href: "/dashboard", icon: "LayoutDashboard" },
-  { title: "Financial Health", href: "/financial-health", icon: "HeartPulse" },
-  { title: "Expense Ledger", href: "/expenses", icon: "Receipt" },
-  { title: "Analytics", href: "/analytics", icon: "BarChart3" },
-  { title: "Goals", href: "/goals", icon: "Target" },
-  { title: "Learning Hub", href: "/learning", icon: "GraduationCap" },
-  { title: "AI Assistant", href: "/assistant", icon: "BotMessageSquare" },
-  { title: "Reports", href: "/reports", icon: "FileText" },
-  { title: "Settings", href: "/settings", icon: "Settings" },
-];
 
 export const EXPENSE_CATEGORIES = [
   "Food & Dining",

@@ -10,9 +10,24 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Card } from "@/components/ui/card";
-import { monthlyData } from "@/lib/mock-data";
+import { useState, useEffect } from "react";
+import { getAnalytics } from "@/services/analytics.service";
+import type { MonthlyData } from "@/types";
 
 export function ExpenseTrendChart() {
+  const [data, setData] = useState<MonthlyData[]>([]);
+
+  useEffect(() => {
+    getAnalytics().then((res) => {
+      setData(
+        (res.monthlyTrend || []).map((m: {month: string; income: number; expenses: number}) => ({
+          ...m,
+          savings: m.income - m.expenses,
+        }))
+      );
+    }).catch(console.error);
+  }, []);
+
   return (
     <Card className="p-6">
       <div className="mb-6 flex items-center justify-between">
@@ -36,7 +51,7 @@ export function ExpenseTrendChart() {
       <div className="h-[280px]">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
-            data={monthlyData}
+            data={data}
             margin={{ top: 5, right: 5, left: -20, bottom: 0 }}
           >
             <defs>

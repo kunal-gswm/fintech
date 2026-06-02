@@ -8,10 +8,25 @@ import {
   Tooltip,
 } from "recharts";
 import { Card } from "@/components/ui/card";
-import { categoryData } from "@/lib/mock-data";
+import { useState, useEffect } from "react";
+import { getAnalytics } from "@/services/analytics.service";
+
+const barColors = ["#2563EB", "#10B981", "#F59E0B", "#8B5CF6", "#EC4899", "#EF4444", "#84CC16"];
 
 export function CategoryBreakdownChart() {
-  const total = categoryData.reduce((sum, d) => sum + d.value, 0);
+  const [data, setData] = useState<{name: string; value: number; color: string}[]>([]);
+
+  useEffect(() => {
+    getAnalytics().then((res) => {
+      const categories = res.categoryBreakdown?.map((c: {name: string; value: number}, i: number) => ({
+        ...c,
+        color: barColors[i % barColors.length],
+      })) || [];
+      setData(categories);
+    }).catch(console.error);
+  }, []);
+
+  const total = data.reduce((sum, d) => sum + d.value, 0);
 
   return (
     <Card className="p-6">
@@ -26,7 +41,7 @@ export function CategoryBreakdownChart() {
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
-                data={categoryData}
+                data={data}
                 cx="50%"
                 cy="50%"
                 innerRadius={55}
@@ -35,7 +50,7 @@ export function CategoryBreakdownChart() {
                 dataKey="value"
                 stroke="none"
               >
-                {categoryData.map((entry, index) => (
+                {data.map((entry, index) => (
                   <Cell key={index} fill={entry.color} />
                 ))}
               </Pie>
@@ -61,7 +76,7 @@ export function CategoryBreakdownChart() {
           </div>
         </div>
         <div className="grid w-full gap-2">
-          {categoryData.map((cat) => (
+          {data.map((cat) => (
             <div key={cat.name} className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { PageHeader } from "@/components/shared/page-header";
 import { PageTransition } from "@/components/shared/page-transition";
@@ -40,7 +40,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string; style?: 
 };
 
 export default function GoalsPage() {
-  const { goals, addGoal, updateGoal } = useGoalStore();
+  const { goals, isLoading, fetchGoals, addGoal, updateGoal } = useGoalStore();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [addAmount, setAddAmount] = useState<{ id: string; amount: string } | null>(null);
 
@@ -50,6 +50,10 @@ export default function GoalsPage() {
     deadline: "",
     category: "",
   });
+
+  useEffect(() => {
+    fetchGoals();
+  }, [fetchGoals]);
 
   const handleSubmit = () => {
     if (!formData.title || !formData.targetAmount || !formData.deadline) return;
@@ -63,7 +67,6 @@ export default function GoalsPage() {
     );
 
     addGoal({
-      id: Date.now().toString(),
       title: formData.title,
       targetAmount: target,
       currentAmount: 0,
@@ -102,7 +105,11 @@ export default function GoalsPage() {
           </Button>
         </PageHeader>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {isLoading ? (
+          <div className="flex h-32 items-center justify-center">Loading goals...</div>
+        ) : (
+          <>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {goals.map((goal, i) => {
             const Icon = iconMap[goal.icon] || Target;
             const progress = (goal.currentAmount / goal.targetAmount) * 100;
@@ -209,6 +216,8 @@ export default function GoalsPage() {
             );
           })}
         </div>
+          </>
+        )}
 
         {/* Add Goal Dialog */}
         <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>

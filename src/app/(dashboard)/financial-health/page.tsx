@@ -1,39 +1,31 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { PageHeader } from "@/components/shared/page-header";
 import { PageTransition } from "@/components/shared/page-transition";
 import { HealthScoreRing } from "@/components/financial-health/health-score-ring";
 import { MetricCard } from "@/components/financial-health/metric-card";
 import { Card } from "@/components/ui/card";
-import { healthMetrics } from "@/lib/mock-data";
 import { Lightbulb, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { getHealth } from "@/services/health.service";
+import type { HealthMetric } from "@/types";
 
-const recommendations = [
-  {
-    title: "Build Your Emergency Fund",
-    description: "You're 2 months short of the recommended 6-month emergency fund. Increase monthly allocation by ₹5,000.",
-    priority: "high",
-  },
-  {
-    title: "Review Insurance Coverage",
-    description: "Consider a term life insurance policy for better risk coverage. This could improve your Risk Level score by 20 points.",
-    priority: "medium",
-  },
-  {
-    title: "Start a Debt Fund SIP",
-    description: "Adding a debt fund will improve portfolio diversification. Recommended: ₹3,000/month in a short-duration debt fund.",
-    priority: "low",
-  },
-];
 
-const priorityColors = {
+const priorityColors: Record<string, string> = {
   high: "border-l-red-500 bg-red-500/5",
   medium: "border-l-amber-500 bg-amber-500/5",
   low: "border-l-blue-500 bg-blue-500/5",
 };
 
 export default function FinancialHealthPage() {
+  const [healthData, setHealthData] = useState<{score: number; metrics: HealthMetric[]; recommendations: string[]} | null>(null);
+
+  useEffect(() => {
+    getHealth().then(setHealthData).catch(console.error);
+  }, []);
+
+  if (!healthData) return <div className="flex h-64 items-center justify-center">Loading health...</div>;
   return (
     <PageTransition>
       <div className="space-y-6">
@@ -45,12 +37,12 @@ export default function FinancialHealthPage() {
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Score Ring */}
           <Card className="flex items-center justify-center p-8 lg:row-span-2">
-            <HealthScoreRing score={78} />
+            <HealthScoreRing score={healthData.score} />
           </Card>
 
           {/* Metrics */}
           <div className="grid gap-4 sm:grid-cols-2 lg:col-span-2">
-            {healthMetrics.map((metric, i) => (
+            {healthData.metrics?.map((metric: HealthMetric, i: number) => (
               <MetricCard key={metric.title} metric={metric} index={i} />
             ))}
           </div>
@@ -63,14 +55,14 @@ export default function FinancialHealthPage() {
             AI Recommendations
           </h2>
           <div className="grid gap-4 md:grid-cols-3">
-            {recommendations.map((rec) => (
+            {healthData.recommendations?.map((rec: string, i: number) => (
               <Card
-                key={rec.title}
-                className={`border-l-4 p-5 ${priorityColors[rec.priority as keyof typeof priorityColors]}`}
+                key={i}
+                className={`border-l-4 p-5 ${priorityColors[i % 3 === 0 ? "high" : i % 3 === 1 ? "medium" : "low"]}`}
               >
-                <h3 className="text-sm font-semibold">{rec.title}</h3>
+                <h3 className="text-sm font-semibold">Tip</h3>
                 <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                  {rec.description}
+                  {rec}
                 </p>
                 <Button
                   variant="ghost"

@@ -1,4 +1,5 @@
 "use client";
+import { useState, useEffect } from "react";
 
 import { PageHeader } from "@/components/shared/page-header";
 import { PageTransition } from "@/components/shared/page-transition";
@@ -17,7 +18,7 @@ import {
   LineChart,
   Line,
 } from "recharts";
-import { categoryData, monthlyData } from "@/lib/mock-data";
+import { getAnalytics } from "@/services/analytics.service";
 import { Sparkles, TrendingUp, AlertCircle } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -63,7 +64,21 @@ const insightIconStyles = {
 };
 
 export default function AnalyticsPage() {
-  const total = categoryData.reduce((s, d) => s + d.value, 0);
+  const [data, setData] = useState<{categoryBreakdown: {name: string; value: number; color: string}[]; monthlyTrend: {month: string; income: number; expenses: number}[]} | null>(null);
+
+  useEffect(() => {
+    getAnalytics().then((res) => {
+      const categories = res.categoryBreakdown.map((c: {name: string; value: number}, i: number) => ({
+        ...c,
+        color: barColors[i % barColors.length],
+      }));
+      setData({ ...res, categoryBreakdown: categories });
+    }).catch(console.error);
+  }, []);
+
+  if (!data) return <div className="flex h-64 items-center justify-center">Loading analytics...</div>;
+
+  const total = data.categoryBreakdown.reduce((s: number, d: {value: number}) => s + d.value, 0);
 
   return (
     <PageTransition>
@@ -86,7 +101,7 @@ export default function AnalyticsPage() {
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
-                      data={categoryData}
+                      data={data.categoryBreakdown}
                       cx="50%"
                       cy="50%"
                       innerRadius={60}
@@ -95,7 +110,7 @@ export default function AnalyticsPage() {
                       dataKey="value"
                       stroke="none"
                     >
-                      {categoryData.map((entry, i) => (
+                      {data.categoryBreakdown.map((entry: {color: string}, i: number) => (
                         <Cell key={i} fill={entry.color} />
                       ))}
                     </Pie>
@@ -120,21 +135,18 @@ export default function AnalyticsPage() {
                   </span>
                 </div>
               </div>
-              <div className="grid w-full gap-2.5">
-                {categoryData.map((cat) => (
-                  <div
-                    key={cat.name}
-                    className="flex items-center justify-between"
-                  >
+              <div className="flex-1 space-y-3 w-full">
+                {data.categoryBreakdown.map((item: {name: string; color: string; value: number}) => (
+                  <div key={item.name} className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div
                         className="h-3 w-3 rounded-full"
-                        style={{ backgroundColor: cat.color }}
+                        style={{ backgroundColor: item.color }}
                       />
-                      <span className="text-xs">{cat.name}</span>
+                      <span className="text-xs">{item.name}</span>
                     </div>
                     <span className="text-xs font-medium">
-                      {((cat.value / total) * 100).toFixed(1)}%
+                      {((item.value / total) * 100).toFixed(1)}%
                     </span>
                   </div>
                 ))}
@@ -151,7 +163,7 @@ export default function AnalyticsPage() {
             <div className="mt-4 h-[280px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
-                  data={[...categoryData].sort((a, b) => b.value - a.value)}
+                  data={data.categoryBreakdown}
                   layout="vertical"
                   margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
                 >
@@ -188,11 +200,9 @@ export default function AnalyticsPage() {
                     ]}
                   />
                   <Bar dataKey="value" radius={[0, 6, 6, 0]} barSize={20}>
-                    {[...categoryData]
-                      .sort((a, b) => b.value - a.value)
-                      .map((_, i) => (
-                        <Cell key={i} fill={barColors[i % barColors.length]} />
-                      ))}
+                    {data.categoryBreakdown.map((entry: {color: string}, i: number) => (
+                      <Cell key={i} fill={entry.color} />
+                    ))}
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
@@ -226,7 +236,7 @@ export default function AnalyticsPage() {
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
-                  data={monthlyData}
+                  data={data.monthlyTrend}
                   margin={{ top: 5, right: 5, left: -20, bottom: 0 }}
                 >
                   <CartesianGrid

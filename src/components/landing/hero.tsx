@@ -119,12 +119,12 @@ export function HeroSection() {
                     color: "text-emerald-600",
                     bg: "bg-emerald-500/10",
                   },
-                ].map((kpi) => (
+                ].map((kpi, i) => (
                   <motion.div
                     key={kpi.label}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 + Math.random() * 0.3 }}
+                    transition={{ delay: 0.5 + i * 0.1 }}
                     className="rounded-xl border border-border bg-background p-3"
                   >
                     <div className={`mb-1 inline-flex rounded-lg p-1.5 ${kpi.bg}`}>
@@ -150,13 +150,13 @@ export function HeroSection() {
                       <motion.div
                         key={i}
                         initial={{ height: 0 }}
-                        animate={{ height: `${h}%` }}
-                        transition={{ delay: 0.8 + i * 0.05, duration: 0.4 }}
-                        className="flex-1 rounded-sm bg-primary/20"
+                        animate={{ height: "100%" }}
+                        transition={{ delay: 0.7 + i * 0.05, duration: 0.8 }}
+                        className="w-full flex-1 rounded-sm bg-primary/20"
                       >
                         <div
                           className="w-full rounded-sm bg-primary"
-                          style={{ height: `${60 + Math.random() * 40}%` }}
+                          style={{ height: `${60 + (i % 3) * 15}%` }}
                         />
                       </motion.div>
                     )

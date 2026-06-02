@@ -16,8 +16,14 @@ import {
   BotMessageSquare,
 } from "lucide-react";
 import { useChatStore } from "@/store/chat-store";
-import { suggestedPrompts } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
+
+const suggestedPrompts = [
+  "How can I save more money?",
+  "Should I invest in mutual funds or ETFs?",
+  "How can I optimize my taxes?",
+  "Review my spending habits",
+];
 
 function TypingIndicator() {
   return (
@@ -50,29 +56,16 @@ export default function AssistantPage() {
     }
   }, [messages, isTyping]);
 
+  const submitMessage = async (message: string) => {
+    await useChatStore.getState().sendMessage(message);
+  };
+
   const handleSend = (text?: string) => {
     const message = text || input.trim();
     if (!message) return;
 
-    addMessage({
-      id: Date.now().toString(),
-      role: "user",
-      content: message,
-      timestamp: new Date().toISOString(),
-    });
     setInput("");
-    setTyping(true);
-
-    // Simulate AI response
-    setTimeout(() => {
-      setTyping(false);
-      addMessage({
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content: generateResponse(message),
-        timestamp: new Date().toISOString(),
-      });
-    }, 1500 + Math.random() * 1000);
+    submitMessage(message);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -223,19 +216,4 @@ export default function AssistantPage() {
   );
 }
 
-function generateResponse(input: string): string {
-  const lower = input.toLowerCase();
-  if (lower.includes("saving") || lower.includes("save")) {
-    return "Based on your current income of ₹85,000 and expenses of ₹42,350, you're saving 50.2% of your income — that's excellent!\n\nHere are some ways to boost your savings further:\n\n1. **Optimize food spending** — You spent ₹3,270 on food delivery. Meal prepping could save ₹1,500/month.\n2. **Review subscriptions** — Check for unused streaming services.\n3. **Automate savings** — Set up auto-transfers on salary day.\n\nWould you like me to create a detailed savings plan?";
-  }
-  if (lower.includes("invest") || lower.includes("sip") || lower.includes("mutual")) {
-    return "Great question! Based on your risk profile and savings rate, here's what I recommend:\n\n**Current Investments:**\n- SIP in HDFC Equity Fund: ₹5,000/month\n- PPF: ₹10,000/month\n\n**Suggestions:**\n1. Increase equity SIP by ₹3,000 (you can afford it)\n2. Start a debt fund SIP of ₹2,000 for portfolio balance\n3. Consider Nifty 50 index fund for passive exposure\n\nYour total monthly investment capacity is around ₹20,000-25,000 while maintaining a healthy emergency fund. Shall I break this down further?";
-  }
-  if (lower.includes("budget") || lower.includes("spend")) {
-    return "Here's your spending analysis for December:\n\n**50/30/20 Rule Assessment:**\n- **Needs (50%):** ₹21,175 — ✅ On track\n- **Wants (30%):** ₹12,705 — ✅ On track\n- **Savings (20%):** ₹42,650 — 🌟 Exceeding target!\n\n**Top optimization opportunities:**\n1. Shopping (₹9,398) — Implement a 48-hour rule\n2. Food delivery (₹3,270) — Reduce by cooking more\n3. Transportation (₹2,130) — Consider monthly passes\n\nWould you like a customized budget for January?";
-  }
-  if (lower.includes("tax")) {
-    return "Here's your tax optimization guide for FY 2025-26:\n\n**Section 80C (₹1.5L limit):**\n- PPF: ₹1,20,000 ✅\n- ELSS SIP: Consider starting ₹30,000/year\n\n**Section 80D (Health Insurance):**\n- Self: Up to ₹25,000 deduction\n- Parents: Additional ₹50,000 if senior citizens\n\n**Other deductions:**\n- NPS (80CCD): Additional ₹50,000\n- Home loan interest (24b): Up to ₹2L\n\nEstimated tax savings potential: ₹45,000-65,000. Want me to create a tax-saving investment plan?";
-  }
-  return "That's a great question! Let me analyze your financial data to give you a personalized answer.\n\nBased on your profile:\n- Monthly income: ₹85,000\n- Monthly expenses: ₹42,350\n- Savings rate: 50.2%\n- Financial health score: 78/100\n\nYour finances are in good shape overall. Your strongest area is your savings rate, and the biggest opportunity for improvement is building your emergency fund to 6 months of expenses.\n\nWould you like me to dive deeper into any specific area — budgeting, investments, tax planning, or goal tracking?";
-}
+

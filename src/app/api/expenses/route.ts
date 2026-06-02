@@ -1,3 +1,4 @@
+import { ZodError } from "zod";
 import { NextResponse } from "next/server";
 import { readData, writeData } from "@/lib/db";
 import { expenseSchema } from "@/lib/validations";
@@ -9,7 +10,7 @@ export async function GET() {
   try {
     const expenses = await readData<Expense[]>(EXPENSES_FILE);
     return NextResponse.json(expenses);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to fetch expenses" },
       { status: 500 }
@@ -33,10 +34,10 @@ export async function POST(request: Request) {
     await writeData(EXPENSES_FILE, expenses);
     
     return NextResponse.json(newExpense, { status: 201 });
-  } catch (error: any) {
-    if (error.name === "ZodError") {
+  } catch (error: unknown) {
+    if (error instanceof ZodError) {
       return NextResponse.json(
-        { error: "Validation failed", details: error.errors },
+        { error: "Validation failed", details: error.issues },
         { status: 400 }
       );
     }
@@ -46,3 +47,6 @@ export async function POST(request: Request) {
     );
   }
 }
+
+
+

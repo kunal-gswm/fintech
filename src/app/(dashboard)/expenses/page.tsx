@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PageHeader } from "@/components/shared/page-header";
 import { PageTransition } from "@/components/shared/page-transition";
 import { Button } from "@/components/ui/button";
@@ -48,7 +48,7 @@ import type { Expense, ExpenseCategory } from "@/types";
 const ITEMS_PER_PAGE = 8;
 
 export default function ExpensesPage() {
-  const { expenses, addExpense, updateExpense, deleteExpense } =
+  const { expenses, isLoading, fetchExpenses, addExpense, updateExpense, deleteExpense } =
     useExpenseStore();
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
@@ -66,6 +66,10 @@ export default function ExpensesPage() {
     date: "",
     notes: "",
   });
+
+  useEffect(() => {
+    fetchExpenses();
+  }, [fetchExpenses]);
 
   const filtered = expenses.filter((e) => {
     const matchesSearch =
@@ -114,7 +118,6 @@ export default function ExpensesPage() {
       });
     } else {
       addExpense({
-        id: Date.now().toString(),
         title: formData.title,
         category: formData.category as ExpenseCategory,
         amount: parseFloat(formData.amount),
@@ -143,7 +146,11 @@ export default function ExpensesPage() {
           </Button>
         </PageHeader>
 
-        {/* Filters */}
+        {isLoading ? (
+          <div className="flex h-32 items-center justify-center">Loading expenses...</div>
+        ) : (
+          <>
+            {/* Filters */}
         <Card className="p-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <div className="relative flex-1">
@@ -417,6 +424,8 @@ export default function ExpensesPage() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+          </>
+        )}
       </div>
     </PageTransition>
   );
