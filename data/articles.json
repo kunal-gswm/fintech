@@ -1,0 +1,26 @@
+[
+  {
+    "id": "art_1",
+    "slug": "understanding-etfs",
+    "title": "Understanding ETFs: A Beginner's Guide",
+    "description": "Learn what Exchange Traded Funds are and why they are a great starting point for new investors.",
+    "category": "ETFs",
+    "author": "Priya Sharma",
+    "readTime": 5,
+    "progress": 100,
+    "bookmarked": false,
+    "content": "Exchange Traded Funds (ETFs) are investment funds traded on stock exchanges, much like stocks. They hold assets such as stocks, commodities, or bonds and generally operate with an arbitrage mechanism designed to keep it trading close to its net asset value, although deviations can occasionally occur. ETFs offer lower expense ratios and fewer broker commissions than buying the stocks individually."
+  },
+  {
+    "id": "art_2",
+    "slug": "power-of-compounding",
+    "title": "The Power of Compounding in SIPs",
+    "description": "Discover how systematic investment plans can multiply your wealth over the long term through compounding.",
+    "category": "SIP",
+    "author": "Rahul Desai",
+    "readTime": 7,
+    "progress": 30,
+    "bookmarked": true,
+    "content": "Compounding is the process in which an asset's earnings, from either capital gains or interest, are reinvested to generate additional earnings over time. This growth, calculated using exponential functions, occurs because the investment will generate earnings from both its initial principal and the accumulated earnings from preceding periods. SIPs harness this power effectively by enforcing regular investments regardless of market conditions."
+  }
+]

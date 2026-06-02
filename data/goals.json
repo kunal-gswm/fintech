@@ -1,0 +1,24 @@
+[
+  {
+    "id": "1",
+    "title": "Emergency Fund",
+    "targetAmount": 300000,
+    "currentAmount": 120000,
+    "deadline": "2025-12-31",
+    "category": "Safety Net",
+    "icon": "Shield",
+    "color": "#10B981",
+    "monthlyTarget": 15000
+  },
+  {
+    "id": "2",
+    "title": "Europe Trip",
+    "targetAmount": 250000,
+    "currentAmount": 50000,
+    "deadline": "2024-10-01",
+    "category": "Travel",
+    "icon": "Plane",
+    "color": "#3B82F6",
+    "monthlyTarget": 25000
+  }
+]

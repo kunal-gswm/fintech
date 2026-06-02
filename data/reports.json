@@ -1,0 +1,16 @@
+[
+  {
+    "id": "rep_2023_12",
+    "month": "December",
+    "year": 2023,
+    "totalIncome": 85000,
+    "totalExpenses": 42350,
+    "totalSavings": 42650,
+    "savingsRate": 50.2,
+    "insights": [
+      "You achieved a savings rate of over 50%, which is excellent.",
+      "Food delivery expenses were slightly higher than the previous month.",
+      "You successfully met your monthly target for the Emergency Fund."
+    ]
+  }
+]
