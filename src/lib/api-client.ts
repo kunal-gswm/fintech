@@ -128,7 +128,7 @@ export async function apiClient<T>(url: string, options?: ApiClientOptions): Pro
     if (method === "POST") {
       const body = JSON.parse(options?.body as string);
       const userMsg = { id: Date.now().toString(), role: "user", content: body.message, timestamp: new Date().toISOString() };
-      const aiMsg = { id: (Date.now() + 1).toString(), role: "assistant", content: "I am running offline in Capacitor. I cannot connect to Ollama.", timestamp: new Date().toISOString() };
+      const aiMsg = { id: (Date.now() + 1).toString(), role: "assistant", content: "I am running offline in Capacitor. I cannot connect to the cloud.", timestamp: new Date().toISOString() };
       setLocalData("chat-history", [...history, userMsg, aiMsg]);
       return aiMsg as T;
     }

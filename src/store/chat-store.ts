@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { get, set, del } from "idb-keyval";
 import type { ChatMessage } from "@/types";
-import { sendChatMessage } from "@/services/chat.service";
+import { sendChatMessage, sendChatMessageStreaming } from "@/services/chat.service";
 
 const idbStorage = {
   getItem: async (name: string): Promise<string | null> => {
@@ -19,6 +19,7 @@ const idbStorage = {
 interface ChatState {
   messages: ChatMessage[];
   isTyping: boolean;
+  streamingContent: string;
   addMessage: (message: ChatMessage) => void;
   sendMessage: (content: string) => Promise<void>;
   setTyping: (typing: boolean) => void;
@@ -37,6 +38,7 @@ export const useChatStore = create<ChatState>()(
     (set, get) => ({
       messages: [welcomeMessage],
       isTyping: false,
+      streamingContent: "",
       addMessage: (message) =>
         set((state) => ({ messages: [...state.messages, message] })),
       sendMessage: async (content) => {
@@ -46,20 +48,53 @@ export const useChatStore = create<ChatState>()(
           content,
           timestamp: new Date().toISOString(),
         };
-        set((state) => ({ messages: [...state.messages, userMsg], isTyping: true }));
+        set((state) => ({ messages: [...state.messages, userMsg], isTyping: true, streamingContent: "" }));
+
+        // Try streaming first (on-device LLM)
+        const streamed = await sendChatMessageStreaming(
+          content,
+          // onChunk — update streaming content live
+          (chunk) => {
+            set((state) => ({ streamingContent: state.streamingContent + chunk }));
+          },
+          // onDone — commit the full response as a message
+          (fullResponse) => {
+            const aiMsg: ChatMessage = {
+              id: (Date.now() + 1).toString(),
+              role: "assistant",
+              content: fullResponse,
+              timestamp: new Date().toISOString(),
+            };
+            set((state) => ({
+              messages: [...state.messages, aiMsg],
+              isTyping: false,
+              streamingContent: "",
+            }));
+          },
+          // onError — fall through to non-streaming
+          (error) => {
+            console.warn("Streaming failed, will fall back:", error);
+          },
+        );
+
+        // If streaming was used successfully, we're done
+        if (streamed) return;
+
+        // Fallback: non-streaming (Gemini)
         try {
           const aiResponse = await sendChatMessage(content);
           set((state) => ({ messages: [...state.messages, aiResponse] }));
         } catch (e) {
           console.error("Chat error:", e);
         } finally {
-          set({ isTyping: false });
+          set({ isTyping: false, streamingContent: "" });
         }
       },
       setTyping: (typing) => set({ isTyping: typing }),
       clearMessages: () =>
         set({
           messages: [welcomeMessage],
+          streamingContent: "",
         }),
     }),
     {
@@ -68,3 +103,4 @@ export const useChatStore = create<ChatState>()(
     }
   )
 );
+

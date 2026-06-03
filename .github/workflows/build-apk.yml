@@ -50,17 +50,20 @@ jobs:
         working-directory: ./android
         run: ./gradlew assembleDebug
 
+      - name: Rename APK
+        run: mv android/app/build/outputs/apk/debug/app-debug.apk android/app/build/outputs/apk/debug/expanda.apk
+
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: app-debug-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: expanda-apk
+          path: android/app/build/outputs/apk/debug/expanda.apk
 
       - name: Upload APK to Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version.outputs.tag }}
           name: Release ${{ steps.version.outputs.tag }}
-          files: android/app/build/outputs/apk/debug/app-debug.apk
+          files: android/app/build/outputs/apk/debug/expanda.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

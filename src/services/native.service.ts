@@ -30,30 +30,7 @@ export class NativeService {
     }
   }
 
-  /**
-   * Request Biometric Authentication (FaceID / Fingerprint)
-   */
-  static async requestBiometrics(): Promise<boolean> {
-    if (!this.isNative()) {
-      // In a browser, we mock the biometrics success after a short delay
-      console.log('Mocking Biometric Authentication for Web...');
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      return true; 
-    }
 
-    try {
-      // Since we don't have the biometric plugin installed yet (due to native dependencies),
-      // we can return a mock success for now, or you can implement the plugin call here:
-      // const result = await NativeBiometric.verifyIdentity({ ... });
-      
-      // For now, simulating native success:
-      await new Promise(resolve => setTimeout(resolve, 500));
-      return true;
-    } catch (error) {
-      console.error('Biometric auth failed', error);
-      return false;
-    }
-  }
 
   /**
    * Open the native Camera to scan a receipt

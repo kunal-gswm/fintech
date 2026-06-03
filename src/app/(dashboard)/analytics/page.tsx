@@ -31,7 +31,7 @@ import {
 
 const barColors = ["#2563EB", "#10B981", "#F59E0B", "#8B5CF6", "#EC4899", "#EF4444", "#84CC16"];
 
-const aiInsights = [
+const defaultAiInsights = [
   {
     title: "Food spending trending up",
     description: "Your food & dining expenses have increased 15% month-over-month. Consider meal planning to reduce costs.",
@@ -58,6 +58,12 @@ const aiInsights = [
   },
 ];
 
+const iconComponentMap: Record<string, React.ElementType> = {
+  TrendingUp,
+  AlertCircle,
+  Sparkles,
+};
+
 const insightStyles = {
   warning: "border-l-amber-500 bg-amber-500/5",
   success: "border-l-emerald-500 bg-emerald-500/5",
@@ -72,15 +78,42 @@ const insightIconStyles = {
 
 export default function AnalyticsPage() {
   const [selectedMonth, setSelectedMonth] = useState<string>("All");
-  const [data, setData] = useState<{ categoryBreakdown: { name: string; value: number; color: string }[]; monthlyTrend: { month: string; income: number; expenses: number }[] } | null>(null);
+  const [data, setData] = useState<{ categoryBreakdown: { name: string; value: number; color: string }[]; monthlyTrend: { month: string; income: number; expenses: number; savings?: number }[] } | null>(null);
+  const [dynamicInsights, setDynamicInsights] = useState<any[]>(defaultAiInsights);
+  const [loadingInsights, setLoadingInsights] = useState(false);
 
   useEffect(() => {
-    getAnalytics(selectedMonth).then((res) => {
+    getAnalytics(selectedMonth).then(async (res) => {
       const categories = res.categoryBreakdown.map((c: { name: string; value: number }, i: number) => ({
         ...c,
         color: barColors[i % barColors.length],
       }));
       setData({ ...res, categoryBreakdown: categories });
+      
+      // Fetch dynamic insights
+      try {
+        setLoadingInsights(true);
+        const { analyzeFinancialData } = await import("@/services/chat.service");
+        const analysisData = JSON.stringify({
+          month: selectedMonth,
+          trends: res.monthlyTrend,
+          breakdown: categories
+        });
+        const insights = await analyzeFinancialData(analysisData);
+        if (insights && Array.isArray(insights) && insights.length > 0) {
+          // Map string icon names to actual Lucide components
+          const mappedInsights = insights.map((i: any) => ({
+            ...i,
+            icon: iconComponentMap[i.icon] || Sparkles
+          }));
+          setDynamicInsights(mappedInsights);
+        }
+      } catch (e) {
+        console.error("Failed to load dynamic insights", e);
+      } finally {
+        setLoadingInsights(false);
+      }
+      
     }).catch(console.error);
   }, [selectedMonth]);
 
@@ -139,11 +172,12 @@ export default function AnalyticsPage() {
                     </Pie>
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: "white",
-                        border: "1px solid #E2E8F0",
+                        backgroundColor: "#0A0A0A",
+                        border: "1px solid #262626",
                         borderRadius: "12px",
                         padding: "8px 12px",
-                        boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
+                        color: "#E2E8F0"
                       }}
                       formatter={(value) => [
                         `₹${Number(value).toLocaleString("en-IN")}`,
@@ -212,11 +246,12 @@ export default function AnalyticsPage() {
                   />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "white",
-                      border: "1px solid #E2E8F0",
+                      backgroundColor: "#0A0A0A",
+                      border: "1px solid #262626",
                       borderRadius: "12px",
                       padding: "8px 12px",
-                      boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+                      boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
+                      color: "#E2E8F0"
                     }}
                     formatter={(value) => [
                       `₹${Number(value).toLocaleString("en-IN")}`,
@@ -281,11 +316,12 @@ export default function AnalyticsPage() {
                   />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "white",
-                      border: "1px solid #E2E8F0",
+                      backgroundColor: "#0A0A0A",
+                      border: "1px solid #262626",
                       borderRadius: "12px",
                       padding: "12px",
-                      boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+                      boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
+                      color: "#E2E8F0"
                     }}
                     formatter={(value) => [
                       `₹${Number(value).toLocaleString("en-IN")}`,
@@ -325,10 +361,10 @@ export default function AnalyticsPage() {
         <div>
           <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold">
             <Sparkles className="h-5 w-5 text-violet-500" />
-            AI Insights
+            AI Insights {loadingInsights && <span className="text-xs text-muted-foreground animate-pulse">(Generating...)</span>}
           </h2>
           <div className="grid gap-4 md:grid-cols-2">
-            {aiInsights.map((insight, i) => (
+            {dynamicInsights.map((insight, i) => (
               <motion.div
                 key={insight.title}
                 initial={{ opacity: 0, y: 10 }}
@@ -336,12 +372,12 @@ export default function AnalyticsPage() {
                 transition={{ delay: i * 0.08 }}
               >
                 <Card
-                  className={`flex items-start gap-4 border-l-4 p-5 ${insightStyles[insight.type]}`}
+                  className={`flex items-start gap-4 border-l-4 p-5 ${insightStyles[insight.type as keyof typeof insightStyles]}`}
                 >
                   <div
-                    className={`shrink-0 rounded-lg p-2 ${insightIconStyles[insight.type]}`}
+                    className={`shrink-0 rounded-lg p-2 ${insightIconStyles[insight.type as keyof typeof insightStyles]}`}
                   >
-                    <insight.icon className="h-4 w-4" />
+                    {insight.icon && <insight.icon className="h-4 w-4" />}
                   </div>
                   <div>
                     <h3 className="text-sm font-semibold">{insight.title}</h3>

@@ -129,10 +129,11 @@ export default function LearningPage() {
                   <div className="flex items-center justify-between border-b px-5 py-3 bg-muted/30">
                     <Badge
                       variant="secondary"
-                      className={cn(
-                        "text-xs font-normal border-transparent",
-                        CATEGORY_COLORS[article.category] || "bg-slate-500/10 text-slate-700 dark:bg-slate-500/20 dark:text-slate-300"
-                      )}
+                      className="text-xs font-normal border-transparent"
+                      style={{ 
+                        backgroundColor: CATEGORY_COLORS[article.category] ? `${CATEGORY_COLORS[article.category]}1A` : undefined, 
+                        color: CATEGORY_COLORS[article.category] || undefined 
+                      }}
                     >
                       {article.category}
                     </Badge>

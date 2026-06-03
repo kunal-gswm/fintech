@@ -131,10 +131,10 @@ function SidebarContent({ onNavigate, forceExpanded }: { onNavigate?: () => void
               initial={{ opacity: 0, width: 0 }}
               animate={{ opacity: 1, width: "auto" }}
               exit={{ opacity: 0, width: 0 }}
-              className="overflow-hidden"
+              className="overflow-hidden flex items-center gap-3"
             >
               <span className="text-lg font-bold tracking-tight whitespace-nowrap">
-                AI Finance
+                Expanda
               </span>
             </motion.div>
           )}

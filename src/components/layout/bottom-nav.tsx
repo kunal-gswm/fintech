@@ -39,8 +39,8 @@ export function BottomNav() {
   if (hiddenPaths.includes(pathname)) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden pb-[env(safe-area-inset-bottom)] glass-nav">
-      <div className="flex min-h-[4rem] py-2 items-center justify-around shadow-[0_-4px_16px_rgba(0,0,0,0.05)] dark:shadow-[0_-4px_16px_rgba(0,0,0,0.2)]">
+    <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden pb-[env(safe-area-inset-bottom)] bg-background border-t border-border">
+      <div className="flex min-h-[4rem] py-2 items-center justify-around">
         {NAV_ITEMS.map((item) => {
           const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
           

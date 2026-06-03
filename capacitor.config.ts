@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.aifinance.app',
-  appName: 'AI Finance',
+  appName: 'Expanda',
   webDir: 'out',
   plugins: {
     SplashScreen: {

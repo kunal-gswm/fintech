@@ -35,18 +35,13 @@ type Section = "profile" | "preferences" | "security" | "notifications" | null;
 export default function SettingsPage() {
   const { theme, setTheme } = useThemeStore();
   const [mounted, setMounted] = React.useState(false);
-  const [biometrics, setBiometrics] = React.useState(false);
   const [activeSection, setActiveSection] = React.useState<Section>(null);
 
   React.useEffect(() => {
     setMounted(true);
-    setBiometrics(localStorage.getItem('biometrics_enabled') === 'true');
   }, []);
 
-  const handleBiometricsChange = (checked: boolean) => {
-    setBiometrics(checked);
-    localStorage.setItem('biometrics_enabled', checked ? 'true' : 'false');
-  };
+
 
   const menuItems = [
     { id: "profile", label: "Profile", icon: User, color: "text-blue-500", bg: "bg-blue-500/10" },
@@ -190,14 +185,7 @@ export default function SettingsPage() {
                     </div>
                     <Switch />
                   </div>
-                  <Separator />
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium">Biometric Login</p>
-                      <p className="text-xs text-muted-foreground">Use FaceID or Fingerprint</p>
-                    </div>
-                    <Switch checked={biometrics} onCheckedChange={handleBiometricsChange} />
-                  </div>
+
                 </div>
               </div>
             )}

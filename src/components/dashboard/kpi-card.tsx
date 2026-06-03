@@ -10,7 +10,6 @@ import {
   HeartPulse,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { AnimatedCounter } from "@/components/shared/animated-counter";
 import { useState, useEffect } from "react";
 import { getProfile } from "@/services/profile.service";
 import { getHealth } from "@/services/health.service";
@@ -144,12 +143,7 @@ export function KPICards() {
               <div className="mt-4">
                 <p className="text-sm text-muted-foreground">{kpi.title}</p>
                 <p className="mt-1 text-2xl font-bold tracking-tight">
-                  <AnimatedCounter
-                    value={kpi.value}
-                    prefix={kpi.prefix}
-                    suffix={kpi.suffix}
-                    decimals={kpi.suffix === "%" ? 1 : 0}
-                  />
+                  {kpi.prefix}{kpi.value.toLocaleString('en-IN', { minimumFractionDigits: kpi.suffix === '%' ? 1 : 0, maximumFractionDigits: kpi.suffix === '%' ? 1 : 0 })}{kpi.suffix}
                 </p>
                 <p className="mt-1 text-xs text-muted-foreground">
                   {kpi.trendLabel}

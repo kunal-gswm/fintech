@@ -1,12 +1,11 @@
-# AI Finance
+# Expanda
 
-AI Finance is a privacy-first, full-stack personal finance application. It provides users with comprehensive tools for tracking expenses, setting financial goals, and receiving AI-driven financial advice directly on their devices. Built with modern web technologies, it is designed to run seamlessly in the browser as a Progressive Web App (PWA) and natively on iOS and Android.
+Expanda is a privacy-first, full-stack personal finance application. It provides users with comprehensive tools for tracking expenses, setting financial goals, and receiving AI-driven financial advice directly on their devices. Built with modern web technologies, it is designed to run seamlessly in the browser as a Progressive Web App (PWA) and natively on iOS and Android.
 
 ## Key Features
 
-- **Local AI Advisor:** Integrates with a local Llama 3.2 instance via Ollama to provide entirely private, offline financial advice. Falls back to the Gemini API if the local instance is unavailable.
+- **On-Device AI Advisor:** Runs a Gemma 4 model locally on your phone using `@capgo/capacitor-llm` and the LiteRT-LM runtime for fully private, offline financial advice. Falls back to the Gemini cloud API when the on-device model is unavailable.
 - **Smart Receipt Scanning:** Utilizes Tesseract.js and device cameras to scan physical receipts, automatically extracting the merchant name and total amount using Optical Character Recognition (OCR).
-- **Biometric Security:** Employs Capacitor's native biometric authentication (FaceID / Fingerprint) to secure user data on mobile devices.
 - **True Offline Support:** Configured as a Progressive Web App (PWA) using Serwist. It employs a network-first caching strategy to ensure the application remains functional even without an internet connection.
 - **Native Mobile Experience:** Features a premium, fluid user interface with glassmorphism, sharp edges, pure dark mode, and native haptic feedback. Can be compiled to native iOS and Android applications.
 
@@ -15,9 +14,9 @@ AI Finance is a privacy-first, full-stack personal finance application. It provi
 - **Framework:** Next.js (App Router, Static Export)
 - **Styling:** Tailwind CSS, Framer Motion, shadcn/ui
 - **State Management:** Zustand
-- **Native Bridge:** Capacitor (Core, Camera, Haptics, Biometrics, Splash Screen, Browser)
+- **Native Bridge:** Capacitor (Core, Camera, Haptics, Splash Screen, Browser)
 - **Offline & PWA:** Serwist
-- **AI Integration:** Google Generative AI SDK, Local Ollama REST API
+- **AI Integration:** On-device Gemma 4 (LiteRT-LM via @capgo/capacitor-llm), Google Generative AI SDK (cloud fallback)
 
 ## Getting Started
 
@@ -25,7 +24,6 @@ AI Finance is a privacy-first, full-stack personal finance application. It provi
 
 - Node.js (v18 or higher)
 - npm or yarn
-- Ollama (Optional, for local AI functionality)
 
 ### Installation
 
@@ -42,23 +40,16 @@ AI Finance is a privacy-first, full-stack personal finance application. It provi
    cp .env.example .env
    ```
 
-4. Start the local Llama 3.2 instance (Optional):
-   ```bash
-   ollama run llama3.2
-   ```
-
-5. Run the development server:
+4. Run the development server:
    ```bash
    npm run dev
    ```
 
-6. Open `http://localhost:3000` in your browser.
+5. Open `http://localhost:3000` in your browser.
 
 ## Building for Native Mobile (iOS / Android)
 
-This project uses Capacitor to package the Next.js web application into native mobile apps.
-
-1. Create an optimized static build of the Next.js application and synchronize the native Capacitor projects:
+This project uses Capacitor to package the Next.js web application and synchronize the native Capacitor projects:
    ```bash
    npm run cap:sync
    ```

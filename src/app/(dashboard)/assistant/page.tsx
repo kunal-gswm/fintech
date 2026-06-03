@@ -40,7 +40,7 @@ function TypingIndicator() {
 }
 
 export default function AssistantPage() {
-  const { messages, isTyping, clearMessages } =
+  const { messages, isTyping, streamingContent, clearMessages } =
     useChatStore();
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -49,7 +49,7 @@ export default function AssistantPage() {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages, isTyping]);
+  }, [messages, isTyping, streamingContent]);
 
   const submitMessage = async (message: string) => {
     await useChatStore.getState().sendMessage(message);
@@ -142,7 +142,26 @@ export default function AssistantPage() {
                 ))}
               </AnimatePresence>
 
-              {isTyping && (
+              {/* Streaming content from on-device LLM */}
+              {streamingContent && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="flex gap-3"
+                >
+                  <Avatar className="mt-1 h-8 w-8 shrink-0">
+                    <AvatarFallback className="bg-gradient-to-br from-emerald-500 to-teal-500 text-white text-xs">
+                      <Sparkles className="h-4 w-4" />
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="max-w-[80%] rounded-2xl bg-muted px-4 py-3 text-sm leading-relaxed">
+                    <div className="whitespace-pre-wrap break-words break-all">{streamingContent}<span className="animate-pulse">▍</span></div>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Typing indicator (shown when waiting for non-streaming response) */}
+              {isTyping && !streamingContent && (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}

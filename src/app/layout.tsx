@@ -9,9 +9,14 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "AI Finance — Smart Personal Finance Platform",
-  description:
-    "Track expenses, learn investing, plan goals, and get AI-powered financial guidance. Make better financial decisions.",
+  title: "Expanda",
+  description: "Your intelligent financial companion",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Expanda",
+  },
   keywords: [
     "personal finance",
     "expense tracker",

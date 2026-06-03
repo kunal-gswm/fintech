@@ -1,5 +1,5 @@
 {
-  "name": "ai-finance",
+  "name": "expanda",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -20,6 +20,7 @@
     "@capacitor/haptics": "^8.0.2",
     "@capacitor/local-notifications": "^8.2.0",
     "@capacitor/splash-screen": "^8.0.1",
+    "@capgo/capacitor-llm": "^8.0.14",
     "@google/generative-ai": "^0.24.1",
     "@serwist/next": "^9.5.11",
     "@tailwindcss/typography": "^0.5.19",
