@@ -1,72 +1,49 @@
 # Expanda
 
-Expanda is a privacy-first, full-stack personal finance application. It provides users with comprehensive tools for tracking expenses, setting financial goals, and receiving AI-driven financial advice directly on their devices. Built with modern web technologies, it is designed to run seamlessly in the browser as a Progressive Web App (PWA) and natively on iOS and Android.
+Expanda is a personal finance application built with Next.js and Capacitor. It allows users to track expenses, set financial goals, and use an on-device AI for financial reviews.
 
-## Key Features
+## Core Features
+- **On-Device AI:** Uses a local Gemma 4 model via `@capgo/capacitor-llm` for offline financial reviews. Falls back to Gemini API if the on-device model is unavailable.
+- **Receipt Scanning:** Uses `tesseract.js` for basic optical character recognition to extract amounts and merchant names from receipt images.
+- **Offline Support:** Configured as a Progressive Web App using Serwist for basic offline caching.
+- **Native Apps:** Compiles to iOS and Android via Capacitor.
 
-- **On-Device AI Advisor:** Runs a Gemma 4 model locally on your phone using `@capgo/capacitor-llm` and the LiteRT-LM runtime for fully private, offline financial advice. Falls back to the Gemini cloud API when the on-device model is unavailable.
-- **Smart Receipt Scanning:** Utilizes Tesseract.js and device cameras to scan physical receipts, automatically extracting the merchant name and total amount using Optical Character Recognition (OCR).
-- **True Offline Support:** Configured as a Progressive Web App (PWA) using Serwist. It employs a network-first caching strategy to ensure the application remains functional even without an internet connection.
-- **Native Mobile Experience:** Features a premium, fluid user interface with glassmorphism, sharp edges, pure dark mode, and native haptic feedback. Can be compiled to native iOS and Android applications.
-
-## Technology Stack
-
-- **Framework:** Next.js (App Router, Static Export)
-- **Styling:** Tailwind CSS, Framer Motion, shadcn/ui
+## Tech Stack
+- **Frontend:** Next.js (App Router, Static Export), Tailwind CSS, shadcn/ui
 - **State Management:** Zustand
-- **Native Bridge:** Capacitor (Core, Camera, Haptics, Splash Screen, Browser)
-- **Offline & PWA:** Serwist
-- **AI Integration:** On-device Gemma 4 (LiteRT-LM via @capgo/capacitor-llm), Google Generative AI SDK (cloud fallback)
+- **Mobile Bridge:** Capacitor
+- **PWA:** Serwist
 
-## Getting Started
+## Development Setup
 
-### Prerequisites
-
-- Node.js (v18 or higher)
-- npm or yarn
-
-### Installation
-
-1. Clone the repository and navigate to the project directory.
-
-2. Install dependencies:
+1. **Install Dependencies**
    ```bash
    npm install
    ```
 
-3. Set up environment variables:
-   Copy `.env.example` to `.env` and provide a Google Gemini API Key if you intend to use the cloud AI fallback.
+2. **Environment Variables**
+   Create a `.env` file from the example and add your Gemini API key (for cloud fallback).
    ```bash
    cp .env.example .env
    ```
 
-4. Run the development server:
+3. **Run Locally**
    ```bash
    npm run dev
    ```
+   Open `http://localhost:3000`.
 
-5. Open `http://localhost:3000` in your browser.
+## Building for Native (iOS/Android)
 
-## Building for Native Mobile (iOS / Android)
-
-This project uses Capacitor to package the Next.js web application and synchronize the native Capacitor projects:
+1. **Sync Capacitor**
+   Compile the Next.js app and sync the native directories:
    ```bash
    npm run cap:sync
    ```
 
-2. Open the project in your respective native IDE:
-   - For iOS (requires macOS and Xcode):
-     ```bash
-     npm run cap:open:ios
-     ```
-   - For Android (requires Android Studio):
-     ```bash
-     npm run cap:open:android
-     ```
+2. **Open Native IDE**
+   - iOS (Requires Xcode): `npm run cap:open:ios`
+   - Android (Requires Android Studio): `npm run cap:open:android`
 
-3. Build and deploy to your physical device or emulator using Xcode or Android Studio.
-
-## Architecture Notes
-
-- **Static Export:** The application is configured with `output: 'export'` in `next.config.ts`. All API calls must be handled client-side or during build time, as Node.js server runtimes are not available in native Capacitor environments.
-- **Theme Management:** The application prevents Flash of Unstyled Content (FOUC) in dark mode through a blocking inline script in the root layout, checking `localStorage` prior to React hydration.
+## Architecture Limitations
+- **Static Export Only:** Because Capacitor requires a static web bundle, `output: 'export'` is strictly enforced in `next.config.ts`. You cannot use Node.js server actions or API routes. All logic must execute client-side.
