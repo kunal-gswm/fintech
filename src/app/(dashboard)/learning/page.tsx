@@ -152,7 +152,7 @@ export default function LearningPage() {
                     <h3 className="text-base font-semibold leading-snug group-hover:text-primary transition-colors">
                       {article.title}
                     </h3>
-                    <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground line-clamp-3">
+                    <p className="mt-2 flex-1 text-sm leading-relaxed text-foreground/90 line-clamp-3">
                       {article.description}
                     </p>
 

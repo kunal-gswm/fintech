@@ -145,6 +145,7 @@
   }
   html {
     @apply font-sans scroll-smooth;
+    overscroll-behavior-y: none;
   }
   /* Improve native feel on interactive elements */
   button, a, input, [role="button"] {
@@ -161,24 +162,9 @@
 /* Custom scrollbar */
 @layer base {
   ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: #CBD5E1;
-    border-radius: 3px;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: #94A3B8;
-  }
-  .dark ::-webkit-scrollbar-thumb {
-    background: #334155;
-  }
-  .dark ::-webkit-scrollbar-thumb:hover {
-    background: #475569;
+    display: none !important;
+    width: 0px;
+    height: 0px;
   }
 }
 

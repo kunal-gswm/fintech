@@ -134,7 +134,7 @@ export default function AssistantPage() {
                       className={cn(
                         "max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed",
                         msg.role === "assistant"
-                          ? "bg-muted text-foreground"
+                          ? "bg-blue-500/10 text-blue-900 dark:bg-blue-500/20 dark:text-blue-100"
                           : "bg-primary text-primary-foreground"
                       )}
                     >
@@ -162,7 +162,7 @@ export default function AssistantPage() {
                       <Sparkles className="h-4 w-4" />
                     </AvatarFallback>
                   </Avatar>
-                  <div className="max-w-[80%] rounded-2xl bg-muted px-4 py-3 text-sm leading-relaxed">
+                  <div className="max-w-[80%] rounded-2xl bg-blue-500/10 text-blue-900 dark:bg-blue-500/20 dark:text-blue-100 px-4 py-3 text-sm leading-relaxed">
                     <div className="prose prose-sm prose-slate dark:prose-invert break-words max-w-none">
                       <ReactMarkdown remarkPlugins={[remarkGfm]}>{streamingContent + "▍"}</ReactMarkdown>
                     </div>

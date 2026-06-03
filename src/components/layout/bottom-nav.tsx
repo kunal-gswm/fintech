@@ -33,7 +33,7 @@ const ALL_MENU_ITEMS = [
   { name: "AI Assistant", href: "/assistant", icon: MessageSquare, color: "text-indigo-500", bg: "bg-indigo-500/10" },
   { name: "Learning", href: "/learning", icon: BookOpen, color: "text-pink-500", bg: "bg-pink-500/10" },
   { name: "Reports", href: "/reports", icon: FileText, color: "text-orange-500", bg: "bg-orange-500/10" },
-  { name: "Settings", href: "/settings", icon: User, color: "text-slate-500", bg: "bg-slate-500/10" },
+  { name: "Settings", href: "/settings", icon: Settings, color: "text-slate-500", bg: "bg-slate-500/10" },
 ];
 
 export function BottomNav() {

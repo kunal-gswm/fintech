@@ -1,10 +1,17 @@
 "use client";
 
+import { useEffect } from "react";
 import { Navbar } from "./navbar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { BottomNav } from "./bottom-nav";
+import { LocalLLMService } from "@/services/local-llm.service";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
+  useEffect(() => {
+    // Preload the AI model in the background so it's ready instantly when the user navigates to the chat
+    LocalLLMService.initialize().catch(console.error);
+  }, []);
+
   return (
     <TooltipProvider delay={0}>
       <div className="min-h-screen bg-background">
