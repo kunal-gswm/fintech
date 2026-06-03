@@ -54,14 +54,16 @@ export function UpdateNotifier() {
   // Find the APK file from the release assets
   const apkAsset = releaseInfo.assets.find(a => a.name.endsWith('.apk'));
 
-  const handleUpdate = () => {
-    if (apkAsset) {
-      window.open(apkAsset.browser_download_url, '_blank');
-      setIsOpen(false);
-    } else {
-      // Fallback to github release page if APK asset is missing
-      window.open(`https://github.com/${APP_CONFIG.GITHUB_REPO}/releases/latest`, '_blank');
-      setIsOpen(false);
+  const handleUpdate = async () => {
+    const url = apkAsset ? apkAsset.browser_download_url : `https://github.com/${APP_CONFIG.GITHUB_REPO}/releases/latest`;
+    setIsOpen(false);
+    
+    try {
+      const { Browser } = await import('@capacitor/browser');
+      await Browser.open({ url });
+    } catch (e) {
+      // Fallback for web
+      window.open(url, '_blank');
     }
   };
 
