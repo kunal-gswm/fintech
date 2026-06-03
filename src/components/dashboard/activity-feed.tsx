@@ -71,7 +71,7 @@ export function ActivityFeed() {
           {activities.length} items
         </Badge>
       </div>
-      <ScrollArea className="h-[360px]">
+      <ScrollArea className="h-[280px]">
         <div className="space-y-3 pr-4">
           {activities.map((activity) => {
             const Icon = iconMap[activity.icon] || CreditCard;

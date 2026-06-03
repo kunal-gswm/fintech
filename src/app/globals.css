@@ -92,6 +92,8 @@
   --sidebar-accent-foreground: #FEF08A;
   --sidebar-border: #262626;
   --sidebar-ring: #E5B80B;
+  
+  --bottom-nav-height: calc(4rem + env(safe-area-inset-bottom));
 }
 
 .light {
@@ -130,8 +132,6 @@
   --sidebar-accent-foreground: #854D0E;
   --sidebar-border: #E2E8F0;
   --sidebar-ring: #D4AF37;
-  
-  --bottom-nav-height: calc(4rem + env(safe-area-inset-bottom));
 }
 
 @layer base {
@@ -198,5 +198,15 @@
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
     }
+  }
+}
+
+@layer utilities {
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
   }
 }

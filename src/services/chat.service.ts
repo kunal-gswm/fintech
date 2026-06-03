@@ -126,5 +126,65 @@ export const sendChatMessageStreaming = async (
   }
 };
 
+export const generateMonthlyReview = async (financialData: string) => {
+  const prompt = `You are a strict financial auditor. 
+Review the provided JSON ledger data for the user's past month.
+
+RULES:
+1. Do NOT invent, assume, or calculate any numbers. Only use the numbers provided in the JSON.
+2. Output your response EXACTLY as a valid JSON object. Do not include markdown formatting, markdown blocks, or any other text.
+3. The JSON object MUST strictly follow this schema:
+{
+  "summary": "A 2-sentence objective summary of the month.",
+  "biggestWin": "One positive financial behavior observed from the data.",
+  "warningArea": "One area where spending was high or could be optimized.",
+  "actionItem": "One specific, actionable step for next month."
+}
+
+DATA TO REVIEW:
+${financialData}`;
+
+  // Priority 1: Local LLM
+  if (LocalLLMService.isAvailable) {
+    try {
+      const initialized = await LocalLLMService.initialize();
+      if (initialized) {
+        const response = await LocalLLMService.sendMessage(prompt);
+        if (response) {
+          const cleanedText = response.replace(/```json\n?|\n?```/g, "").trim();
+          return JSON.parse(cleanedText);
+        }
+      }
+    } catch (error) {
+      console.warn("On-device review failed, falling back to Gemini...", error);
+    }
+  }
+
+  // Priority 2: Cloud Gemini API
+  let apiKey = "";
+  if (typeof window !== "undefined") {
+    apiKey = localStorage.getItem("gemini_api_key") || "";
+  }
+  
+  const activeKey = apiKey || API_KEY;
+  
+  if (!activeKey) {
+    console.error("No Gemini API Key found for monthly review");
+    return null;
+  }
+
+  try {
+    const analyzerAI = new GoogleGenerativeAI(activeKey);
+    const model = analyzerAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
+    const cleanedText = text.replace(/```json\n?|\n?```/g, "").trim();
+    return JSON.parse(cleanedText);
+  } catch (error) {
+    console.error("Gemini Review Error:", error);
+    return null;
+  }
+};
+
 // Re-export for direct access from settings / status UI
 export { LocalLLMService } from "@/services/local-llm.service";

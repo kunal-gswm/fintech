@@ -103,7 +103,7 @@ export function KPICards() {
   }, [expenseCount]); // Depend on expenseCount so mutations trigger a sync
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+    <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-4 px-4 sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 sm:overflow-visible sm:px-0 sm:mx-0 hide-scrollbar">
       {data.map((kpi, i) => {
         const Icon = iconMap[kpi.icon] || TrendingUp;
         const colors = colorMap[kpi.title] || {
@@ -115,6 +115,7 @@ export function KPICards() {
         return (
           <motion.div
             key={kpi.title}
+            className="shrink-0 w-[85%] snap-center sm:w-auto"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.08 }}

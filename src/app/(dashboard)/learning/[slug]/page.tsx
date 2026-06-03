@@ -107,7 +107,7 @@ export default function ArticlePage({ params }: { params: Promise<{ slug: string
               variant="secondary"
               className={cn(
                 "px-3 py-1 font-medium border-transparent",
-                CATEGORY_COLORS[article.category] || "bg-slate-500/10 text-slate-700"
+                CATEGORY_COLORS[article.category] || "bg-slate-500/10 text-slate-700 dark:text-slate-300"
               )}
             >
               {article.category}

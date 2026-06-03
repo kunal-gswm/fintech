@@ -3,6 +3,8 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PageTransition } from "@/components/shared/page-transition";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -136,7 +138,13 @@ export default function AssistantPage() {
                           : "bg-primary text-primary-foreground"
                       )}
                     >
-                      <div className="whitespace-pre-wrap break-words break-all">{msg.content}</div>
+                      {msg.role === "assistant" ? (
+                        <div className="prose prose-sm prose-slate dark:prose-invert break-words max-w-none">
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
+                        </div>
+                      ) : (
+                        <div className="whitespace-pre-wrap break-words break-all">{msg.content}</div>
+                      )}
                     </div>
                   </motion.div>
                 ))}
@@ -155,7 +163,9 @@ export default function AssistantPage() {
                     </AvatarFallback>
                   </Avatar>
                   <div className="max-w-[80%] rounded-2xl bg-muted px-4 py-3 text-sm leading-relaxed">
-                    <div className="whitespace-pre-wrap break-words break-all">{streamingContent}<span className="animate-pulse">▍</span></div>
+                    <div className="prose prose-sm prose-slate dark:prose-invert break-words max-w-none">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{streamingContent + "▍"}</ReactMarkdown>
+                    </div>
                   </div>
                 </motion.div>
               )}

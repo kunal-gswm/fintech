@@ -90,6 +90,14 @@ export function Navbar() {
         <span className="sr-only">Open menu</span>
       </Button>
 
+      {/* Mobile Branding */}
+      <div className="flex flex-1 items-center gap-2 lg:hidden pl-2">
+        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold shadow-sm text-sm">
+          E
+        </div>
+        <span className="text-lg font-bold tracking-tight">Expanda</span>
+      </div>
+
       {/* Search */}
       <div className="relative hidden flex-1 md:block md:max-w-sm">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
