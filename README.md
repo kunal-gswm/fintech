@@ -1,36 +1,81 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Finance
+
+AI Finance is a privacy-first, full-stack personal finance application. It provides users with comprehensive tools for tracking expenses, setting financial goals, and receiving AI-driven financial advice directly on their devices. Built with modern web technologies, it is designed to run seamlessly in the browser as a Progressive Web App (PWA) and natively on iOS and Android.
+
+## Key Features
+
+- **Local AI Advisor:** Integrates with a local Llama 3.2 instance via Ollama to provide entirely private, offline financial advice. Falls back to the Gemini API if the local instance is unavailable.
+- **Smart Receipt Scanning:** Utilizes Tesseract.js and device cameras to scan physical receipts, automatically extracting the merchant name and total amount using Optical Character Recognition (OCR).
+- **Biometric Security:** Employs Capacitor's native biometric authentication (FaceID / Fingerprint) to secure user data on mobile devices.
+- **True Offline Support:** Configured as a Progressive Web App (PWA) using Serwist. It employs a network-first caching strategy to ensure the application remains functional even without an internet connection.
+- **Native Mobile Experience:** Features a premium, fluid user interface with glassmorphism, sharp edges, pure dark mode, and native haptic feedback. Can be compiled to native iOS and Android applications.
+
+## Technology Stack
+
+- **Framework:** Next.js (App Router, Static Export)
+- **Styling:** Tailwind CSS, Framer Motion, shadcn/ui
+- **State Management:** Zustand
+- **Native Bridge:** Capacitor (Core, Camera, Haptics, Biometrics, Splash Screen, Browser)
+- **Offline & PWA:** Serwist
+- **AI Integration:** Google Generative AI SDK, Local Ollama REST API
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Node.js (v18 or higher)
+- npm or yarn
+- Ollama (Optional, for local AI functionality)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Installation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Clone the repository and navigate to the project directory.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-## Learn More
+3. Set up environment variables:
+   Copy `.env.example` to `.env` and provide a Google Gemini API Key if you intend to use the cloud AI fallback.
+   ```bash
+   cp .env.example .env
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+4. Start the local Llama 3.2 instance (Optional):
+   ```bash
+   ollama run llama3.2
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+5. Run the development server:
+   ```bash
+   npm run dev
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+6. Open `http://localhost:3000` in your browser.
 
-## Deploy on Vercel
+## Building for Native Mobile (iOS / Android)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+This project uses Capacitor to package the Next.js web application into native mobile apps.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Create an optimized static build of the Next.js application and synchronize the native Capacitor projects:
+   ```bash
+   npm run cap:sync
+   ```
+
+2. Open the project in your respective native IDE:
+   - For iOS (requires macOS and Xcode):
+     ```bash
+     npm run cap:open:ios
+     ```
+   - For Android (requires Android Studio):
+     ```bash
+     npm run cap:open:android
+     ```
+
+3. Build and deploy to your physical device or emulator using Xcode or Android Studio.
+
+## Architecture Notes
+
+- **Static Export:** The application is configured with `output: 'export'` in `next.config.ts`. All API calls must be handled client-side or during build time, as Node.js server runtimes are not available in native Capacitor environments.
+- **Theme Management:** The application prevents Flash of Unstyled Content (FOUC) in dark mode through a blocking inline script in the root layout, checking `localStorage` prior to React hydration.
