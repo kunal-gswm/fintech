@@ -3,13 +3,11 @@ import * as React from "react";
 
 import { PageHeader } from "@/components/shared/page-header";
 import { PageTransition } from "@/components/shared/page-transition";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
   SelectContent,
@@ -25,13 +23,20 @@ import {
   ShieldCheck,
   Bell,
   Camera,
+  ChevronRight,
+  ChevronLeft,
+  LogOut
 } from "lucide-react";
 import { useThemeStore } from "@/store/theme-store";
+import { NativeService } from "@/services/native.service";
+
+type Section = "profile" | "preferences" | "theme" | "security" | "notifications" | null;
 
 export default function SettingsPage() {
   const { theme, setTheme } = useThemeStore();
   const [mounted, setMounted] = React.useState(false);
   const [biometrics, setBiometrics] = React.useState(false);
+  const [activeSection, setActiveSection] = React.useState<Section>(null);
 
   React.useEffect(() => {
     setMounted(true);
@@ -43,106 +48,74 @@ export default function SettingsPage() {
     localStorage.setItem('biometrics_enabled', checked ? 'true' : 'false');
   };
 
-  return (
-    <PageTransition>
-      <div className="space-y-6">
-        <PageHeader
-          title="Settings"
-          description="Manage your account and preferences."
-        />
+  const menuItems = [
+    { id: "profile", label: "Profile", icon: User, color: "text-blue-500", bg: "bg-blue-500/10" },
+    { id: "preferences", label: "Preferences", icon: Sliders, color: "text-purple-500", bg: "bg-purple-500/10" },
+    { id: "theme", label: "Theme", icon: Palette, color: "text-amber-500", bg: "bg-amber-500/10" },
+    { id: "security", label: "Security", icon: ShieldCheck, color: "text-emerald-500", bg: "bg-emerald-500/10" },
+    { id: "notifications", label: "Notifications", icon: Bell, color: "text-rose-500", bg: "bg-rose-500/10" },
+  ] as const;
 
-        <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="w-full justify-start bg-muted/50 p-1">
-            <TabsTrigger value="profile" className="gap-2">
-              <User className="h-4 w-4" />
-              Profile
-            </TabsTrigger>
-            <TabsTrigger value="preferences" className="gap-2">
-              <Sliders className="h-4 w-4" />
-              Preferences
-            </TabsTrigger>
-            <TabsTrigger value="theme" className="gap-2">
-              <Palette className="h-4 w-4" />
-              Theme
-            </TabsTrigger>
-            <TabsTrigger value="security" className="gap-2">
-              <ShieldCheck className="h-4 w-4" />
-              Security
-            </TabsTrigger>
-            <TabsTrigger value="notifications" className="gap-2">
-              <Bell className="h-4 w-4" />
-              Notifications
-            </TabsTrigger>
-          </TabsList>
+  if (activeSection) {
+    return (
+      <PageTransition>
+        <div className="space-y-4">
+          <div className="flex items-center gap-3 pt-2">
+            <Button variant="ghost" size="icon" onClick={() => { NativeService.hapticLight(); setActiveSection(null); }}>
+              <ChevronLeft className="h-6 w-6" />
+            </Button>
+            <h1 className="text-xl font-semibold capitalize">{activeSection}</h1>
+          </div>
 
-          {/* Profile */}
-          <TabsContent value="profile">
-            <Card className="p-6">
-              <h3 className="text-lg font-semibold">Profile Information</h3>
-              <p className="text-sm text-muted-foreground">
-                Update your personal details
-              </p>
-              <Separator className="my-6" />
-
-              <div className="mb-8 flex items-center gap-6">
-                <div className="relative">
-                  <Avatar className="h-20 w-20">
-                    <AvatarFallback className="bg-primary/10 text-xl font-semibold text-primary">
-                      AK
-                    </AvatarFallback>
-                  </Avatar>
-                  <button className="absolute -bottom-1 -right-1 rounded-full border-2 border-card bg-primary p-1.5 text-primary-foreground">
-                    <Camera className="h-3 w-3" />
-                  </button>
-                </div>
-                <div>
-                  <p className="font-medium">Arjun Kumar</p>
-                  <p className="text-sm text-muted-foreground">
-                    arjun@example.com
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid gap-6 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label>First Name</Label>
-                  <Input defaultValue="Arjun" />
-                </div>
-                <div className="space-y-2">
-                  <Label>Last Name</Label>
-                  <Input defaultValue="Kumar" />
-                </div>
-                <div className="space-y-2">
-                  <Label>Email</Label>
-                  <Input type="email" defaultValue="arjun@example.com" />
-                </div>
-                <div className="space-y-2">
-                  <Label>Phone</Label>
-                  <Input type="tel" defaultValue="+91 98765 43210" />
-                </div>
-              </div>
-
-              <div className="mt-6 flex justify-end">
-                <Button>Save Changes</Button>
-              </div>
-            </Card>
-          </TabsContent>
-
-          {/* Financial Preferences */}
-          <TabsContent value="preferences">
-            <Card className="p-6">
-              <h3 className="text-lg font-semibold">Financial Preferences</h3>
-              <p className="text-sm text-muted-foreground">
-                Customize your financial settings
-              </p>
-              <Separator className="my-6" />
-
+          <div className="px-4 pb-8 space-y-6">
+            {activeSection === "profile" && (
               <div className="space-y-6">
-                <div className="grid gap-6 md:grid-cols-2">
+                <div className="flex flex-col items-center gap-4 py-4">
+                  <div className="relative">
+                    <Avatar className="h-24 w-24 border-4 border-background shadow-sm">
+                      <AvatarFallback className="bg-primary/10 text-2xl font-bold text-primary">
+                        AK
+                      </AvatarFallback>
+                    </Avatar>
+                    <button className="absolute bottom-0 right-0 rounded-full border-2 border-background bg-primary p-2 text-primary-foreground shadow-sm">
+                      <Camera className="h-4 w-4" />
+                    </button>
+                  </div>
+                  <div className="text-center">
+                    <p className="font-semibold text-lg">Arjun Kumar</p>
+                    <p className="text-sm text-muted-foreground">arjun@example.com</p>
+                  </div>
+                </div>
+
+                <div className="space-y-4 rounded-xl border bg-card p-4">
+                  <div className="space-y-2">
+                    <Label>First Name</Label>
+                    <Input defaultValue="Arjun" className="bg-transparent" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Last Name</Label>
+                    <Input defaultValue="Kumar" className="bg-transparent" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Email</Label>
+                    <Input type="email" defaultValue="arjun@example.com" className="bg-transparent" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Phone</Label>
+                    <Input type="tel" defaultValue="+91 98765 43210" className="bg-transparent" />
+                  </div>
+                </div>
+                <Button className="w-full" size="lg">Save Profile</Button>
+              </div>
+            )}
+
+            {activeSection === "preferences" && (
+              <div className="space-y-6">
+                <div className="space-y-4 rounded-xl border bg-card p-4">
                   <div className="space-y-2">
                     <Label>Currency</Label>
                     <Select defaultValue="inr">
-                      <SelectTrigger>
+                      <SelectTrigger className="bg-transparent">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -154,106 +127,77 @@ export default function SettingsPage() {
                   </div>
                   <div className="space-y-2">
                     <Label>Monthly Budget Limit</Label>
-                    <Input type="number" defaultValue="50000" />
+                    <Input type="number" defaultValue="50000" className="bg-transparent" />
                   </div>
                   <div className="space-y-2">
                     <Label>Savings Goal (%)</Label>
-                    <Input type="number" defaultValue="30" />
+                    <Input type="number" defaultValue="30" className="bg-transparent" />
                   </div>
                   <div className="space-y-2">
                     <Label>Emergency Fund Target (months)</Label>
-                    <Input type="number" defaultValue="6" />
+                    <Input type="number" defaultValue="6" className="bg-transparent" />
                   </div>
                 </div>
 
-                <Separator />
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium">Auto-categorize expenses</p>
-                    <p className="text-xs text-muted-foreground">
-                      Use AI to automatically categorize your expenses
-                    </p>
+                <div className="space-y-4 rounded-xl border bg-card p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">Auto-categorize</p>
+                      <p className="text-xs text-muted-foreground">Use AI to sort expenses</p>
+                    </div>
+                    <Switch defaultChecked />
                   </div>
-                  <Switch defaultChecked />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium">Weekly spending digest</p>
-                    <p className="text-xs text-muted-foreground">
-                      Receive a weekly summary of your spending
-                    </p>
+                  <Separator />
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">Weekly digest</p>
+                      <p className="text-xs text-muted-foreground">Receive a summary</p>
+                    </div>
+                    <Switch defaultChecked />
                   </div>
-                  <Switch defaultChecked />
                 </div>
+                <Button className="w-full" size="lg">Save Preferences</Button>
               </div>
+            )}
 
-              <div className="mt-6 flex justify-end">
-                <Button>Save Preferences</Button>
-              </div>
-            </Card>
-          </TabsContent>
-
-          {/* Theme */}
-          <TabsContent value="theme">
-            <Card className="p-6">
-              <h3 className="text-lg font-semibold">Appearance</h3>
-              <p className="text-sm text-muted-foreground">
-                Customize how the app looks and feels
-              </p>
-              <Separator className="my-6" />
-
-              <div className="grid gap-4 sm:grid-cols-2 max-w-md">
+            {activeSection === "theme" && (
+              <div className="grid gap-4 sm:grid-cols-2">
                 <button
                   onClick={() => setTheme("light")}
-                  className={`rounded-xl border-2 p-4 text-left transition-all ${
+                  className={`rounded-xl border p-4 text-left transition-all ${
                     mounted && theme === "light"
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover:border-muted-foreground/30"
+                      ? "border-primary bg-primary/5 ring-1 ring-primary"
+                      : "border-border bg-card hover:bg-accent/5"
                   }`}
                 >
-                  <div className="mb-3 h-20 rounded-lg bg-white border border-gray-200">
-                    <div className="h-4 rounded-t-lg bg-gray-100" />
+                  <div className="mb-3 h-24 rounded-lg bg-gray-50 border shadow-sm">
+                    <div className="h-4 rounded-t-lg bg-gray-200" />
                   </div>
-                  <p className="text-sm font-medium">Light</p>
-                  <p className="text-xs text-muted-foreground">
-                    Clean and bright
-                  </p>
+                  <p className="font-medium">Light Mode</p>
+                  <p className="text-xs text-muted-foreground">Clean and bright</p>
                 </button>
                 <button
                   onClick={() => setTheme("dark")}
-                  className={`rounded-xl border-2 p-4 text-left transition-all ${
+                  className={`rounded-xl border p-4 text-left transition-all ${
                     mounted && theme === "dark"
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover:border-muted-foreground/30"
+                      ? "border-primary bg-primary/5 ring-1 ring-primary"
+                      : "border-border bg-card hover:bg-accent/5"
                   }`}
                 >
-                  <div className="mb-3 h-20 rounded-lg bg-gray-900 border border-gray-700">
-                    <div className="h-4 rounded-t-lg bg-gray-800" />
+                  <div className="mb-3 h-24 rounded-lg bg-black border border-gray-800 shadow-sm">
+                    <div className="h-4 rounded-t-lg bg-gray-900" />
                   </div>
-                  <p className="text-sm font-medium">Dark</p>
-                  <p className="text-xs text-muted-foreground">
-                    Easy on the eyes
-                  </p>
+                  <p className="font-medium">Dark Mode</p>
+                  <p className="text-xs text-muted-foreground">Pure black background</p>
                 </button>
               </div>
-            </Card>
-          </TabsContent>
+            )}
 
-          {/* Security */}
-          <TabsContent value="security">
-            <Card className="p-6">
-              <h3 className="text-lg font-semibold">Security</h3>
-              <p className="text-sm text-muted-foreground">
-                Manage your account security settings
-              </p>
-              <Separator className="my-6" />
-
+            {activeSection === "security" && (
               <div className="space-y-6">
-                <div className="space-y-4">
-                  <h4 className="text-sm font-medium">Change Password</h4>
-                  <div className="max-w-md space-y-3">
+                <div className="space-y-4 rounded-xl border bg-card p-4">
+                  <h4 className="font-medium">Change Password</h4>
+                  <div className="space-y-3">
                     <div className="space-y-2">
                       <Label>Current Password</Label>
                       <Input type="password" />
@@ -266,108 +210,110 @@ export default function SettingsPage() {
                       <Label>Confirm New Password</Label>
                       <Input type="password" />
                     </div>
-                    <Button>Update Password</Button>
+                    <Button className="w-full mt-2">Update Password</Button>
                   </div>
                 </div>
 
-                <Separator />
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium">
-                      Two-factor authentication
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Add an extra layer of security to your account
-                    </p>
-                  </div>
-                  <Switch />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium">Biometric login</p>
-                    <p className="text-xs text-muted-foreground">
-                      Use fingerprint or face recognition
-                    </p>
-                  </div>
-                  <Switch checked={biometrics} onCheckedChange={handleBiometricsChange} />
-                </div>
-              </div>
-            </Card>
-          </TabsContent>
-
-          {/* Notifications */}
-          <TabsContent value="notifications">
-            <Card className="p-6">
-              <h3 className="text-lg font-semibold">Notification Preferences</h3>
-              <p className="text-sm text-muted-foreground">
-                Choose what notifications you receive
-              </p>
-              <Separator className="my-6" />
-              
-              <div className="mb-6 rounded-lg bg-primary/10 p-4 flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-bold text-primary">Daily Reminders (Native)</p>
-                  <p className="text-xs text-muted-foreground mt-1">Get an OS-level push notification to log expenses at 8 PM</p>
-                </div>
-                <Button variant="outline" size="sm" onClick={() => {
-                  import("@/services/native.service").then(m => m.NativeService.scheduleDailyReminder());
-                }}>
-                  Enable Push
-                </Button>
-              </div>
-
-              <div className="space-y-5">
-                {[
-                  {
-                    title: "Expense alerts",
-                    desc: "Get notified when you add or approach budget limits",
-                    checked: true,
-                  },
-                  {
-                    title: "Goal milestones",
-                    desc: "Celebrate when you hit savings milestones",
-                    checked: true,
-                  },
-                  {
-                    title: "Monthly reports",
-                    desc: "Receive your monthly financial summary",
-                    checked: true,
-                  },
-                  {
-                    title: "AI insights",
-                    desc: "Get personalized AI-powered recommendations",
-                    checked: true,
-                  },
-                  {
-                    title: "Security alerts",
-                    desc: "Important security notifications about your account",
-                    checked: true,
-                  },
-                  {
-                    title: "Marketing emails",
-                    desc: "Product updates and feature announcements",
-                    checked: false,
-                  },
-                ].map((item) => (
-                  <div
-                    key={item.title}
-                    className="flex items-center justify-between"
-                  >
+                <div className="space-y-4 rounded-xl border bg-card p-4">
+                  <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium">{item.title}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {item.desc}
-                      </p>
+                      <p className="font-medium">Two-factor Auth</p>
+                      <p className="text-xs text-muted-foreground">Add an extra layer</p>
                     </div>
-                    <Switch defaultChecked={item.checked} />
+                    <Switch />
                   </div>
-                ))}
+                  <Separator />
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">Biometric Login</p>
+                      <p className="text-xs text-muted-foreground">Use FaceID or Fingerprint</p>
+                    </div>
+                    <Switch checked={biometrics} onCheckedChange={handleBiometricsChange} />
+                  </div>
+                </div>
               </div>
-            </Card>
-          </TabsContent>
-        </Tabs>
+            )}
+
+            {activeSection === "notifications" && (
+              <div className="space-y-6">
+                <div className="rounded-xl bg-primary/10 border border-primary/20 p-4 flex items-center justify-between">
+                  <div>
+                    <p className="font-bold text-primary">Daily Reminders</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">Native Push Notifications</p>
+                  </div>
+                  <Button size="sm" onClick={() => {
+                    import("@/services/native.service").then(m => m.NativeService.scheduleDailyReminder());
+                  }}>
+                    Enable
+                  </Button>
+                </div>
+
+                <div className="space-y-4 rounded-xl border bg-card p-4">
+                  {[
+                    { title: "Expense alerts", desc: "When you approach budget limits", checked: true },
+                    { title: "Goal milestones", desc: "Celebrate when you hit milestones", checked: true },
+                    { title: "Monthly reports", desc: "Receive financial summaries", checked: true },
+                    { title: "AI insights", desc: "Personalized recommendations", checked: true },
+                    { title: "Security alerts", desc: "Important account notifications", checked: true },
+                    { title: "Marketing emails", desc: "Product updates", checked: false },
+                  ].map((item, idx, arr) => (
+                    <React.Fragment key={item.title}>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">{item.title}</p>
+                          <p className="text-xs text-muted-foreground">{item.desc}</p>
+                        </div>
+                        <Switch defaultChecked={item.checked} />
+                      </div>
+                      {idx !== arr.length - 1 && <Separator />}
+                    </React.Fragment>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </PageTransition>
+    );
+  }
+
+  return (
+    <PageTransition>
+      <div className="space-y-6 pb-8">
+        <PageHeader title="Settings" description="Manage your preferences." />
+
+        <div className="space-y-2">
+          <div className="rounded-2xl border bg-card overflow-hidden">
+            {menuItems.map((item, index) => (
+              <React.Fragment key={item.id}>
+                <button
+                  onClick={() => { NativeService.hapticLight(); setActiveSection(item.id); }}
+                  className="w-full flex items-center justify-between p-4 bg-transparent hover:bg-accent/50 active:bg-accent transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`p-2 rounded-lg ${item.bg}`}>
+                      <item.icon className={`h-5 w-5 ${item.color}`} />
+                    </div>
+                    <span className="font-medium">{item.label}</span>
+                  </div>
+                  <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                </button>
+                {index < menuItems.length - 1 && <Separator className="ml-14" />}
+              </React.Fragment>
+            ))}
+          </div>
+        </div>
+
+        <div className="pt-4">
+          <Button variant="outline" className="w-full text-destructive hover:text-destructive gap-2 h-12 rounded-xl">
+            <LogOut className="h-4 w-4" />
+            Log Out
+          </Button>
+        </div>
+        
+        <p className="text-center text-xs text-muted-foreground mt-8">
+          Version 1.3.0
+        </p>
       </div>
     </PageTransition>
   );
