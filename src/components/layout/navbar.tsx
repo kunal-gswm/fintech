@@ -109,25 +109,6 @@ export function Navbar() {
       <SearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
 
       <div className="ml-auto flex items-center gap-1">
-        {/* Theme Toggle */}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={toggleTheme}
-          className="h-9 w-9"
-        >
-          {mounted ? (
-            theme === "light" ? (
-              <Moon className="h-4 w-4" />
-            ) : (
-              <Sun className="h-4 w-4" />
-            )
-          ) : (
-            <div className="h-4 w-4" />
-          )}
-          <span className="sr-only">Toggle theme</span>
-        </Button>
-
         {/* Notifications */}
         <Popover>
           <PopoverTrigger className={buttonVariants({ variant: "ghost", size: "icon", className: "relative h-9 w-9" })}>

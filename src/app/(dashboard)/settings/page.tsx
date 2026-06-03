@@ -30,7 +30,7 @@ import {
 import { useThemeStore } from "@/store/theme-store";
 import { NativeService } from "@/services/native.service";
 
-type Section = "profile" | "preferences" | "theme" | "security" | "notifications" | null;
+type Section = "profile" | "preferences" | "security" | "notifications" | null;
 
 export default function SettingsPage() {
   const { theme, setTheme } = useThemeStore();
@@ -48,13 +48,12 @@ export default function SettingsPage() {
     localStorage.setItem('biometrics_enabled', checked ? 'true' : 'false');
   };
 
-  const menuItems = [
-    { id: "profile", label: "Profile", icon: User, color: "text-blue-500", bg: "bg-blue-500/10" },
-    { id: "preferences", label: "Preferences", icon: Sliders, color: "text-purple-500", bg: "bg-purple-500/10" },
-    { id: "theme", label: "Theme", icon: Palette, color: "text-amber-500", bg: "bg-amber-500/10" },
-    { id: "security", label: "Security", icon: ShieldCheck, color: "text-emerald-500", bg: "bg-emerald-500/10" },
-    { id: "notifications", label: "Notifications", icon: Bell, color: "text-rose-500", bg: "bg-rose-500/10" },
-  ] as const;
+    const menuItems = [
+      { id: "profile", label: "Profile", icon: User, color: "text-blue-500", bg: "bg-blue-500/10" },
+      { id: "preferences", label: "Preferences", icon: Sliders, color: "text-purple-500", bg: "bg-purple-500/10" },
+      { id: "security", label: "Security", icon: ShieldCheck, color: "text-emerald-500", bg: "bg-emerald-500/10" },
+      { id: "notifications", label: "Notifications", icon: Bell, color: "text-rose-500", bg: "bg-rose-500/10" },
+    ] as const;
 
   if (activeSection) {
     return (
@@ -160,38 +159,7 @@ export default function SettingsPage() {
               </div>
             )}
 
-            {activeSection === "theme" && (
-              <div className="grid gap-4 sm:grid-cols-2">
-                <button
-                  onClick={() => setTheme("light")}
-                  className={`rounded-xl border p-4 text-left transition-all ${
-                    mounted && theme === "light"
-                      ? "border-primary bg-primary/5 ring-1 ring-primary"
-                      : "border-border bg-card hover:bg-accent/5"
-                  }`}
-                >
-                  <div className="mb-3 h-24 rounded-lg bg-gray-50 border shadow-sm">
-                    <div className="h-4 rounded-t-lg bg-gray-200" />
-                  </div>
-                  <p className="font-medium">Light Mode</p>
-                  <p className="text-xs text-muted-foreground">Clean and bright</p>
-                </button>
-                <button
-                  onClick={() => setTheme("dark")}
-                  className={`rounded-xl border p-4 text-left transition-all ${
-                    mounted && theme === "dark"
-                      ? "border-primary bg-primary/5 ring-1 ring-primary"
-                      : "border-border bg-card hover:bg-accent/5"
-                  }`}
-                >
-                  <div className="mb-3 h-24 rounded-lg bg-black border border-gray-800 shadow-sm">
-                    <div className="h-4 rounded-t-lg bg-gray-900" />
-                  </div>
-                  <p className="font-medium">Dark Mode</p>
-                  <p className="text-xs text-muted-foreground">Pure black background</p>
-                </button>
-              </div>
-            )}
+
 
             {activeSection === "security" && (
               <div className="space-y-6">

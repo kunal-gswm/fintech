@@ -29,33 +29,19 @@ export const viewport: Viewport = {
   userScalable: false,
 };
 
+import { AnimatedSplash } from "@/components/shared/animated-splash";
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} h-full antialiased`} suppressHydrationWarning>
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              try {
-                let theme = 'light';
-                let storage = localStorage.getItem('theme-storage');
-                if (storage) {
-                  let parsed = JSON.parse(storage);
-                  theme = parsed.state.theme;
-                }
-                if (theme === 'dark') {
-                  document.documentElement.classList.add('dark');
-                }
-              } catch (e) {}
-            `,
-          }}
-        />
-      </head>
-      <body className="min-h-full font-sans">{children}</body>
+    <html lang="en" className={`${inter.variable} h-full antialiased dark`} suppressHydrationWarning>
+      <body className="min-h-full font-sans">
+        <AnimatedSplash />
+        {children}
+      </body>
     </html>
   );
 }
