@@ -190,7 +190,7 @@ export default function ExpensesPage() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Categories</SelectItem>
-                      {EXPENSE_CATEGORIES.map((cat) => (
+                      {[...EXPENSE_CATEGORIES].sort().map((cat) => (
                         <SelectItem key={cat} value={cat}>
                           {cat}
                         </SelectItem>
@@ -207,9 +207,9 @@ export default function ExpensesPage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Title</TableHead>
-                    <TableHead>Category</TableHead>
+                    <TableHead className="hidden sm:table-cell">Category</TableHead>
                     <TableHead className="text-right">Amount</TableHead>
-                    <TableHead>Date</TableHead>
+                    <TableHead className="hidden sm:table-cell">Date</TableHead>
                     <TableHead className="hidden md:table-cell">Notes</TableHead>
                     <TableHead className="w-24">Actions</TableHead>
                   </TableRow>
@@ -218,7 +218,7 @@ export default function ExpensesPage() {
                   {paginated.map((expense) => (
                     <TableRow key={expense.id} className="group">
                       <TableCell className="font-medium">{expense.title}</TableCell>
-                      <TableCell>
+                      <TableCell className="hidden sm:table-cell">
                         <Badge
                           variant="secondary"
                           className="font-normal"
@@ -233,7 +233,7 @@ export default function ExpensesPage() {
                       <TableCell className="text-right font-semibold">
                         ₹{expense.amount.toLocaleString("en-IN")}
                       </TableCell>
-                      <TableCell className="text-muted-foreground">
+                      <TableCell className="hidden sm:table-cell text-muted-foreground">
                         {new Date(expense.date).toLocaleDateString("en-IN", {
                           day: "numeric",
                           month: "short",
@@ -364,7 +364,7 @@ export default function ExpensesPage() {
                           <SelectValue placeholder="Select" />
                         </SelectTrigger>
                         <SelectContent>
-                          {EXPENSE_CATEGORIES.map((cat) => (
+                          {[...EXPENSE_CATEGORIES].sort().map((cat) => (
                             <SelectItem key={cat} value={cat}>
                               {cat}
                             </SelectItem>

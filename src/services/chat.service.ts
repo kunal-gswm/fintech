@@ -127,22 +127,23 @@ export const sendChatMessageStreaming = async (
 };
 
 export const generateMonthlyReview = async (financialData: string) => {
-  const prompt = `You are a strict financial auditor. 
-Review the provided JSON ledger data for the user's past month.
-
+  const prompt = `You are a financial advisor. You are reviewing the user's monthly spending ledger.
+Analyze the following JSON payload representing their month's expenses.
 RULES:
-1. Do NOT invent, assume, or calculate any numbers. Only use the numbers provided in the JSON.
-2. Output your response EXACTLY as a valid JSON object. Do not include markdown formatting, markdown blocks, or any other text.
-3. The JSON object MUST strictly follow this schema:
-{
-  "summary": "A 2-sentence objective summary of the month.",
-  "biggestWin": "One positive financial behavior observed from the data.",
-  "warningArea": "One area where spending was high or could be optimized.",
-  "actionItem": "One specific, actionable step for next month."
-}
+1. ONLY output valid JSON.
+2. The JSON must EXACTLY match this schema:
+   {
+     "summary": "2-3 sentence objective overview of the month",
+     "win": "1 sentence describing their best financial decision",
+     "improvement": "1 sentence describing an area they overspent or could improve",
+     "action": "1 highly specific, actionable step for next month"
+   }
+3. DO NOT include markdown, code blocks, or any text outside the JSON object.
+4. ABSOLUTELY CRITICAL: Format ALL monetary values in Indian Rupees (₹). Do NOT use dollars ($) or any other currency symbol.
 
-DATA TO REVIEW:
-${financialData}`;
+LEDGER:
+${financialData}
+`;
 
   // Priority 1: Local LLM
   if (LocalLLMService.isAvailable) {
