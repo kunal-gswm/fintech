@@ -36,6 +36,25 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} h-full antialiased`} suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                let theme = 'light';
+                let storage = localStorage.getItem('theme-storage');
+                if (storage) {
+                  let parsed = JSON.parse(storage);
+                  theme = parsed.state.theme;
+                }
+                if (theme === 'dark') {
+                  document.documentElement.classList.add('dark');
+                }
+              } catch (e) {}
+            `,
+          }}
+        />
+      </head>
       <body className="min-h-full font-sans">{children}</body>
     </html>
   );

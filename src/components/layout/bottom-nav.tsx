@@ -11,7 +11,7 @@ import { NativeService } from "@/services/native.service";
 const NAV_ITEMS = [
   {
     name: "Home",
-    href: "/",
+    href: "/dashboard",
     icon: Home,
   },
   {
@@ -21,12 +21,12 @@ const NAV_ITEMS = [
   },
   {
     name: "AI Advisor",
-    href: "/ai-advisor",
+    href: "/assistant",
     icon: MessageSquare,
   },
   {
     name: "Profile",
-    href: "/profile",
+    href: "/settings",
     icon: User,
   },
 ];

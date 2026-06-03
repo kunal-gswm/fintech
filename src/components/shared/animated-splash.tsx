@@ -7,6 +7,13 @@ export function AnimatedSplash() {
   const [stage, setStage] = useState<"loading" | "zooming" | "splitting" | "done">("loading");
 
   useEffect(() => {
+    // Only play once per session
+    if (sessionStorage.getItem("splash_played") === "true") {
+      setStage("done");
+      return;
+    }
+    sessionStorage.setItem("splash_played", "true");
+
     // Hide the native OS splash screen instantly once React is ready!
     const hideNativeSplash = async () => {
       try {

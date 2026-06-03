@@ -78,7 +78,7 @@ export function Navbar() {
   }, [theme]);
 
   return (
-    <header className="sticky top-0 z-20 flex h-16 items-center gap-4 border-b border-border bg-background/80 px-4 backdrop-blur-md md:px-6">
+    <header className="sticky top-0 z-20 flex h-16 items-center gap-4 border-b border-border/40 bg-background/70 px-4 backdrop-blur-xl shadow-[0_4px_30px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_30px_rgba(212,175,55,0.03)] md:px-6 transition-colors duration-300">
       {/* Mobile menu button */}
       <Button
         variant="ghost"
