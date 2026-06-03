@@ -61,8 +61,9 @@ export class NativeService {
   static async takeReceiptPhoto(): Promise<string | null> {
     try {
       const image = await Camera.getPhoto({
-        quality: 90,
-        allowEditing: false,
+        quality: 70,
+        width: 1200,
+        allowEditing: true, // Let users crop out background noise
         resultType: CameraResultType.DataUrl,
         source: CameraSource.Camera
       });

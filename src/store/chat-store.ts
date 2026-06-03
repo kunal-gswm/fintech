@@ -1,6 +1,20 @@
 import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
+import { get, set, del } from "idb-keyval";
 import type { ChatMessage } from "@/types";
 import { sendChatMessage } from "@/services/chat.service";
+
+const idbStorage = {
+  getItem: async (name: string): Promise<string | null> => {
+    return (await get(name)) || null;
+  },
+  setItem: async (name: string, value: string): Promise<void> => {
+    await set(name, value);
+  },
+  removeItem: async (name: string): Promise<void> => {
+    await del(name);
+  },
+};
 
 interface ChatState {
   messages: ChatMessage[];
@@ -18,31 +32,39 @@ const welcomeMessage: ChatMessage = {
   timestamp: new Date().toISOString(),
 };
 
-export const useChatStore = create<ChatState>((set) => ({
-  messages: [welcomeMessage],
-  isTyping: false,
-  addMessage: (message) =>
-    set((state) => ({ messages: [...state.messages, message] })),
-  sendMessage: async (content) => {
-    const userMsg: ChatMessage = {
-      id: Date.now().toString(),
-      role: "user",
-      content,
-      timestamp: new Date().toISOString(),
-    };
-    set((state) => ({ messages: [...state.messages, userMsg], isTyping: true }));
-    try {
-      const aiResponse = await sendChatMessage(content);
-      set((state) => ({ messages: [...state.messages, aiResponse] }));
-    } catch (e) {
-      console.error("Chat error:", e);
-    } finally {
-      set({ isTyping: false });
-    }
-  },
-  setTyping: (typing) => set({ isTyping: typing }),
-  clearMessages: () =>
-    set({
+export const useChatStore = create<ChatState>()(
+  persist(
+    (set, get) => ({
       messages: [welcomeMessage],
+      isTyping: false,
+      addMessage: (message) =>
+        set((state) => ({ messages: [...state.messages, message] })),
+      sendMessage: async (content) => {
+        const userMsg: ChatMessage = {
+          id: Date.now().toString(),
+          role: "user",
+          content,
+          timestamp: new Date().toISOString(),
+        };
+        set((state) => ({ messages: [...state.messages, userMsg], isTyping: true }));
+        try {
+          const aiResponse = await sendChatMessage(content);
+          set((state) => ({ messages: [...state.messages, aiResponse] }));
+        } catch (e) {
+          console.error("Chat error:", e);
+        } finally {
+          set({ isTyping: false });
+        }
+      },
+      setTyping: (typing) => set({ isTyping: typing }),
+      clearMessages: () =>
+        set({
+          messages: [welcomeMessage],
+        }),
     }),
-}));
+    {
+      name: "chat-storage",
+      storage: createJSONStorage(() => idbStorage),
+    }
+  )
+);

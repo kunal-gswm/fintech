@@ -72,7 +72,7 @@ export default function AssistantPage() {
 
   return (
     <PageTransition>
-      <div className="mx-auto flex h-[calc(100vh-8rem)] max-w-4xl flex-col">
+      <div className="mx-auto flex h-full min-h-[500px] flex-grow flex-col max-w-4xl">
         {/* Header */}
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -136,7 +136,7 @@ export default function AssistantPage() {
                           : "bg-primary text-primary-foreground"
                       )}
                     >
-                      <div className="whitespace-pre-wrap">{msg.content}</div>
+                      <div className="whitespace-pre-wrap break-words break-all">{msg.content}</div>
                     </div>
                   </motion.div>
                 ))}
@@ -176,11 +176,11 @@ export default function AssistantPage() {
               />
               <Button
                 size="icon"
-                className="absolute bottom-2 right-2 h-8 w-8 rounded-lg"
+                className="absolute bottom-1 right-1 h-11 w-11 rounded-lg"
                 onClick={() => handleSend()}
                 disabled={!input.trim() || isTyping}
               >
-                <Send className="h-4 w-4" />
+                <Send className="h-5 w-5" />
               </Button>
             </div>
             <p className="mt-2 text-center text-xs text-muted-foreground">

@@ -24,8 +24,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           className="flex min-h-[100dvh] flex-col max-lg:!ml-0"
         >
           <Navbar />
-          {/* Add padding bottom on mobile to account for bottom nav */}
-          <main className="flex-1 p-4 md:p-6 pb-24 lg:pb-6">{children}</main>
+          {/* Add dynamic padding bottom on mobile to account for bottom nav + safe area */}
+          <main className="flex-1 p-4 md:p-6 pb-[var(--bottom-nav-height)] lg:pb-6">{children}</main>
         </motion.div>
         
         {/* Bottom Nav visible only on mobile */}

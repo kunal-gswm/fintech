@@ -9,10 +9,10 @@ const genAI = new GoogleGenerativeAI(API_KEY);
 
 export const sendChatMessage = async (message: string): Promise<ChatMessage> => {
   const allMessages = useChatStore.getState().messages;
-  
+
   // Format history for Ollama
   const systemInstruction = "You are a professional AI Financial Advisor. Provide concise, helpful, and responsible financial advice. Remind the user to consult real professionals for major decisions.";
-  
+
   const ollamaMessages = [
     { role: "system", content: systemInstruction },
     ...allMessages
@@ -51,7 +51,7 @@ export const sendChatMessage = async (message: string): Promise<ChatMessage> => 
 
   // Fallback to Gemini
   try {
-    const model = genAI.getGenerativeModel({ 
+    const model = genAI.getGenerativeModel({
       model: "gemini-2.5-flash",
       systemInstruction
     });

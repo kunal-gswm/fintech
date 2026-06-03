@@ -48,12 +48,12 @@ export default function SettingsPage() {
     localStorage.setItem('biometrics_enabled', checked ? 'true' : 'false');
   };
 
-    const menuItems = [
-      { id: "profile", label: "Profile", icon: User, color: "text-blue-500", bg: "bg-blue-500/10" },
-      { id: "preferences", label: "Preferences", icon: Sliders, color: "text-purple-500", bg: "bg-purple-500/10" },
-      { id: "security", label: "Security", icon: ShieldCheck, color: "text-emerald-500", bg: "bg-emerald-500/10" },
-      { id: "notifications", label: "Notifications", icon: Bell, color: "text-rose-500", bg: "bg-rose-500/10" },
-    ] as const;
+  const menuItems = [
+    { id: "profile", label: "Profile", icon: User, color: "text-blue-500", bg: "bg-blue-500/10" },
+    { id: "preferences", label: "Preferences", icon: Sliders, color: "text-purple-500", bg: "bg-purple-500/10" },
+    { id: "security", label: "Security", icon: ShieldCheck, color: "text-emerald-500", bg: "bg-emerald-500/10" },
+    { id: "notifications", label: "Notifications", icon: Bell, color: "text-rose-500", bg: "bg-rose-500/10" },
+  ] as const;
 
   if (activeSection) {
     return (
@@ -278,7 +278,7 @@ export default function SettingsPage() {
             Log Out
           </Button>
         </div>
-        
+
         <p className="text-center text-xs text-muted-foreground mt-8">
           Version 1.3.0
         </p>

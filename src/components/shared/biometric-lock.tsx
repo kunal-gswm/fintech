@@ -9,6 +9,8 @@ import { PageTransition } from "./page-transition";
 export function BiometricLockProvider({ children }: { children: React.ReactNode }) {
   const [isLocked, setIsLocked] = useState(true);
   const [isChecking, setIsChecking] = useState(true);
+  const [requiresPinFallback, setRequiresPinFallback] = useState(false);
+  const [pinInput, setPinInput] = useState("");
 
   // We need to check if biometrics are enabled in settings
   // For now, we assume it's enabled for the sake of the feature showcase
@@ -16,11 +18,24 @@ export function BiometricLockProvider({ children }: { children: React.ReactNode 
 
   const authenticate = async () => {
     setIsChecking(true);
+    setRequiresPinFallback(false);
     const success = await NativeService.requestBiometrics();
     if (success) {
       setIsLocked(false);
+    } else {
+      setRequiresPinFallback(true);
     }
     setIsChecking(false);
+  };
+
+  const handlePinSubmit = () => {
+    // Basic hardcoded fallback for offline PWA
+    if (pinInput === "1234") {
+      setIsLocked(false);
+    } else {
+      alert("Incorrect PIN. Please try again.");
+      setPinInput("");
+    }
   };
 
   useEffect(() => {
@@ -63,10 +78,31 @@ export function BiometricLockProvider({ children }: { children: React.ReactNode 
               <p className="text-muted-foreground">Please authenticate to access your financial data.</p>
             </div>
 
-            <Button onClick={authenticate} size="lg" className="w-full rounded-full h-14 text-lg shadow-lg">
-              <ScanFace className="w-5 h-5 mr-2" />
-              Unlock App
-            </Button>
+            {!requiresPinFallback ? (
+              <Button onClick={authenticate} size="lg" className="w-full rounded-full h-14 text-lg shadow-lg">
+                <ScanFace className="w-5 h-5 mr-2" />
+                Unlock App
+              </Button>
+            ) : (
+              <div className="w-full space-y-4">
+                <p className="text-sm text-amber-500 font-medium">Biometrics failed. Please enter your PIN.</p>
+                <div className="flex gap-2">
+                  <input 
+                    type="password" 
+                    value={pinInput}
+                    onChange={(e) => setPinInput(e.target.value)}
+                    placeholder="Enter PIN (1234)"
+                    className="flex-1 rounded-full border bg-background px-4 py-2"
+                  />
+                  <Button onClick={handlePinSubmit} className="rounded-full">
+                    Submit
+                  </Button>
+                </div>
+                <Button variant="ghost" onClick={authenticate} className="text-muted-foreground w-full">
+                  Try Biometrics Again
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </PageTransition>
