@@ -14,17 +14,6 @@ export function BiometricLockProvider({ children }: { children: React.ReactNode 
   // For now, we assume it's enabled for the sake of the feature showcase
   const biometricsEnabled = typeof window !== 'undefined' ? localStorage.getItem('biometrics_enabled') === 'true' : false;
 
-  useEffect(() => {
-    if (!biometricsEnabled) {
-      setIsLocked(false);
-      setIsChecking(false);
-      return;
-    }
-
-    // Try to auto-authenticate on mount
-    authenticate();
-  }, [biometricsEnabled]);
-
   const authenticate = async () => {
     setIsChecking(true);
     const success = await NativeService.requestBiometrics();
@@ -33,6 +22,21 @@ export function BiometricLockProvider({ children }: { children: React.ReactNode 
     }
     setIsChecking(false);
   };
+
+  useEffect(() => {
+    if (!biometricsEnabled) {
+      // Use setTimeout to avoid synchronous state update in effect
+      setTimeout(() => {
+        setIsLocked(false);
+        setIsChecking(false);
+      }, 0);
+      return;
+    }
+
+    // Try to auto-authenticate on mount
+    authenticate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [biometricsEnabled]);
 
   if (isChecking) {
     return (

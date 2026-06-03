@@ -5,6 +5,7 @@ import { Sidebar } from "./sidebar";
 import { Navbar } from "./navbar";
 import { useSidebarStore } from "@/store/sidebar-store";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { BottomNav } from "./bottom-nav";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { isCollapsed } = useSidebarStore();
@@ -12,16 +13,23 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <TooltipProvider delay={0}>
       <div className="min-h-screen bg-background">
-        <Sidebar />
+        {/* Sidebar is hidden on lg breakpoints and below */}
+        <div className="hidden lg:block">
+          <Sidebar />
+        </div>
         <motion.div
           initial={false}
           animate={{ marginLeft: isCollapsed ? 72 : 256 }}
           transition={{ duration: 0.3, ease: "easeInOut" }}
-          className="flex min-h-screen flex-col max-lg:!ml-0"
+          className="flex min-h-[100dvh] flex-col max-lg:!ml-0"
         >
           <Navbar />
-          <main className="flex-1 p-4 md:p-6">{children}</main>
+          {/* Add padding bottom on mobile to account for bottom nav */}
+          <main className="flex-1 p-4 md:p-6 pb-24 lg:pb-6">{children}</main>
         </motion.div>
+        
+        {/* Bottom Nav visible only on mobile */}
+        <BottomNav />
       </div>
     </TooltipProvider>
   );

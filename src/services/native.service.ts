@@ -1,6 +1,7 @@
 import { Capacitor } from '@capacitor/core';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { LocalNotifications } from '@capacitor/local-notifications';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 
 export class NativeService {
   /**
@@ -9,6 +10,24 @@ export class NativeService {
    */
   static isNative(): boolean {
     return Capacitor.isNativePlatform();
+  }
+
+  /**
+   * Trigger light haptic feedback for UI interactions
+   */
+  static async hapticLight() {
+    if (this.isNative()) {
+      await Haptics.impact({ style: ImpactStyle.Light });
+    }
+  }
+
+  /**
+   * Trigger heavy haptic feedback for major actions or successes
+   */
+  static async hapticHeavy() {
+    if (this.isNative()) {
+      await Haptics.impact({ style: ImpactStyle.Heavy });
+    }
   }
 
   /**
