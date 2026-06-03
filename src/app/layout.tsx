@@ -32,6 +32,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
+  interactiveWidget: "resizes-content",
 };
 
 import { AnimatedSplash } from "@/components/shared/animated-splash";
@@ -43,7 +44,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} h-full antialiased dark`} suppressHydrationWarning>
-      <body className="min-h-full font-sans">
+      <body className="min-h-full font-sans hide-scrollbar">
         <AnimatedSplash />
         {children}
       </body>

@@ -105,10 +105,10 @@ export default function ArticlePage({ params }: { params: Promise<{ slug: string
           <div className="flex flex-wrap items-center gap-3">
             <Badge
               variant="secondary"
-              className={cn(
-                "px-3 py-1 font-medium border-transparent",
-                CATEGORY_COLORS[article.category] || "bg-slate-500/10 text-slate-700 dark:text-slate-300"
-              )}
+              className="px-3 py-1 font-medium border-transparent"
+              style={{
+                backgroundColor: CATEGORY_COLORS[article.category] ? `${CATEGORY_COLORS[article.category]}20` : undefined,
+              }}
             >
               {article.category}
             </Badge>

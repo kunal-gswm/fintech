@@ -74,7 +74,7 @@ export default function AssistantPage() {
 
   return (
     <PageTransition>
-      <div className="mx-auto flex h-full min-h-[500px] flex-grow flex-col max-w-4xl">
+      <div className="mx-auto flex h-[calc(100dvh-130px)] flex-col max-w-4xl">
         {/* Header */}
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-3">

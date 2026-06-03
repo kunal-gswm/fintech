@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Home, PieChart, MessageSquare, User, Grid, Target, BookOpen, FileText, CreditCard } from "lucide-react";
+import { Home, PieChart, MessageSquare, User, Grid, Target, BookOpen, FileText, CreditCard, Settings } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { NativeService } from "@/services/native.service";
@@ -22,7 +22,7 @@ const MAIN_NAV = [
 
 const RIGHT_NAV = [
   { name: "AI Advisor", href: "/assistant", icon: MessageSquare },
-  { name: "Profile", href: "/settings", icon: User },
+  { name: "Settings", href: "/settings", icon: Settings },
 ];
 
 const ALL_MENU_ITEMS = [
