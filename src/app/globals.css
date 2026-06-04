@@ -163,12 +163,16 @@
   }
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar globally */
 @layer base {
-  ::-webkit-scrollbar {
+  *::-webkit-scrollbar {
     display: none !important;
-    width: 0px;
-    height: 0px;
+    width: 0px !important;
+    height: 0px !important;
+  }
+  * {
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
   }
 }
 
