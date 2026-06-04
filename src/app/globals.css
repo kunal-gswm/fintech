@@ -197,6 +197,8 @@
   }
 }
 
-body {
+body, html {
   overflow-x: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }

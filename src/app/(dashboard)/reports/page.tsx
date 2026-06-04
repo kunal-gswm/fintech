@@ -56,8 +56,12 @@ export default function ReportsPage() {
     }).catch(console.error);
   }, []);
 
-  if (isLoading || !selectedReport) {
+  if (isLoading) {
     return <div className="flex h-64 items-center justify-center">Loading reports...</div>;
+  }
+
+  if (!selectedReport) {
+    return <div className="flex h-64 flex-col items-center justify-center gap-2 text-muted-foreground"><FileText className="h-8 w-8 opacity-50" /><p>No reports available.</p></div>;
   }
 
   return (

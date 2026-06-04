@@ -42,6 +42,13 @@ function TypingIndicator() {
   );
 }
 
+const PREDEFINED_PROMPTS = [
+  "Analyze my recent expenses and give tips",
+  "How can I improve my health score?",
+  "Suggest a 50/30/20 budget for my income",
+  "What is an emergency fund?"
+];
+
 export default function AssistantPage() {
   const { messages, isTyping, streamingContent, clearMessages } =
     useChatStore();
@@ -57,8 +64,8 @@ export default function AssistantPage() {
   // Poll LLM status so the badge updates as the model loads
   const [llmStatus, setLlmStatus] = useState(LocalLLMService.status);
   useEffect(() => {
-    // Check immediately
-    setLlmStatus(LocalLLMService.status);
+    // Check immediately via microtask to avoid sync setState warning
+    Promise.resolve().then(() => setLlmStatus(LocalLLMService.status));
     // Then poll every 2s to catch async init changes
     const interval = setInterval(() => {
       setLlmStatus(LocalLLMService.status);
@@ -223,7 +230,25 @@ export default function AssistantPage() {
             </div>
           </ScrollArea>
 
-
+          {/* Predefined Prompts */}
+          {messages.length === 0 && (
+            <div className="px-4 pb-2">
+              <p className="mb-2 text-xs font-medium text-muted-foreground">Try asking:</p>
+              <div className="flex flex-wrap gap-2">
+                {PREDEFINED_PROMPTS.map((prompt, i) => (
+                  <Button
+                    key={i}
+                    variant="secondary"
+                    size="sm"
+                    className="h-auto py-1.5 px-3 text-xs font-normal bg-primary/10 hover:bg-primary/20 text-primary border-0"
+                    onClick={() => handleSend(prompt)}
+                  >
+                    {prompt}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Input Area */}
           <div className="border-t p-4">

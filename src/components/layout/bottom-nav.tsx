@@ -17,7 +17,7 @@ import { useState } from "react";
 
 const MAIN_NAV = [
   { name: "Home", href: "/dashboard", icon: Home },
-  { name: "Analytics", href: "/analytics", icon: PieChart },
+  { name: "Expenses", href: "/expenses", icon: CreditCard },
 ];
 
 const RIGHT_NAV = [
@@ -45,7 +45,7 @@ export function BottomNav() {
   const hiddenPaths = ["/login", "/signup", "/onboarding"];
   if (hiddenPaths.includes(pathname)) return null;
 
-  const NavButton = ({ item }: { item: any }) => {
+  const NavButton = ({ item }: { item: { name: string; href: string; icon: React.ElementType } }) => {
     const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
     return (
       <Link

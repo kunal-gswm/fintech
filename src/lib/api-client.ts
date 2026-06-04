@@ -142,23 +142,31 @@ export async function apiClient<T>(url: string, options?: ApiClientOptions): Pro
 
   if (path.startsWith("/api/analytics")) {
     const expenses = getLocalData<Expense[]>("expenses");
+    const profile = getLocalData<Record<string, unknown>>("profile");
+    const monthlyIncome = typeof profile.monthlyIncome === "number" ? profile.monthlyIncome : 0;
+
     const month = searchParams.get("month");
     const filtered = month && month !== "All" ? expenses.filter(e => new Date(e.date).toLocaleString('default', { month: 'short' }) === month) : expenses;
     const analytics = generateExpenseAnalytics(filtered);
-    const monthlyTrend = [
-      { month: "Jul", income: 5200, expenses: 3500 },
-      { month: "Aug", income: 5500, expenses: 4100 },
-      { month: "Sep", income: 6100, expenses: 4000 },
-      { month: "Oct", income: 5800, expenses: 3900 },
-      { month: "Nov", income: 7200, expenses: 5100 },
-      { month: "Dec", income: 7800, expenses: 6200 },
-      { month: "Jan", income: 6500, expenses: 4800 },
-      { month: "Feb", income: 5900, expenses: 4200 },
-      { month: "Mar", income: 6200, expenses: 4700 },
-      { month: "Apr", income: 7100, expenses: 5200 },
-      { month: "May", income: 7600, expenses: 4900 },
-      { month: "Jun", income: 7900, expenses: 5100 },
-    ];
+    
+    const monthlyTrend = [];
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const now = new Date();
+    
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const mName = monthNames[d.getMonth()];
+      const monthExpenses = expenses
+        .filter(e => new Date(e.date).getMonth() === d.getMonth() && new Date(e.date).getFullYear() === d.getFullYear())
+        .reduce((sum, e) => sum + e.amount, 0);
+        
+      monthlyTrend.push({
+        month: mName,
+        income: monthlyIncome,
+        expenses: monthExpenses
+      });
+    }
+
     return {
       totalSpent: analytics.totalSpending,
       topCategory: analytics.largestCategory?.name || "None",
