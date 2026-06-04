@@ -14,28 +14,27 @@ import '../screens/reports_screen.dart';
 import '../screens/settings_screen.dart';
 import '../screens/notifications_screen.dart';
 import '../screens/learning_placeholder_screen.dart';
+import '../screens/splash_screen.dart';
 import '../providers/settings_provider.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
 final routerProvider = Provider<GoRouter>((ref) {
-  final settings = ref.watch(settingsProvider);
-
-  String initialLocation;
-  if (!settings.onboardingComplete) {
-    initialLocation = '/onboarding';
-  } else if (settings.biometricEnabled || settings.pinEnabled) {
-    initialLocation = '/lock';
-  } else {
-    initialLocation = '/home';
-  }
+  // We keep watching settings to ensure the router recreates on changes if needed,
+  // but the absolute starting point is now always the animated splash screen.
+  final _ = ref.watch(settingsProvider);
 
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: initialLocation,
+    initialLocation: '/splash',
     routes: [
       // ── Full-screen routes (no bottom nav) ──
+      GoRoute(
+        path: '/splash',
+        name: 'splash',
+        builder: (context, state) => const SplashScreen(),
+      ),
       GoRoute(
         path: '/onboarding',
         name: 'onboarding',

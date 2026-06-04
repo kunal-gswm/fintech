@@ -4,6 +4,9 @@ import 'package:expanda/main.dart';
 import 'package:expanda/providers/settings_provider.dart';
 import 'package:expanda/models/user_settings.dart';
 
+import 'package:expanda/providers/update_provider.dart';
+import 'package:expanda/services/update_service.dart';
+
 class MockSettingsNotifier extends SettingsNotifier {
   @override
   UserSettings build() {
@@ -18,6 +21,7 @@ void main() {
       ProviderScope(
         overrides: [
           settingsProvider.overrideWith(() => MockSettingsNotifier()),
+          updateStateProvider.overrideWith((ref) => const UpdateInfo(hasUpdate: false)),
         ],
         child: const ExpandaApp(),
       ),
