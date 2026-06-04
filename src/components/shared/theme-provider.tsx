@@ -66,10 +66,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("expanda_theme", t);
   };
 
-  if (!mounted) {
-    return <>{children}</>;
-  }
-
   return (
     <ThemeProviderContext.Provider 
       value={{ 

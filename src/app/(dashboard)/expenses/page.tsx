@@ -388,8 +388,6 @@ export default function ExpensesPage() {
                   </div>
                 </div>
               )}
-            </Card>
-
             {/* Add/Edit Dialog */}
             <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
               <DialogContent>

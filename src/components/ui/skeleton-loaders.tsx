@@ -13,7 +13,7 @@ const shimmerVariants = {
 const Shimmer = () => (
   <div className="absolute inset-0 overflow-hidden">
     <motion.div
-      variants={shimmerVariants}
+      variants={shimmerVariants as any}
       initial="initial"
       animate="animate"
       className="h-full w-full bg-gradient-to-r from-transparent via-[#2A2A2A] to-transparent opacity-30"

@@ -227,8 +227,8 @@ export default function ReportsPage() {
                   fill="#2563EB"
                   radius={[6, 6, 0, 0]}
                   barSize={24}
-                  onClick={(data) => setActiveChartData(data)}
-                  onMouseEnter={(data) => setActiveChartData(data)}
+                  onClick={(data: any) => setActiveChartData(data.payload || data)}
+                  onMouseEnter={(data: any) => setActiveChartData(data.payload || data)}
                   style={{ cursor: "pointer" }}
                 />
                 <Bar
@@ -236,8 +236,8 @@ export default function ReportsPage() {
                   fill="#F59E0B"
                   radius={[6, 6, 0, 0]}
                   barSize={24}
-                  onClick={(data) => setActiveChartData(data)}
-                  onMouseEnter={(data) => setActiveChartData(data)}
+                  onClick={(data: any) => setActiveChartData(data.payload || data)}
+                  onMouseEnter={(data: any) => setActiveChartData(data.payload || data)}
                   style={{ cursor: "pointer" }}
                 />
               </BarChart>
