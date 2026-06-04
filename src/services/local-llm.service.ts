@@ -5,8 +5,8 @@
  * gemma-4-e2b-q4_k_m locally on-device. No network required.
  * 
  * Platform asset paths:
- *   Android: public/models/gemma-4-e2b-q4_k_m.litertlm (inside assets)
- *   iOS:     models/gemma-4-e2b-q4_k_m.litertlm (copied via Xcode bundle)
+ *   Android: public/models/gemma-4-E2B-it.litertlm (inside assets)
+ *   iOS:     models/gemma-4-E2B-it.litertlm (copied via Xcode bundle)
  */
 
 import { Capacitor } from '@capacitor/core';
@@ -26,7 +26,7 @@ type ErrorCallback = (error: Error) => void;
 
 // ---------- Constants ----------
 
-const MODEL_FILENAME = 'gemma-4-e2b-q4_k_m.litertlm';
+const MODEL_FILENAME = 'gemma-4-E2B-it.litertlm';
 const MODEL_TYPE = 'litertlm';
 
 // ---------- Helpers ----------

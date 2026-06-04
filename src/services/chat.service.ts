@@ -6,7 +6,6 @@ import { LocalLLMService } from "@/services/local-llm.service";
 // Use the injected environment variable, or fallback to the obfuscated key
 const API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY || ["AQ.Ab8RN6IGQn99lT83w", "3zgyZbKK49BExU0lpGkYuPwvUewW32fyQ"].join("");
 
-const genAI = new GoogleGenerativeAI(API_KEY);
 
 /**
  * Sends a chat message through the AI priority chain:
@@ -40,7 +39,14 @@ export const sendChatMessage = async (message: string): Promise<ChatMessage> => 
 
   // ─── Priority 2: Cloud Gemini API ───
   try {
-    const model = genAI.getGenerativeModel({
+    let apiKey = "";
+    if (typeof window !== "undefined") {
+      apiKey = localStorage.getItem("gemini_api_key") || "";
+    }
+    const activeKey = apiKey || API_KEY;
+    const activeGenAI = new GoogleGenerativeAI(activeKey);
+
+    const model = activeGenAI.getGenerativeModel({
       model: "gemini-2.5-flash",
       systemInstruction
     });

@@ -21,7 +21,6 @@ import {
   Sliders,
   Palette,
   ShieldCheck,
-  Bell,
   Camera,
   ChevronRight,
   ChevronLeft,
@@ -30,7 +29,7 @@ import {
 import { useThemeStore } from "@/store/theme-store";
 import { NativeService } from "@/services/native.service";
 
-type Section = "profile" | "preferences" | "security" | "notifications" | null;
+type Section = "profile" | "preferences" | "security" | null;
 
 export default function SettingsPage() {
   const { theme, setTheme } = useThemeStore();
@@ -47,7 +46,6 @@ export default function SettingsPage() {
     { id: "profile", label: "Profile", icon: User, color: "text-blue-500", bg: "bg-blue-500/10" },
     { id: "preferences", label: "Preferences", icon: Sliders, color: "text-purple-500", bg: "bg-purple-500/10" },
     { id: "security", label: "Security", icon: ShieldCheck, color: "text-emerald-500", bg: "bg-emerald-500/10" },
-    { id: "notifications", label: "Notifications", icon: Bell, color: "text-rose-500", bg: "bg-rose-500/10" },
   ] as const;
 
   if (activeSection) {
@@ -190,43 +188,6 @@ export default function SettingsPage() {
               </div>
             )}
 
-            {activeSection === "notifications" && (
-              <div className="space-y-6">
-                <div className="rounded-xl bg-primary/10 border border-primary/20 p-4 flex items-center justify-between">
-                  <div>
-                    <p className="font-bold text-primary">Daily Reminders</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">Native Push Notifications</p>
-                  </div>
-                  <Button size="sm" onClick={() => {
-                    import("@/services/native.service").then(m => m.NativeService.scheduleDailyReminder());
-                  }}>
-                    Enable
-                  </Button>
-                </div>
-
-                <div className="space-y-4 rounded-xl border bg-card p-4">
-                  {[
-                    { title: "Expense alerts", desc: "When you approach budget limits", checked: true },
-                    { title: "Goal milestones", desc: "Celebrate when you hit milestones", checked: true },
-                    { title: "Monthly reports", desc: "Receive financial summaries", checked: true },
-                    { title: "AI insights", desc: "Personalized recommendations", checked: true },
-                    { title: "Security alerts", desc: "Important account notifications", checked: true },
-                    { title: "Marketing emails", desc: "Product updates", checked: false },
-                  ].map((item, idx, arr) => (
-                    <React.Fragment key={item.title}>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-medium">{item.title}</p>
-                          <p className="text-xs text-muted-foreground">{item.desc}</p>
-                        </div>
-                        <Switch defaultChecked={item.checked} />
-                      </div>
-                      {idx !== arr.length - 1 && <Separator />}
-                    </React.Fragment>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </PageTransition>

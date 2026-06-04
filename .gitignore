@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# AI Models
+public/models/
+
+# IDE
+.idea/
+android/.idea/

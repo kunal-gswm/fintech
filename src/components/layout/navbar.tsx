@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import {
   Search,
-  Bell,
   Moon,
   Sun,
   Menu,
@@ -35,39 +34,12 @@ import { useThemeStore } from "@/store/theme-store";
 import { SearchDialog } from "@/components/shared/search-dialog";
 import { cn } from "@/lib/utils";
 
-const mockNotifications = [
-  {
-    id: "1",
-    title: "Salary Credited",
-    description: "₹85,000 has been credited to your HDFC account",
-    time: "2 hours ago",
-    type: "success",
-    read: false,
-  },
-  {
-    id: "2",
-    title: "Budget Alert",
-    description: "You've exceeded your dining budget for this month",
-    time: "5 hours ago",
-    type: "warning",
-    read: false,
-  },
-  {
-    id: "3",
-    title: "New Insight",
-    description: "AI has generated a new tip to optimize your taxes",
-    time: "1 day ago",
-    type: "info",
-    read: true,
-  },
-];
 
 export function Navbar() {
   const { setMobileOpen } = useSidebarStore();
   const { theme, toggleTheme } = useThemeStore();
   const [mounted, setMounted] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const unreadCount = mockNotifications.filter((n) => !n.read).length;
 
   useEffect(() => {
     setMounted(true);
@@ -108,54 +80,6 @@ export function Navbar() {
       <SearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
 
       <div className="ml-auto flex items-center gap-1">
-        {/* Notifications */}
-        <Popover>
-          <PopoverTrigger className={buttonVariants({ variant: "ghost", size: "icon", className: "relative h-9 w-9" })}>
-            <Bell className="h-4 w-4" />
-            {unreadCount > 0 && (
-              <span className="absolute top-2 right-2.5 h-2 w-2 rounded-full bg-red-500 ring-2 ring-background" />
-            )}
-          </PopoverTrigger>
-          <PopoverContent align="end" className="w-80 p-0">
-            <div className="border-b px-4 py-3">
-              <h4 className="text-sm font-semibold">Notifications</h4>
-              <p className="text-xs text-muted-foreground">
-                You have {unreadCount} unread notifications
-              </p>
-            </div>
-            <div className="max-h-80 overflow-y-auto">
-              {mockNotifications.map((notification) => (
-                <div
-                  key={notification.id}
-                  className={cn(
-                    "border-b px-4 py-3 last:border-0 transition-colors hover:bg-muted/50",
-                    !notification.read && "bg-primary/5"
-                  )}
-                >
-                  <div className="flex items-start gap-3">
-                    <div
-                      className={cn(
-                        "mt-0.5 h-2 w-2 shrink-0 rounded-full",
-                        notification.type === "success" && "bg-emerald-500",
-                        notification.type === "warning" && "bg-amber-500",
-                        notification.type === "info" && "bg-blue-500"
-                      )}
-                    />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium">{notification.title}</p>
-                      <p className="text-xs text-muted-foreground truncate">
-                        {notification.description}
-                      </p>
-                      <p className="mt-1 text-xs text-muted-foreground/70">
-                        {notification.time}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </PopoverContent>
-        </Popover>
 
         {/* Profile Dropdown */}
         <div className="hidden md:block">
