@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Table,
   TableBody,
@@ -45,6 +46,7 @@ import { useExpenseStore } from "@/store/expense-store";
 import { EXPENSE_CATEGORIES, CATEGORY_COLORS } from "@/lib/constants";
 import type { Expense, ExpenseCategory } from "@/types";
 import { ReceiptScanner } from "@/components/dashboard/receipt-scanner";
+import { SkeletonRow } from "@/components/ui/skeleton-loaders";
 
 const ITEMS_PER_PAGE = 8;
 
@@ -158,7 +160,13 @@ export default function ExpensesPage() {
         </PageHeader>
 
         {loadingState.status === "loading" ? (
-          <div className="flex h-32 items-center justify-center">Loading expenses...</div>
+          <div className="flex flex-col gap-3">
+            <SkeletonRow />
+            <SkeletonRow />
+            <SkeletonRow />
+            <SkeletonRow />
+            <SkeletonRow />
+          </div>
         ) : (
           <>
             {/* Filters */}
@@ -201,8 +209,9 @@ export default function ExpensesPage() {
               </div>
             </Card>
 
-            {/* Table */}
-            <Card>
+            {/* Desktop Table */}
+            <div className="hidden sm:block">
+              <Card>
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -277,6 +286,66 @@ export default function ExpensesPage() {
                   )}
                 </TableBody>
               </Table>
+            </Card>
+            </div>
+
+            {/* Mobile Cards View */}
+            <div className="block sm:hidden">
+              <div className="flex flex-col gap-3">
+                <AnimatePresence mode="popLayout">
+                  {paginated.map((expense, i) => (
+                    <motion.div
+                      key={expense.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ delay: i * 0.05 }}
+                      className="flex flex-col gap-3 rounded-xl border border-[#262626] bg-[#0A0A0A] p-4 shadow-sm"
+                      onClick={() => openEdit(expense)}
+                    >
+                      <div className="flex justify-between items-start">
+                        <span className="font-bold text-[#E2E8F0]">{expense.title}</span>
+                        <span className={`font-bold ${expense.amount > 0 ? "text-[#E5B80B]" : "text-[#EF4444]"}`}>
+                          ₹{expense.amount.toLocaleString("en-IN")}
+                        </span>
+                      </div>
+                      
+                      <div className="flex items-center gap-2 text-sm">
+                        <Badge
+                          variant="secondary"
+                          className="font-medium px-2 py-0.5 rounded-md border-0"
+                          style={{
+                            backgroundColor: `${CATEGORY_COLORS[expense.category]}15`,
+                            color: CATEGORY_COLORS[expense.category],
+                          }}
+                        >
+                          {expense.category}
+                        </Badge>
+                        <span className="text-[#A1A1AA]">·</span>
+                        <span className="text-[#A1A1AA]">
+                          {new Date(expense.date).toLocaleDateString("en-IN", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          })}
+                        </span>
+                      </div>
+
+                      {expense.notes && (
+                        <p className="truncate text-xs text-[#A1A1AA]">
+                          {expense.notes}
+                        </p>
+                      )}
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+                {paginated.length === 0 && (
+                  <div className="h-32 flex items-center justify-center text-[#A1A1AA]">
+                    No expenses found.
+                  </div>
+                )}
+              </div>
+            </div>
 
               {/* Pagination */}
               {totalPages > 1 && (

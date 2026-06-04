@@ -20,7 +20,6 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  Tooltip,
   ResponsiveContainer,
 } from "recharts";
 import {
@@ -35,29 +34,42 @@ import {
 import { getReports } from "@/services/reports.service";
 import { getAnalytics } from "@/services/analytics.service";
 import type { Report, MonthlyData } from "@/types";
+import { SkeletonCard, SkeletonChart } from "@/components/ui/skeleton-loaders";
 
 export default function ReportsPage() {
   const [reports, setReports] = useState<Report[]>([]);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [chartData, setChartData] = useState<MonthlyData[]>([]);
+  const [activeChartData, setActiveChartData] = useState<MonthlyData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([getReports(), getAnalytics()]).then(([reportsData, analyticsData]) => {
       setReports(reportsData);
       if (reportsData.length > 0) setSelectedReport(reportsData[0]);
-      setChartData(
-        (analyticsData.monthlyTrend || []).map((m: {month: string; income: number; expenses: number}) => ({
-          ...m,
-          savings: m.income - m.expenses,
-        }))
-      );
+      const formattedData = (analyticsData.monthlyTrend || []).map((m: {month: string; income: number; expenses: number}) => ({
+        ...m,
+        savings: m.income - m.expenses,
+      }));
+      setChartData(formattedData);
+      if (formattedData.length > 0) setActiveChartData(formattedData[formattedData.length - 1]);
       setIsLoading(false);
     }).catch(console.error);
   }, []);
 
   if (isLoading) {
-    return <div className="flex h-64 items-center justify-center">Loading reports...</div>;
+    return (
+      <div className="space-y-6">
+        <PageHeader title="Reports" description="Monthly financial reports with AI-powered insights." />
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+        </div>
+        <SkeletonChart />
+      </div>
+    );
   }
 
   if (!selectedReport) {
@@ -158,12 +170,36 @@ export default function ReportsPage() {
         </div>
 
         {/* Chart */}
-        <Card className="p-6">
-          <h3 className="text-sm font-semibold">6-Month Overview</h3>
-          <p className="text-xs text-muted-foreground">
-            Income and expenses comparison
-          </p>
-          <div className="mt-4 h-[300px]">
+        <Card className="flex flex-col overflow-hidden">
+          {activeChartData && (
+            <motion.div 
+              key={activeChartData.month}
+              initial={{ backgroundColor: "rgba(10,10,10,0)" }}
+              animate={{ backgroundColor: "rgba(38,38,38,0.2)" }}
+              className="flex items-center justify-between border-b border-[#262626] bg-[#0A0A0A] px-4 py-3"
+            >
+              <div className="flex flex-col">
+                <span className="text-xs text-muted-foreground">Month</span>
+                <span className="font-semibold text-[#E2E8F0]">{activeChartData.month}</span>
+              </div>
+              <div className="flex items-center gap-4 text-right">
+                <div className="flex flex-col">
+                  <span className="text-xs text-blue-500">Income</span>
+                  <span className="font-bold text-[#E2E8F0]">₹{(activeChartData.income / 1000).toFixed(1)}k</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-xs text-amber-500">Expense</span>
+                  <span className="font-bold text-[#E5B80B]">₹{(activeChartData.expenses / 1000).toFixed(1)}k</span>
+                </div>
+              </div>
+            </motion.div>
+          )}
+          <div className="p-6">
+            <h3 className="text-sm font-semibold">6-Month Overview</h3>
+            <p className="text-xs text-muted-foreground mb-4">
+              Tap a bar to see details
+            </p>
+            <div className="h-[260px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={chartData}
@@ -186,32 +222,27 @@ export default function ReportsPage() {
                   tick={{ fontSize: 12, fill: "#94A3B8" }}
                   tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}K`}
                 />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "white",
-                    border: "1px solid #E2E8F0",
-                    borderRadius: "12px",
-                    padding: "12px",
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-                  }}
-                  formatter={(value) => [
-                    `₹${Number(value).toLocaleString("en-IN")}`,
-                  ]}
-                />
                 <Bar
                   dataKey="income"
                   fill="#2563EB"
                   radius={[6, 6, 0, 0]}
                   barSize={24}
+                  onClick={(data) => setActiveChartData(data)}
+                  onMouseEnter={(data) => setActiveChartData(data)}
+                  style={{ cursor: "pointer" }}
                 />
                 <Bar
                   dataKey="expenses"
                   fill="#F59E0B"
                   radius={[6, 6, 0, 0]}
                   barSize={24}
+                  onClick={(data) => setActiveChartData(data)}
+                  onMouseEnter={(data) => setActiveChartData(data)}
+                  style={{ cursor: "pointer" }}
                 />
               </BarChart>
             </ResponsiveContainer>
+            </div>
           </div>
         </Card>
 

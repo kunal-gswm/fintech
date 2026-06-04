@@ -6,6 +6,7 @@ import { ErrorBoundary } from "@/components/shared/error-boundary";
 import { KPICards } from "@/components/dashboard/kpi-card";
 import { ActivityFeed } from "@/components/dashboard/activity-feed";
 import { AiMonthlyReview } from "@/components/dashboard/ai-monthly-review";
+import { ContrastToggle } from "@/components/shared/contrast-toggle";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
@@ -27,6 +28,7 @@ export default function DashboardPage() {
         <div className="pt-2">
           <div className="mb-4 flex items-center justify-between px-2">
             <h2 className="text-xl font-bold tracking-tight">Overview</h2>
+            <ContrastToggle />
           </div>
           <ErrorBoundary fallbackMessage="Failed to load Key Performance Indicators">
             <KPICards />

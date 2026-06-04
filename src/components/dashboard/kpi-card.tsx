@@ -16,6 +16,7 @@ import { getHealth } from "@/services/health.service";
 import { getAnalytics } from "@/services/analytics.service";
 import { useExpenseStore } from "@/store/expense-store";
 import { cn } from "@/lib/utils";
+import { SkeletonCard } from "@/components/ui/skeleton-loaders";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   PiggyBank,
@@ -83,6 +84,16 @@ export function KPICards() {
         cancelled = true;
       };
   }, [expenseCount]); // Depend on expenseCount so mutations trigger a sync
+
+  if (data.length === 0) {
+    return (
+      <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-4 px-4 sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 sm:overflow-visible sm:px-0 sm:mx-0 hide-scrollbar">
+        <div className="shrink-0 w-[85%] snap-center sm:w-auto"><SkeletonCard /></div>
+        <div className="shrink-0 w-[85%] snap-center sm:w-auto"><SkeletonCard /></div>
+        <div className="shrink-0 w-[85%] snap-center sm:w-auto"><SkeletonCard /></div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-4 px-4 sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 sm:overflow-visible sm:px-0 sm:mx-0 hide-scrollbar">

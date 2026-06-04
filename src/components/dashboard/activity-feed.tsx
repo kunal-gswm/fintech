@@ -8,6 +8,7 @@ import { useState, useEffect } from "react";
 import { getExpenses } from "@/services/expenses.service";
 import { getGoals } from "@/services/goals.service";
 import { cn } from "@/lib/utils";
+import { SkeletonRow } from "@/components/ui/skeleton-loaders";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   CreditCard,
@@ -29,6 +30,7 @@ const typeIconColors = {
 
 export function ActivityFeed() {
   const [activities, setActivities] = useState<{id: string; title: string; description: string; amount?: number; type: "expense" | "goal" | "ai_recommendation"; icon: string; timestamp: string;}[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([getExpenses(), getGoals()]).then(([expenses, goals]) => {
@@ -55,7 +57,11 @@ export function ActivityFeed() {
       });
 
       setActivities(feed.sort(() => Math.random() - 0.5).slice(0, 5)); // shuffle for visual variety and limit to 5
-    }).catch(console.error);
+      setLoading(false);
+    }).catch((e) => {
+      console.error(e);
+      setLoading(false);
+    });
   }, []);
 
   return (
@@ -73,45 +79,53 @@ export function ActivityFeed() {
       </div>
       <ScrollArea className="h-[280px]">
         <div className="space-y-3 pr-4">
-          {activities.map((activity) => {
-            const Icon = iconMap[activity.icon] || CreditCard;
-            return (
-              <div
-                key={`${activity.type}-${activity.id}`}
-                className="flex items-start gap-3 rounded-lg border border-border p-3 transition-colors hover:bg-muted/50"
-              >
+          {loading ? (
+            <>
+              <SkeletonRow />
+              <SkeletonRow />
+              <SkeletonRow />
+            </>
+          ) : (
+            activities.map((activity) => {
+              const Icon = iconMap[activity.icon] || CreditCard;
+              return (
                 <div
-                  className={cn(
-                    "mt-0.5 shrink-0 rounded-lg border p-2",
-                    typeColors[activity.type]
-                  )}
+                  key={`${activity.type}-${activity.id}`}
+                  className="flex items-start gap-3 rounded-lg border border-border p-3 transition-colors hover:bg-muted/50"
                 >
-                  <Icon
+                  <div
                     className={cn(
-                      "h-4 w-4",
-                      typeIconColors[activity.type]
+                      "mt-0.5 shrink-0 rounded-lg border p-2",
+                      typeColors[activity.type]
                     )}
-                  />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-start justify-between gap-2">
-                    <p className="text-sm font-medium">{activity.title}</p>
-                    {activity.amount && (
-                      <span className="shrink-0 text-sm font-semibold text-amber-600">
-                        -₹{activity.amount.toLocaleString("en-IN")}
-                      </span>
-                    )}
+                  >
+                    <Icon
+                      className={cn(
+                        "h-4 w-4",
+                        typeIconColors[activity.type]
+                      )}
+                    />
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    {activity.description}
-                  </p>
-                  <p className="mt-1 text-xs text-muted-foreground/70">
-                    {activity.timestamp}
-                  </p>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="text-sm font-medium">{activity.title}</p>
+                      {activity.amount && (
+                        <span className="shrink-0 text-sm font-semibold text-amber-600">
+                          -₹{activity.amount.toLocaleString("en-IN")}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {activity.description}
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground/70">
+                      {activity.timestamp}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })
+          )}
         </div>
       </ScrollArea>
     </Card>

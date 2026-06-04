@@ -67,7 +67,7 @@
   --secondary: #171717;
   --secondary-foreground: #E2E8F0;
   --muted: #171717;
-  --muted-foreground: #A1A1AA;
+  --muted-foreground: #B8B8C0;
   --accent: #422006;
   --accent-foreground: #FEF08A;
   --destructive: #EF4444;
@@ -132,6 +132,12 @@
   --sidebar-accent-foreground: #854D0E;
   --sidebar-border: #E2E8F0;
   --sidebar-ring: #D4AF37;
+}
+
+.high-contrast {
+  --muted-foreground: #D4D4D8;
+  --card: #111111;
+  --border: #3F3F46;
 }
 
 @layer base {

@@ -1,8 +1,8 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { DM_Sans } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
+const dmSans = DM_Sans({
   variable: "--font-sans",
   subsets: ["latin"],
   display: "swap",
@@ -36,6 +36,8 @@ export const viewport: Viewport = {
 };
 
 import { AnimatedSplash } from "@/components/shared/animated-splash";
+import { ThemeProvider } from "@/components/shared/theme-provider";
+import { FAB } from "@/components/shared/fab";
 
 export default function RootLayout({
   children,
@@ -43,10 +45,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} h-full antialiased dark`} suppressHydrationWarning>
+    <html lang="en" className={`${dmSans.variable} h-full antialiased`} suppressHydrationWarning>
       <body className="min-h-full font-sans hide-scrollbar">
-        <AnimatedSplash />
-        {children}
+        <ThemeProvider>
+          <AnimatedSplash />
+          {children}
+          <FAB />
+        </ThemeProvider>
       </body>
     </html>
   );
