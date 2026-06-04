@@ -24,7 +24,8 @@ export function UpdateNotifier() {
         const { CapacitorUpdater } = await import('@capgo/capacitor-updater');
         
         // Listen for successful background update downloads
-        listener = await CapacitorUpdater.addListener('download', (info: { version: string }) => {
+        // @ts-expect-error - dynamic import type overload mismatch
+        listener = await CapacitorUpdater.addListener('downloadComplete', (info: { version: string }) => {
           setUpdateVersion(info.version);
           setIsOpen(true);
         });

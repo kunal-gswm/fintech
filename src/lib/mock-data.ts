@@ -17,7 +17,7 @@ export function generateStudentMockData(): Expense[] {
       id: `rent-${year}-${month}`,
       title: "Flat Rent",
       amount: 9000,
-      category: "Housing",
+      category: "Bills & Utilities",
       date: new Date(year, month, 2).toISOString(),
     });
     
@@ -26,7 +26,7 @@ export function generateStudentMockData(): Expense[] {
       id: `elec-${year}-${month}`,
       title: "Electricity Bill",
       amount: randomInt(1000, 2000),
-      category: "Utilities",
+      category: "Bills & Utilities",
       date: new Date(year, month, 5).toISOString(),
     });
 
@@ -36,14 +36,14 @@ export function generateStudentMockData(): Expense[] {
       id: `food1-${year}-${month}`,
       title: "Groceries",
       amount: Math.floor(foodTotal * 0.6),
-      category: "Food",
+      category: "Groceries",
       date: new Date(year, month, 10).toISOString(),
     });
     expenses.push({
       id: `food2-${year}-${month}`,
       title: "Eating Out",
       amount: Math.floor(foodTotal * 0.4),
-      category: "Food",
+      category: "Food & Dining",
       date: new Date(year, month, 20).toISOString(),
     });
 
