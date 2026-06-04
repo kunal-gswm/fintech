@@ -120,79 +120,93 @@ class _LockScreenState extends ConsumerState<LockScreen> {
     return Scaffold(
       body: SafeArea(
         child: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 40),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Logo
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(22),
-                  child: Image.asset(
-                    'assets/logo.jpg',
-                    width: 80,
-                    height: 80,
-                    fit: BoxFit.cover,
-                  ),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Card(
+              elevation: 8,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(28),
+                side: BorderSide(
+                  color: theme.colorScheme.outline.withValues(alpha: 0.1),
+                  width: 1,
                 ),
-                const SizedBox(height: 32),
-                Text('Enter PIN', style: theme.textTheme.titleLarge),
-                const SizedBox(height: 8),
-                Text('Enter your 6-digit PIN to unlock',
-                    style: theme.textTheme.bodyMedium),
-                const SizedBox(height: 32),
-
-                // PIN dots
-                Row(
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 32),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(6, (i) {
-                    final filled = i < _pin.length;
-                    return AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      margin: const EdgeInsets.symmetric(horizontal: 8),
-                      width: 16,
-                      height: 16,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: filled
-                            ? theme.colorScheme.primary
-                            : Colors.transparent,
-                        border: Border.all(
-                          color: _error != null
-                              ? theme.colorScheme.error
-                              : theme.colorScheme.outline,
-                          width: 2,
-                        ),
+                  children: [
+                    // Logo
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(22),
+                      child: Image.asset(
+                        'assets/logo.jpg',
+                        width: 80,
+                        height: 80,
+                        fit: BoxFit.cover,
                       ),
-                    );
-                  }),
+                    ),
+                    const SizedBox(height: 24),
+                    Text('Enter PIN', style: theme.textTheme.titleLarge),
+                    const SizedBox(height: 8),
+                    Text('Enter your 6-digit PIN to unlock',
+                        style: theme.textTheme.bodyMedium),
+                    const SizedBox(height: 32),
+
+                    // PIN dots
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(6, (i) {
+                        final filled = i < _pin.length;
+                        return AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          margin: const EdgeInsets.symmetric(horizontal: 10),
+                          width: 22,
+                          height: 22,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: filled
+                                ? theme.colorScheme.primary
+                                : Colors.transparent,
+                            border: Border.all(
+                              color: _error != null
+                                  ? theme.colorScheme.error
+                                  : theme.colorScheme.outline,
+                              width: 2,
+                            ),
+                          ),
+                        );
+                      }),
+                    ),
+
+                    // Error
+                    if (_error != null) ...[
+                      const SizedBox(height: 16),
+                      Text(
+                        _error!,
+                        style: theme.textTheme.bodySmall
+                            ?.copyWith(color: theme.colorScheme.error),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+
+                    const SizedBox(height: 32),
+
+                    // Keypad
+                    _buildKeypad(theme),
+
+                    const SizedBox(height: 24),
+
+                    // Biometric button
+                    TextButton.icon(
+                      onPressed: _tryBiometric,
+                      icon: const Icon(Icons.fingerprint_rounded, size: 28),
+                      label: const Text('Use Biometrics'),
+                    ),
+                  ],
                 ),
-
-                // Error
-                if (_error != null) ...[
-                  const SizedBox(height: 16),
-                  Text(
-                    _error!,
-                    style: theme.textTheme.bodySmall
-                        ?.copyWith(color: theme.colorScheme.error),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-
-                const SizedBox(height: 40),
-
-                // Keypad
-                _buildKeypad(theme),
-
-                const SizedBox(height: 24),
-
-                // Biometric button
-                TextButton.icon(
-                  onPressed: _tryBiometric,
-                  icon: const Icon(Icons.fingerprint_rounded, size: 28),
-                  label: const Text('Use Biometrics'),
-                ),
-              ],
+              ),
             ),
           ),
         ),
@@ -214,21 +228,21 @@ class _LockScreenState extends ConsumerState<LockScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: row.map((d) {
             if (d.isEmpty) {
-              return const SizedBox(width: 80, height: 64);
+              return const SizedBox(width: 90, height: 76);
             }
             if (d == '⌫') {
               return SizedBox(
-                width: 80,
-                height: 64,
+                width: 90,
+                height: 76,
                 child: IconButton(
                   onPressed: _onBackspace,
-                  icon: const Icon(Icons.backspace_outlined, size: 22),
+                  icon: const Icon(Icons.backspace_outlined, size: 26),
                 ),
               );
             }
             return SizedBox(
-              width: 80,
-              height: 64,
+              width: 90,
+              height: 76,
               child: TextButton(
                 onPressed: _coolingDown ? null : () => _onDigit(d),
                 style: TextButton.styleFrom(
@@ -237,7 +251,7 @@ class _LockScreenState extends ConsumerState<LockScreen> {
                 child: Text(
                   d,
                   style: const TextStyle(
-                      fontSize: 24, fontWeight: FontWeight.w500),
+                      fontSize: 28, fontWeight: FontWeight.w600),
                 ),
               ),
             );

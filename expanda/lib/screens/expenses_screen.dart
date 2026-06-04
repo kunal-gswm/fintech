@@ -76,11 +76,21 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
                 }
               },
             )
-          else
+          else ...[
+            IconButton(
+              onPressed: () => ref
+                  .read(settingsProvider.notifier)
+                  .togglePrivacyMode(!settings.privacyModeEnabled),
+              icon: Icon(settings.privacyModeEnabled
+                  ? Icons.visibility_off_outlined
+                  : Icons.visibility_outlined),
+              tooltip: settings.privacyModeEnabled ? 'Show balances' : 'Hide balances',
+            ),
             IconButton(
               icon: const Icon(Icons.add_rounded),
               onPressed: () => _showAddEditSheet(context, ref, theme, sym),
             ),
+          ],
         ],
       ),
       body: Column(
@@ -249,7 +259,7 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
                                       size: 22,
                                     ),
                                   ),
-                                Container(
+                                 Container(
                                   width: 40,
                                   height: 40,
                                   decoration: BoxDecoration(
@@ -258,9 +268,11 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
                                         BorderRadius.circular(10),
                                   ),
                                   child: Icon(
-                                    AppConstants.categoryIcons[
-                                            expense.category] ??
-                                        Icons.more_horiz_rounded,
+                                    expense.iconName != null
+                                        ? _getIconData(expense.iconName!)
+                                        : (AppConstants.categoryIcons[
+                                                expense.category] ??
+                                            Icons.more_horiz_rounded),
                                     color: catColor,
                                     size: 20,
                                   ),
@@ -294,12 +306,12 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
                                     ],
                                   ),
                                 ),
-                                Column(
+                                 Column(
                                   crossAxisAlignment:
                                       CrossAxisAlignment.end,
                                   children: [
                                     Text(
-                                      '$sym${expense.amount.toStringAsFixed(0)}',
+                                      settings.privacyModeEnabled ? '••••' : '$sym${expense.amount.toStringAsFixed(0)}',
                                       style: theme.textTheme.labelLarge
                                           ?.copyWith(
                                               color: const Color(
@@ -339,6 +351,8 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
     DateTime date = existing?.date ?? DateTime.now();
     bool isRecurring = existing?.isRecurring ?? false;
     String recurrenceRule = existing?.recurrenceRule ?? 'monthly';
+    String paymentMethod = existing?.paymentMethod ?? 'Cash';
+    String? iconName = existing?.iconName;
 
     showModalBottomSheet(
       context: context,
@@ -395,6 +409,69 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
                                 value: c, child: Text(c)))
                             .toList(),
                         onChanged: (v) => setBS(() => category = v!),
+                      ),
+                      const SizedBox(height: 12),
+                      DropdownButtonFormField<String>(
+                        value: paymentMethod,
+                        decoration: const InputDecoration(
+                            labelText: 'Payment Method'),
+                        items: ['Cash', 'Card', 'UPI']
+                            .map((p) => DropdownMenuItem(
+                                value: p, child: Text(p)))
+                            .toList(),
+                        onChanged: (v) => setBS(() => paymentMethod = v!),
+                      ),
+                      const SizedBox(height: 16),
+                      Text('Choose Icon / Logo', style: theme.textTheme.bodyMedium),
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        height: 50,
+                        child: ListView(
+                          scrollDirection: Axis.horizontal,
+                          children: [
+                            'food',
+                            'game',
+                            'clothes',
+                            'travel',
+                            'shopping',
+                            'bills',
+                            'education',
+                            'healthcare',
+                            'entertainment',
+                            'subscriptions'
+                          ].map((iconNameOption) {
+                            final isSelected = iconName == iconNameOption;
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: GestureDetector(
+                                onTap: () => setBS(() => iconName = iconNameOption),
+                                child: Container(
+                                  width: 44,
+                                  height: 44,
+                                  decoration: BoxDecoration(
+                                    color: isSelected
+                                        ? theme.colorScheme.primary.withValues(alpha: 0.2)
+                                        : theme.colorScheme.surface,
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: isSelected
+                                          ? theme.colorScheme.primary
+                                          : theme.colorScheme.outline.withValues(alpha: 0.3),
+                                      width: isSelected ? 2 : 1,
+                                    ),
+                                  ),
+                                  child: Icon(
+                                    _getIconData(iconNameOption),
+                                    color: isSelected
+                                        ? theme.colorScheme.primary
+                                        : theme.colorScheme.onSurface,
+                                    size: 22,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
                       ),
                       const SizedBox(height: 12),
                       InkWell(
@@ -468,6 +545,8 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
                                     isRecurring: isRecurring,
                                     recurrenceRule:
                                         isRecurring ? recurrenceRule : null,
+                                    paymentMethod: paymentMethod,
+                                    iconName: iconName,
                                   ));
                             } else {
                               ref.read(expenseListProvider.notifier).add(
@@ -481,6 +560,8 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
                                     isRecurring: isRecurring,
                                     recurrenceRule:
                                         isRecurring ? recurrenceRule : null,
+                                    paymentMethod: paymentMethod,
+                                    iconName: iconName,
                                   );
                             }
                             Navigator.pop(ctx);
@@ -499,5 +580,32 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
         );
       },
     );
+  }
+
+  IconData _getIconData(String name) {
+    switch (name) {
+      case 'food':
+        return Icons.restaurant_rounded;
+      case 'game':
+        return Icons.sports_esports_rounded;
+      case 'clothes':
+        return Icons.checkroom_rounded;
+      case 'travel':
+        return Icons.flight_rounded;
+      case 'shopping':
+        return Icons.shopping_bag_rounded;
+      case 'bills':
+        return Icons.receipt_long_rounded;
+      case 'education':
+        return Icons.school_rounded;
+      case 'healthcare':
+        return Icons.local_hospital_rounded;
+      case 'entertainment':
+        return Icons.movie_rounded;
+      case 'subscriptions':
+        return Icons.subscriptions_rounded;
+      default:
+        return Icons.more_horiz_rounded;
+    }
   }
 }

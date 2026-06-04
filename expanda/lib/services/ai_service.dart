@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 class AiService {
   // Inbuilt Gemini API Key
   static final String _apiKey = utf8.decode(base64.decode('QVEuQWI4Uk42SUdRbjk5bFQ4M3d6Z3laYktLNDlCRXhVMGxwR2tZdVB3dlVld1czMmZ5UQ=='));
-  static const String _model = 'gemini-1.5-flash';
+  static const String _model = 'gemini-2.5-flash';
 
   static bool get isConfigured => _apiKey.isNotEmpty;
 
@@ -71,6 +71,7 @@ class AiService {
 
   /// Streams response tokens from the Gemini API.
   static Stream<String> streamMessage(List<Map<String, String>> messages) async* {
+    final client = http.Client();
     try {
       // Use streamGenerateContent with alt=sse for Server-Sent Events stream
       final url = 'https://generativelanguage.googleapis.com/v1beta/models/$_model:streamGenerateContent?alt=sse&key=$_apiKey';
@@ -104,55 +105,46 @@ class AiService {
         };
       }
 
-      final response = await http.post(
-        Uri.parse(url),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(body),
-      );
+      final request = http.Request('POST', Uri.parse(url));
+      request.headers['Content-Type'] = 'application/json';
+      request.body = jsonEncode(body);
+
+      final response = await client.send(request);
 
       if (response.statusCode != 200) {
-        throw AiServiceException('AI stream failed (${response.statusCode})');
+        final errorBody = await response.stream.bytesToString();
+        throw AiServiceException('AI stream failed (${response.statusCode}): $errorBody');
       }
 
-      final bodyString = response.body;
+      final stream = response.stream
+          .transform(utf8.decoder)
+          .transform(const LineSplitter());
 
-      // Handle standard array JSON or SSE stream response
-      if (bodyString.trim().startsWith('[')) {
-        try {
-          final list = jsonDecode(bodyString) as List;
-          for (final item in list) {
-            final text = item['candidates']?[0]?['content']?['parts']?[0]?['text'];
+      await for (final line in stream) {
+        final trimmed = line.trim();
+        if (trimmed.startsWith('data: ')) {
+          try {
+            final json = jsonDecode(trimmed.substring(6)) as Map<String, dynamic>;
+            final text = json['candidates']?[0]?['content']?['parts']?[0]?['text'];
             if (text != null && text is String) {
               yield text;
             }
-          }
-        } catch (_) {}
-      } else {
-        final lines = bodyString.split('\n');
-        for (final line in lines) {
-          final trimmed = line.trim();
-          if (trimmed.startsWith('data: ')) {
-            try {
-              final json = jsonDecode(trimmed.substring(6)) as Map<String, dynamic>;
-              final text = json['candidates']?[0]?['content']?['parts']?[0]?['text'];
-              if (text != null && text is String) {
-                yield text;
-              }
-            } catch (_) {}
-          } else if (trimmed.isNotEmpty && !trimmed.startsWith('event:')) {
-            try {
-              final json = jsonDecode(trimmed) as Map<String, dynamic>;
-              final text = json['candidates']?[0]?['content']?['parts']?[0]?['text'];
-              if (text != null && text is String) {
-                yield text;
-              }
-            } catch (_) {}
-          }
+          } catch (_) {}
+        } else if (trimmed.isNotEmpty && !trimmed.startsWith('event:')) {
+          try {
+            final json = jsonDecode(trimmed) as Map<String, dynamic>;
+            final text = json['candidates']?[0]?['content']?['parts']?[0]?['text'];
+            if (text != null && text is String) {
+              yield text;
+            }
+          } catch (_) {}
         }
       }
     } catch (e) {
       if (e is AiServiceException) rethrow;
       throw AiServiceException('Network error — check your connection.\n$e');
+    } finally {
+      client.close();
     }
   }
 

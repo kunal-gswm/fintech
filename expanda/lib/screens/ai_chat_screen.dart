@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -299,38 +300,161 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
 
   Widget _buildBubble(ThemeData theme, String content, bool isUser,
       {bool isStreaming = false}) {
-    return Align(
-      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
-      child: Container(
-        constraints:
-            BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.8),
-        margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: isUser
-              ? theme.colorScheme.primary
-              : theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(16).copyWith(
-            bottomRight: isUser ? const Radius.circular(4) : null,
-            bottomLeft: !isUser ? const Radius.circular(4) : null,
-          ),
+    final settings = ref.watch(settingsProvider);
+
+    final avatar = isUser
+        ? CircleAvatar(
+            radius: 16,
+            backgroundColor: theme.colorScheme.secondary.withValues(alpha: 0.12),
+            backgroundImage: settings.avatarPath != null
+                ? FileImage(File(settings.avatarPath!))
+                : null,
+            child: settings.avatarPath == null
+                ? Text(
+                    settings.initials,
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.secondary,
+                    ),
+                  )
+                : null,
+          )
+        : Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  theme.colorScheme.primary,
+                  theme.colorScheme.secondary,
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: theme.colorScheme.primary.withValues(alpha: 0.2),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: const Icon(
+              Icons.smart_toy_rounded,
+              size: 16,
+              color: Colors.white,
+            ),
+          );
+
+    final bubble = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        gradient: isUser
+            ? LinearGradient(
+                colors: [
+                  theme.colorScheme.primary,
+                  theme.colorScheme.primary.withValues(alpha: 0.8),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              )
+            : null,
+        color: isUser
+            ? null
+            : theme.cardTheme.color ?? theme.colorScheme.surface,
+        borderRadius: BorderRadius.only(
+          topLeft: const Radius.circular(16),
+          topRight: const Radius.circular(16),
+          bottomLeft: Radius.circular(isUser ? 16 : 4),
+          bottomRight: Radius.circular(isUser ? 4 : 16),
         ),
-        child: isUser
-            ? Text(content,
-                style: const TextStyle(color: Colors.white, fontSize: 14))
-            : MarkdownBody(
-                data: isStreaming ? '$content▍' : content,
-                styleSheet: MarkdownStyleSheet(
-                  p: theme.textTheme.bodyMedium
-                      ?.copyWith(color: theme.colorScheme.onSurface),
-                  code: TextStyle(
-                    backgroundColor: theme.colorScheme.outline.withValues(alpha: 0.2),
-                    color: theme.colorScheme.primary,
-                    fontSize: 13,
+        border: Border.all(
+          color: isUser
+              ? theme.colorScheme.primary.withValues(alpha: 0.15)
+              : theme.colorScheme.outline.withValues(alpha: 0.1),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: isUser
+          ? Text(
+              content,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14.5,
+                height: 1.3,
+              ),
+            )
+          : MarkdownBody(
+              data: isStreaming ? '$content▍' : content,
+              styleSheet: MarkdownStyleSheet(
+                p: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.95),
+                  fontSize: 14.5,
+                  height: 1.4,
+                ),
+                strong: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.primary,
+                ),
+                listBullet: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.primary,
+                  fontSize: 14.5,
+                ),
+                code: TextStyle(
+                  backgroundColor: theme.colorScheme.outline.withValues(alpha: 0.12),
+                  color: theme.colorScheme.secondary,
+                  fontFamily: 'monospace',
+                  fontSize: 13,
+                ),
+                codeblockPadding: const EdgeInsets.all(12),
+                codeblockDecoration: BoxDecoration(
+                  color: theme.colorScheme.surface.withValues(alpha: 0.5),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: theme.colorScheme.outline.withValues(alpha: 0.12),
                   ),
-                  h3: theme.textTheme.titleMedium,
+                ),
+                h3: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.primary,
                 ),
               ),
+            ),
+    );
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        mainAxisAlignment:
+            isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (!isUser) ...[
+            avatar,
+            const SizedBox(width: 8),
+          ],
+          Flexible(
+            child: Container(
+              constraints: BoxConstraints(
+                maxWidth: MediaQuery.of(context).size.width * 0.72,
+              ),
+              child: bubble,
+            ),
+          ),
+          if (isUser) ...[
+            const SizedBox(width: 8),
+            avatar,
+          ],
+        ],
       ),
     );
   }

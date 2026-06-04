@@ -24,13 +24,15 @@ class ExpenseAdapter extends TypeAdapter<Expense> {
       isRecurring: fields[6] as bool? ?? false,
       recurrenceRule: fields[7] as String?,
       receiptImagePath: fields[8] as String?,
+      paymentMethod: fields[9] as String? ?? 'Cash',
+      iconName: fields[10] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Expense obj) {
     writer
-      ..writeByte(9)
+      ..writeByte(11)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -48,7 +50,11 @@ class ExpenseAdapter extends TypeAdapter<Expense> {
       ..writeByte(7)
       ..write(obj.recurrenceRule)
       ..writeByte(8)
-      ..write(obj.receiptImagePath);
+      ..write(obj.receiptImagePath)
+      ..writeByte(9)
+      ..write(obj.paymentMethod)
+      ..writeByte(10)
+      ..write(obj.iconName);
   }
 
   @override

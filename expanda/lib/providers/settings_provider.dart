@@ -64,4 +64,10 @@ class SettingsNotifier extends Notifier<UserSettings> {
     await HiveService.saveSettings(updated);
     state = updated;
   }
+
+  Future<void> togglePrivacyMode(bool enabled) async {
+    final updated = state.copyWith(privacyModeEnabled: enabled);
+    await HiveService.saveSettings(updated);
+    state = updated;
+  }
 }

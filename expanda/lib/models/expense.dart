@@ -30,6 +30,12 @@ class Expense extends HiveObject {
   @HiveField(8)
   String? receiptImagePath;
 
+  @HiveField(9)
+  String? paymentMethod; // 'Cash', 'Card', 'UPI'
+
+  @HiveField(10)
+  String? iconName; // 'food', 'game', 'clothes', 'travel', 'shopping', 'bills', 'other'
+
   Expense({
     required this.id,
     required this.title,
@@ -40,6 +46,8 @@ class Expense extends HiveObject {
     this.isRecurring = false,
     this.recurrenceRule,
     this.receiptImagePath,
+    this.paymentMethod = 'Cash',
+    this.iconName,
   });
 
   Expense copyWith({
@@ -52,6 +60,8 @@ class Expense extends HiveObject {
     bool? isRecurring,
     String? recurrenceRule,
     String? receiptImagePath,
+    String? paymentMethod,
+    String? iconName,
   }) {
     return Expense(
       id: id ?? this.id,
@@ -63,6 +73,8 @@ class Expense extends HiveObject {
       isRecurring: isRecurring ?? this.isRecurring,
       recurrenceRule: recurrenceRule ?? this.recurrenceRule,
       receiptImagePath: receiptImagePath ?? this.receiptImagePath,
+      paymentMethod: paymentMethod ?? this.paymentMethod,
+      iconName: iconName ?? this.iconName,
     );
   }
 
@@ -76,6 +88,8 @@ class Expense extends HiveObject {
         'isRecurring': isRecurring,
         'recurrenceRule': recurrenceRule,
         'receiptImagePath': receiptImagePath,
+        'paymentMethod': paymentMethod,
+        'iconName': iconName,
       };
 
   factory Expense.fromJson(Map<String, dynamic> json) => Expense(
@@ -88,5 +102,7 @@ class Expense extends HiveObject {
         isRecurring: json['isRecurring'] as bool? ?? false,
         recurrenceRule: json['recurrenceRule'] as String?,
         receiptImagePath: json['receiptImagePath'] as String?,
+        paymentMethod: json['paymentMethod'] as String? ?? 'Cash',
+        iconName: json['iconName'] as String?,
       );
 }

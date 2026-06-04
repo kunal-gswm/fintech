@@ -29,13 +29,14 @@ class UserSettingsAdapter extends TypeAdapter<UserSettings> {
       avatarPath: fields[12] as String?,
       onboardingComplete: fields[13] as bool? ?? false,
       pinEnabled: fields[14] as bool? ?? false,
+      privacyModeEnabled: fields[15] as bool? ?? false,
     );
   }
 
   @override
   void write(BinaryWriter writer, UserSettings obj) {
     writer
-      ..writeByte(15)
+      ..writeByte(16)
       ..writeByte(0)
       ..write(obj.currency)
       ..writeByte(1)
@@ -65,7 +66,9 @@ class UserSettingsAdapter extends TypeAdapter<UserSettings> {
       ..writeByte(13)
       ..write(obj.onboardingComplete)
       ..writeByte(14)
-      ..write(obj.pinEnabled);
+      ..write(obj.pinEnabled)
+      ..writeByte(15)
+      ..write(obj.privacyModeEnabled);
   }
 
   @override

@@ -48,6 +48,9 @@ class UserSettings extends HiveObject {
   @HiveField(14)
   bool pinEnabled;
 
+  @HiveField(15)
+  bool privacyModeEnabled;
+
   UserSettings({
     this.currency = 'INR',
     this.monthlyIncome = 0,
@@ -64,6 +67,7 @@ class UserSettings extends HiveObject {
     this.avatarPath,
     this.onboardingComplete = false,
     this.pinEnabled = false,
+    this.privacyModeEnabled = false,
   });
 
   String get currencySymbol {
@@ -107,6 +111,7 @@ class UserSettings extends HiveObject {
     String? avatarPath,
     bool? onboardingComplete,
     bool? pinEnabled,
+    bool? privacyModeEnabled,
   }) {
     return UserSettings(
       currency: currency ?? this.currency,
@@ -124,6 +129,7 @@ class UserSettings extends HiveObject {
       avatarPath: avatarPath ?? this.avatarPath,
       onboardingComplete: onboardingComplete ?? this.onboardingComplete,
       pinEnabled: pinEnabled ?? this.pinEnabled,
+      privacyModeEnabled: privacyModeEnabled ?? this.privacyModeEnabled,
     );
   }
 
@@ -143,6 +149,7 @@ class UserSettings extends HiveObject {
         'avatarPath': avatarPath,
         'onboardingComplete': onboardingComplete,
         'pinEnabled': pinEnabled,
+        'privacyModeEnabled': privacyModeEnabled,
       };
 
   factory UserSettings.fromJson(Map<String, dynamic> json) => UserSettings(
@@ -163,5 +170,6 @@ class UserSettings extends HiveObject {
         avatarPath: json['avatarPath'] as String?,
         onboardingComplete: json['onboardingComplete'] as bool? ?? false,
         pinEnabled: json['pinEnabled'] as bool? ?? false,
+        privacyModeEnabled: json['privacyModeEnabled'] as bool? ?? false,
       );
 }

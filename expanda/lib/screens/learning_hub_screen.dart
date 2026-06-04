@@ -319,7 +319,7 @@ Taxes are one of the largest lifetime expenses. Minimizing them legal and effici
                     onSelected: (_) => setState(() => _selectedCategory = cat),
                     selectedColor: theme.colorScheme.primary.withOpacity(0.15),
                     labelStyle: TextStyle(
-                      color: isSelected ? theme.colorScheme.primary : theme.colorScheme.outline,
+                      color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant,
                       fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                     ),
                   ),
@@ -401,7 +401,7 @@ Taxes are one of the largest lifetime expenses. Minimizing them legal and effici
                                       const SizedBox(height: 8),
                                       Text(art.title, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
                                       const SizedBox(height: 6),
-                                      Text(art.description, style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.outline), maxLines: 2, overflow: TextOverflow.ellipsis),
+                                      Text(art.description, style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant), maxLines: 2, overflow: TextOverflow.ellipsis),
                                     ],
                                   ),
                                 ),

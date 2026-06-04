@@ -153,19 +153,10 @@ class _MainShellState extends State<MainShell> with SingleTickerProviderStateMix
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Text(
-                                    'Menu & Services',
-                                    style: theme.textTheme.titleMedium?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: theme.colorScheme.primary,
-                                      letterSpacing: 0.5,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 20),
                                   _buildMenuItem(
                                     theme: theme,
                                     icon: Icons.auto_awesome_rounded,
-                                    label: 'AI Chat Assistant',
+                                    label: 'AI Chat',
                                     color: const Color(0xFFD4AF37), // Gold
                                     onTap: () {
                                       _toggleMenu();
@@ -176,7 +167,7 @@ class _MainShellState extends State<MainShell> with SingleTickerProviderStateMix
                                   _buildMenuItem(
                                     theme: theme,
                                     icon: Icons.favorite_rounded,
-                                    label: 'Financial Health Score',
+                                    label: 'Health Score',
                                     color: const Color(0xFF10B981), // Green
                                     onTap: () {
                                       _toggleMenu();
@@ -187,7 +178,7 @@ class _MainShellState extends State<MainShell> with SingleTickerProviderStateMix
                                   _buildMenuItem(
                                     theme: theme,
                                     icon: Icons.assessment_rounded,
-                                    label: 'Export Reports',
+                                    label: 'Reports',
                                     color: const Color(0xFF3B82F6), // Blue
                                     onTap: () {
                                       _toggleMenu();
@@ -197,19 +188,19 @@ class _MainShellState extends State<MainShell> with SingleTickerProviderStateMix
                                   const Divider(height: 16),
                                   _buildMenuItem(
                                     theme: theme,
-                                    icon: Icons.notifications_rounded,
-                                    label: 'Notifications',
-                                    color: const Color(0xFFEF4444), // Red
+                                    icon: Icons.school_rounded,
+                                    label: 'Learning Hub',
+                                    color: const Color(0xFF06B6D4), // Cyan
                                     onTap: () {
                                       _toggleMenu();
-                                      context.push('/notifications');
+                                      context.push('/learn');
                                     },
                                   ),
                                   const Divider(height: 16),
                                   _buildMenuItem(
                                     theme: theme,
                                     icon: Icons.settings_rounded,
-                                    label: 'App Settings',
+                                    label: 'Settings',
                                     color: const Color(0xFF8B5CF6), // Purple
                                     onTap: () {
                                       _toggleMenu();
@@ -264,17 +255,45 @@ class _MainShellState extends State<MainShell> with SingleTickerProviderStateMix
                       ),
                     ),
                     child: Center(
-                      child: RotationTransition(
-                        turns: _rotateAnimation,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(26),
-                          child: Image.asset(
-                            'assets/logo.jpg',
-                            width: 44,
-                            height: 44,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 250),
+                        transitionBuilder: (child, animation) {
+                          return ScaleTransition(
+                            scale: animation,
+                            child: child,
+                          );
+                        },
+                        child: _isMenuOpen
+                            ? Container(
+                                key: const ValueKey('rupee'),
+                                width: 44,
+                                height: 44,
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Color(0xFFD4AF37), // Gold
+                                ),
+                                child: const Center(
+                                  child: Text(
+                                    '₹',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily: 'Roboto',
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : ClipRRect(
+                                key: const ValueKey('panda'),
+                                borderRadius: BorderRadius.circular(22),
+                                child: Image.asset(
+                                  'assets/logo.jpg',
+                                  width: 44,
+                                  height: 44,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
                       ),
                     ),
                   ),

@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:csv/csv.dart';
-import 'package:pdf/widgets.dart' as pw;
+import 'package:excel/excel.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import '../providers/expense_provider.dart';
@@ -79,17 +78,8 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.share_rounded),
-            onPressed: () => _exportPdf(context, ref, theme, sym),
-          ),
-          PopupMenuButton<String>(
-            onSelected: (v) {
-              if (v == 'csv') _exportCsv(context, ref, sym);
-              if (v == 'pdf') _exportPdf(context, ref, theme, sym);
-            },
-            itemBuilder: (_) => [
-              const PopupMenuItem(value: 'csv', child: Text('Export CSV')),
-              const PopupMenuItem(value: 'pdf', child: Text('Export PDF')),
-            ],
+            tooltip: 'Export Excel',
+            onPressed: () => _exportExcel(context, ref, sym),
           ),
         ],
       ),
@@ -414,7 +404,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
     return v.toStringAsFixed(0);
   }
 
-  Future<void> _exportCsv(
+  Future<void> _exportExcel(
       BuildContext context, WidgetRef ref, String sym) async {
     HapticFeedback.mediumImpact();
     final expenses = ref.read(expenseListProvider);
@@ -424,108 +414,39 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
       return key == _selectedMonth;
     }).toList();
 
-    final List<List<dynamic>> rows = [
-      ['Title', 'Amount', 'Category', 'Date', 'Notes'],
-      ...filtered.map((e) => [
-            e.title,
-            e.amount.toStringAsFixed(2),
-            e.category,
-            e.date.toIso8601String().substring(0, 10),
-            e.notes ?? '',
-          ]),
-    ];
+    final excel = Excel.createExcel();
+    final sheet = excel['Sheet1'];
 
-    final csv = const ListToCsvConverter().convert(rows);
-    final dir = await getTemporaryDirectory();
-    final file = File('${dir.path}/expanda_report_$_selectedMonth.csv');
-    await file.writeAsString(csv);
+    // Headers
+    sheet.appendRow([
+      TextCellValue('Title'),
+      TextCellValue('Amount ($sym)'),
+      TextCellValue('Category'),
+      TextCellValue('Date'),
+      TextCellValue('Notes'),
+      TextCellValue('Payment Method'),
+    ]);
 
-    await Share.shareXFiles([XFile(file.path)],
-        text: 'EXPANDA Report — $_selectedMonth');
-  }
+    // Rows
+    for (final e in filtered) {
+      sheet.appendRow([
+        TextCellValue(e.title),
+        DoubleCellValue(e.amount),
+        TextCellValue(e.category),
+        TextCellValue(e.date.toIso8601String().substring(0, 10)),
+        TextCellValue(e.notes ?? ''),
+        TextCellValue(e.paymentMethod ?? 'N/A'),
+      ]);
+    }
 
-  Future<void> _exportPdf(BuildContext context, WidgetRef ref,
-      ThemeData theme, String sym) async {
-    HapticFeedback.mediumImpact();
-    final expenses = ref.read(expenseListProvider);
-    final settings = ref.read(settingsProvider);
-    final income = settings.monthlyIncome;
-
-    final filtered = expenses.where((e) {
-      final key =
-          '${e.date.year}-${e.date.month.toString().padLeft(2, '0')}';
-      return key == _selectedMonth;
-    }).toList();
-
-    final totalExpenses =
-        filtered.fold(0.0, (sum, e) => sum + e.amount);
-    final savings = income - totalExpenses;
-    final rate = income > 0 ? (savings / income * 100) : 0.0;
-
-    final pdf = pw.Document();
-    pdf.addPage(
-      pw.Page(
-        build: (ctx) {
-          return pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: [
-              pw.Text('EXPANDA Financial Report',
-                  style: pw.TextStyle(
-                      fontSize: 24, fontWeight: pw.FontWeight.bold)),
-              pw.SizedBox(height: 8),
-              pw.Text('Month: $_selectedMonth'),
-              pw.Divider(),
-              pw.SizedBox(height: 12),
-              pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                children: [
-                  _pdfKpi('Income', '$sym${income.toStringAsFixed(0)}'),
-                  _pdfKpi('Expenses',
-                      '$sym${totalExpenses.toStringAsFixed(0)}'),
-                  _pdfKpi(
-                      'Savings', '$sym${savings.toStringAsFixed(0)}'),
-                  _pdfKpi('Rate', '${rate.toStringAsFixed(1)}%'),
-                ],
-              ),
-              pw.SizedBox(height: 20),
-              pw.Text('Transactions',
-                  style: pw.TextStyle(
-                      fontSize: 16, fontWeight: pw.FontWeight.bold)),
-              pw.SizedBox(height: 8),
-              pw.TableHelper.fromTextArray(
-                headers: ['Title', 'Amount', 'Category', 'Date'],
-                data: filtered
-                    .map((e) => [
-                          e.title,
-                          '$sym${e.amount.toStringAsFixed(0)}',
-                          e.category,
-                          e.date.toIso8601String().substring(0, 10),
-                        ])
-                    .toList(),
-              ),
-            ],
-          );
-        },
-      ),
-    );
+    final fileBytes = excel.save();
+    if (fileBytes == null) return;
 
     final dir = await getTemporaryDirectory();
-    final file = File('${dir.path}/expanda_report_$_selectedMonth.pdf');
-    await file.writeAsBytes(await pdf.save());
+    final file = File('${dir.path}/expanda_report_$_selectedMonth.xlsx');
+    await file.writeAsBytes(fileBytes);
 
     await Share.shareXFiles([XFile(file.path)],
-        text: 'EXPANDA Report — $_selectedMonth');
-  }
-
-  pw.Widget _pdfKpi(String label, String value) {
-    return pw.Column(
-      children: [
-        pw.Text(label, style: const pw.TextStyle(fontSize: 10)),
-        pw.SizedBox(height: 4),
-        pw.Text(value,
-            style:
-                pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
-      ],
-    );
+        text: 'EXPANDA Excel Report — $_selectedMonth');
   }
 }

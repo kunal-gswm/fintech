@@ -36,6 +36,8 @@ class ExpenseNotifier extends Notifier<List<Expense>> {
     bool isRecurring = false,
     String? recurrenceRule,
     String? receiptImagePath,
+    String? paymentMethod,
+    String? iconName,
   }) async {
     final expense = Expense(
       id: _uuid.v4(),
@@ -47,6 +49,8 @@ class ExpenseNotifier extends Notifier<List<Expense>> {
       isRecurring: isRecurring,
       recurrenceRule: recurrenceRule,
       receiptImagePath: receiptImagePath,
+      paymentMethod: paymentMethod ?? 'Cash',
+      iconName: iconName,
     );
     await HiveService.addExpense(expense);
     state = HiveService.getAllExpenses();

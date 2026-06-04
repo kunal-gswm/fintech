@@ -34,15 +34,17 @@ class DashboardScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Hello, ${settings.firstName.isEmpty ? 'there' : settings.firstName}',
-                style: theme.textTheme.bodyMedium),
-            const Text('EXPANDA'),
-          ],
-        ),
+        title: Text('Hello, ${settings.firstName.isEmpty ? 'User' : settings.firstName}'),
         actions: [
+          IconButton(
+            onPressed: () => ref
+                .read(settingsProvider.notifier)
+                .togglePrivacyMode(!settings.privacyModeEnabled),
+            icon: Icon(settings.privacyModeEnabled
+                ? Icons.visibility_off_outlined
+                : Icons.visibility_outlined),
+            tooltip: settings.privacyModeEnabled ? 'Show balances' : 'Hide balances',
+          ),
           IconButton(
             onPressed: () => context.push('/notifications'),
             icon: Badge(
@@ -85,7 +87,7 @@ class DashboardScreen extends ConsumerWidget {
                   Text('Overview', style: theme.textTheme.titleMedium),
                   const SizedBox(height: 12),
                   _buildKpiGrid(theme, sym, income, totalExpenses, savings,
-                      savingsRate),
+                      savingsRate, settings.privacyModeEnabled),
                   const SizedBox(height: 20),
 
                   // Recent Activity
@@ -102,7 +104,7 @@ class DashboardScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 8),
                   ...expenses.take(10).map(
-                        (e) => _buildActivityItem(theme, e, sym),
+                        (e) => _buildActivityItem(theme, e, sym, settings.privacyModeEnabled),
                       ),
                 ],
               ),
@@ -205,15 +207,15 @@ class DashboardScreen extends ConsumerWidget {
   }
 
   Widget _buildKpiGrid(ThemeData theme, String sym, double income,
-      double expenses, double savings, double rate) {
+      double expenses, double savings, double rate, bool privacyModeEnabled) {
     final items = [
-      _KpiData('Income', '$sym${_fmt(income)}', Icons.wallet_rounded,
+      _KpiData('Income', privacyModeEnabled ? '••••' : '$sym${_fmt(income)}', Icons.wallet_rounded,
           const Color(0xFF3B82F6)),
-      _KpiData('Expenses', '$sym${_fmt(expenses)}',
+      _KpiData('Expenses', privacyModeEnabled ? '••••' : '$sym${_fmt(expenses)}',
           Icons.credit_card_rounded, const Color(0xFFF59E0B)),
-      _KpiData('Savings', '$sym${_fmt(savings)}',
+      _KpiData('Savings', privacyModeEnabled ? '••••' : '$sym${_fmt(savings)}',
           Icons.savings_rounded, const Color(0xFF10B981)),
-      _KpiData('Rate', '${rate.toStringAsFixed(1)}%',
+      _KpiData('Rate', privacyModeEnabled ? '••••' : '${rate.toStringAsFixed(1)}%',
           Icons.trending_up_rounded, const Color(0xFF8B5CF6)),
     ];
 
@@ -260,7 +262,7 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildActivityItem(ThemeData theme, dynamic expense, String sym) {
+  Widget _buildActivityItem(ThemeData theme, dynamic expense, String sym, bool privacyModeEnabled) {
     final catColor =
         _categoryColor(expense.category);
     return Container(
@@ -280,7 +282,10 @@ class DashboardScreen extends ConsumerWidget {
               color: catColor.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(_categoryIcon(expense.category),
+            child: Icon(
+                expense.iconName != null
+                    ? _getIconData(expense.iconName!)
+                    : _categoryIcon(expense.category),
                 color: catColor, size: 20),
           ),
           const SizedBox(width: 12),
@@ -297,7 +302,7 @@ class DashboardScreen extends ConsumerWidget {
             ),
           ),
           Text(
-            '$sym${_fmt(expense.amount)}',
+            privacyModeEnabled ? '••••' : '$sym${_fmt(expense.amount)}',
             style: theme.textTheme.labelLarge
                 ?.copyWith(color: const Color(0xFFE5B80B)),
           ),
@@ -416,6 +421,33 @@ class DashboardScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  IconData _getIconData(String name) {
+    switch (name) {
+      case 'food':
+        return Icons.restaurant_rounded;
+      case 'game':
+        return Icons.sports_esports_rounded;
+      case 'clothes':
+        return Icons.checkroom_rounded;
+      case 'travel':
+        return Icons.flight_rounded;
+      case 'shopping':
+        return Icons.shopping_bag_rounded;
+      case 'bills':
+        return Icons.receipt_long_rounded;
+      case 'education':
+        return Icons.school_rounded;
+      case 'healthcare':
+        return Icons.local_hospital_rounded;
+      case 'entertainment':
+        return Icons.movie_rounded;
+      case 'subscriptions':
+        return Icons.subscriptions_rounded;
+      default:
+        return Icons.more_horiz_rounded;
+    }
   }
 }
 

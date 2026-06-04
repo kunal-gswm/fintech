@@ -51,7 +51,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     _pandaOpacity = Tween<double>(begin: 1.0, end: 0.0).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(0.0, 0.40, curve: Curves.easeOut),
+        curve: const Interval(0.0, 0.30, curve: Curves.easeOut),
       ),
     );
 
@@ -112,7 +112,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
           // Before final phase, scale is _coinScale. During final phase, it is multiplied by _coinFinalScale.
           final scale = _coinScale.value * _coinFinalScale.value;
           
-          final pandaOpa = _controller.value >= 0.40 ? 0.0 : _pandaOpacity.value;
+          final pandaOpa = _controller.value >= 0.30 ? 0.0 : _pandaOpacity.value;
           
           // Before final phase, opacity is 1. During final phase, it fades out.
           final coinOpa = _coinFinalOpacity.value;
