@@ -25,7 +25,7 @@ function QuoteCard() {
       <Quote className="absolute -top-2 -left-2 h-16 w-16 text-primary/10 rotate-180" />
       <div className="relative z-10 flex flex-col items-center justify-center text-center">
         <p className="font-serif text-lg sm:text-xl font-medium leading-relaxed tracking-wide text-foreground italic max-w-2xl">
-          "{quote}"
+          {quote}
         </p>
       </div>
     </div>

@@ -18,6 +18,7 @@ import {
   BotMessageSquare,
 } from "lucide-react";
 import { useChatStore } from "@/store/chat-store";
+import { LocalLLMService } from "@/services/local-llm.service";
 import { cn } from "@/lib/utils";
 
 
@@ -53,6 +54,18 @@ export default function AssistantPage() {
     }
   }, [messages, isTyping, streamingContent]);
 
+  // Poll LLM status so the badge updates as the model loads
+  const [llmStatus, setLlmStatus] = useState(LocalLLMService.status);
+  useEffect(() => {
+    // Check immediately
+    setLlmStatus(LocalLLMService.status);
+    // Then poll every 2s to catch async init changes
+    const interval = setInterval(() => {
+      setLlmStatus(LocalLLMService.status);
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
+
   const submitMessage = async (message: string) => {
     await useChatStore.getState().sendMessage(message);
   };
@@ -83,9 +96,29 @@ export default function AssistantPage() {
             </div>
             <div>
               <h1 className="text-lg font-semibold">AI Financial Advisor</h1>
-              <p className="text-xs text-muted-foreground">
-                Ask anything about your finances
-              </p>
+              <div className="flex items-center gap-2">
+                <p className="text-xs text-muted-foreground">
+                  Ask anything about your finances
+                </p>
+                <span className={cn(
+                  "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium",
+                  llmStatus.ready
+                    ? "bg-emerald-500/15 text-emerald-400"
+                    : llmStatus.error
+                      ? "bg-slate-500/15 text-slate-400"
+                      : "bg-amber-500/15 text-amber-400"
+                )}>
+                  <span className={cn(
+                    "h-1.5 w-1.5 rounded-full",
+                    llmStatus.ready
+                      ? "bg-emerald-400 animate-pulse"
+                      : llmStatus.error
+                        ? "bg-slate-400"
+                        : "bg-amber-400 animate-pulse"
+                  )} />
+                  {llmStatus.ready ? "On-Device" : llmStatus.error ? "Cloud" : "Loading…"}
+                </span>
+              </div>
             </div>
           </div>
           <Button
@@ -134,12 +167,12 @@ export default function AssistantPage() {
                       className={cn(
                         "max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed",
                         msg.role === "assistant"
-                          ? "bg-blue-500/10 text-blue-900 dark:bg-blue-500/20 dark:text-blue-100"
+                          ? "bg-slate-500/10 text-slate-200"
                           : "bg-primary text-primary-foreground"
                       )}
                     >
                       {msg.role === "assistant" ? (
-                        <div className="prose prose-sm prose-slate dark:prose-invert break-words max-w-none">
+                        <div className="prose prose-sm prose-invert break-words max-w-none">
                           <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
                         </div>
                       ) : (
@@ -162,8 +195,8 @@ export default function AssistantPage() {
                       <Sparkles className="h-4 w-4" />
                     </AvatarFallback>
                   </Avatar>
-                  <div className="max-w-[80%] rounded-2xl bg-blue-500/10 text-blue-900 dark:bg-blue-500/20 dark:text-blue-100 px-4 py-3 text-sm leading-relaxed">
-                    <div className="prose prose-sm prose-slate dark:prose-invert break-words max-w-none">
+                  <div className="max-w-[80%] rounded-2xl bg-slate-500/10 text-slate-200 px-4 py-3 text-sm leading-relaxed">
+                    <div className="prose prose-sm prose-invert break-words max-w-none">
                       <ReactMarkdown remarkPlugins={[remarkGfm]}>{streamingContent + "▍"}</ReactMarkdown>
                     </div>
                   </div>

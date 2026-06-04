@@ -159,7 +159,7 @@ export default function ArticlePage({ params }: { params: Promise<{ slug: string
           
           {/* Main Content */}
           <article className="flex-1 min-w-0">
-            <div className="prose prose-slate dark:prose-invert max-w-none prose-headings:font-bold prose-h2:text-2xl prose-h2:mt-10 prose-h2:border-b prose-h2:pb-2 prose-a:text-primary hover:prose-a:text-primary/80 prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:bg-primary/5 prose-blockquote:py-1 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:font-normal prose-blockquote:not-italic">
+            <div className="prose prose-invert max-w-none prose-headings:font-bold prose-h2:text-2xl prose-h2:mt-10 prose-h2:border-b prose-h2:pb-2 prose-a:text-primary hover:prose-a:text-primary/80 prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:bg-primary/5 prose-blockquote:py-1 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:font-normal prose-blockquote:not-italic">
               <ReactMarkdown 
                 remarkPlugins={[remarkGfm]}
                 components={{
@@ -169,12 +169,12 @@ export default function ArticlePage({ params }: { params: Promise<{ slug: string
                     // Match GitHub style alerts
                     if (text.includes("[!WARNING]") || text.includes("[!CAUTION]")) {
                       return (
-                        <div className="my-6 border-l-4 border-rose-500 bg-rose-50 dark:bg-rose-950/20 p-4 rounded-r-lg">
-                          <div className="flex items-center gap-2 text-rose-700 dark:text-rose-400 font-bold mb-2">
+                        <div className="my-6 border-l-4 border-rose-500 bg-rose-950/20 p-4 rounded-r-lg">
+                          <div className="flex items-center gap-2 text-rose-400 font-bold mb-2">
                             <AlertTriangle className="w-5 h-5" />
                             Warning
                           </div>
-                          <div className="text-rose-900 dark:text-rose-200">
+                          <div className="text-rose-200">
                             {children}
                           </div>
                         </div>
@@ -182,12 +182,12 @@ export default function ArticlePage({ params }: { params: Promise<{ slug: string
                     }
                     if (text.includes("[!TIP]") || text.includes("[!IMPORTANT]")) {
                       return (
-                        <div className="my-6 border-l-4 border-emerald-500 bg-emerald-50 dark:bg-emerald-950/20 p-4 rounded-r-lg">
-                          <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400 font-bold mb-2">
+                        <div className="my-6 border-l-4 border-emerald-500 bg-emerald-950/20 p-4 rounded-r-lg">
+                          <div className="flex items-center gap-2 text-emerald-400 font-bold mb-2">
                             <CheckCircle2 className="w-5 h-5" />
                             Key Takeaway
                           </div>
-                          <div className="text-emerald-900 dark:text-emerald-200">
+                          <div className="text-emerald-200">
                             {children}
                           </div>
                         </div>
@@ -195,12 +195,12 @@ export default function ArticlePage({ params }: { params: Promise<{ slug: string
                     }
                     if (text.includes("[!NOTE]")) {
                       return (
-                        <div className="my-6 border-l-4 border-blue-500 bg-blue-50 dark:bg-blue-950/20 p-4 rounded-r-lg">
-                          <div className="flex items-center gap-2 text-blue-700 dark:text-blue-400 font-bold mb-2">
+                        <div className="my-6 border-l-4 border-blue-500 bg-blue-950/20 p-4 rounded-r-lg">
+                          <div className="flex items-center gap-2 text-blue-400 font-bold mb-2">
                             <Info className="w-5 h-5" />
                             Note
                           </div>
-                          <div className="text-blue-900 dark:text-blue-200">
+                          <div className="text-blue-200">
                             {children}
                           </div>
                         </div>
