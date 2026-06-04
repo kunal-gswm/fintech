@@ -42,10 +42,11 @@ export const useExpenseStore = create<ExpenseState>((set, get) => ({
         loadingState: { status: data.length === 0 ? "empty" : "success" },
         abortController: null
       });
-    } catch (e: any) {
+    } catch (e) {
+      const error = e as Error;
       if (controller.signal.aborted) return;
       set({ 
-        loadingState: { status: "error", error: e.message || "Failed to fetch expenses" },
+        loadingState: { status: "error", error: error.message || "Failed to fetch expenses" },
         abortController: null
       });
     }

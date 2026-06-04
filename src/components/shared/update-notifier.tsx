@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Download, Rocket, X } from "lucide-react";
+import { Download, Rocket } from "lucide-react";
 import { APP_CONFIG } from "@/lib/config";
 import { Button } from "@/components/ui/button";
 import {
@@ -61,7 +61,7 @@ export function UpdateNotifier() {
     try {
       const { Browser } = await import('@capacitor/browser');
       await Browser.open({ url });
-    } catch (e) {
+    } catch {
       // Fallback for web
       window.open(url, '_blank');
     }
@@ -81,7 +81,7 @@ export function UpdateNotifier() {
         </DialogHeader>
 
         <div className="bg-muted/50 rounded-md p-4 max-h-40 overflow-y-auto text-sm my-2 border">
-          <p className="font-semibold mb-2">What's New in {releaseInfo.name}:</p>
+          <p className="font-semibold mb-2">What&apos;s New in {releaseInfo.name}:</p>
           <div className="whitespace-pre-wrap text-muted-foreground">
             {releaseInfo.body || "Various improvements and bug fixes."}
           </div>

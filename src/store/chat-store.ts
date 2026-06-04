@@ -35,7 +35,7 @@ const welcomeMessage: ChatMessage = {
 
 export const useChatStore = create<ChatState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       messages: [welcomeMessage],
       isTyping: false,
       streamingContent: "",

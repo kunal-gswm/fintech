@@ -47,10 +47,11 @@ export const useGoalStore = create<GoalState>((set, get) => ({
         loadingState: { status: data.length === 0 ? "empty" : "success" },
         abortController: null 
       });
-    } catch (e: any) {
+    } catch (e) {
+      const error = e as Error;
       if (controller.signal.aborted) return;
       set({ 
-        loadingState: { status: "error", error: e.message || "Failed to fetch goals" },
+        loadingState: { status: "error", error: error.message || "Failed to fetch goals" },
         abortController: null
       });
     }

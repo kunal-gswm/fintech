@@ -9,7 +9,7 @@ export function AnimatedSplash() {
   useEffect(() => {
     // Only play once per session
     if (sessionStorage.getItem("splash_played") === "true") {
-      setStage("done");
+      setTimeout(() => setStage("done"), 0);
       return;
     }
     sessionStorage.setItem("splash_played", "true");
@@ -18,7 +18,7 @@ export function AnimatedSplash() {
     const hideNativeSplash = async () => {
       try {
         await SplashScreen.hide();
-      } catch (e) {
+      } catch {
         // Ignore if running in web browser
       }
     };

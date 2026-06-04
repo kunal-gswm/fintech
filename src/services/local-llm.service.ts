@@ -64,8 +64,8 @@ class _LocalLLMService {
   private _chatId: string | null = null;
   
   // Active listeners
-  private _textListenerHandle: any = null;
-  private _finishListenerHandle: any = null;
+  private _textListenerHandle: unknown = null;
+  private _finishListenerHandle: unknown = null;
   
   // Streaming state
   private _currentFullResponse = '';
@@ -96,7 +96,6 @@ class _LocalLLMService {
     if (this._plugin) return this._plugin;
 
     try {
-      // @ts-ignore — Plugin is only available in native builds
       const mod = await import('@capgo/capacitor-llm');
       this._plugin = mod.CapgoLLM;
       return this._plugin;
@@ -155,9 +154,10 @@ class _LocalLLMService {
       console.log(`[LocalLLM] Session created: ${this._chatId}`);
 
       return true;
-    } catch (e: any) {
-      console.error('[LocalLLM] Initialization failed:', e);
-      this._error = e?.message || 'Failed to load model';
+    } catch (e) {
+      const error = e instanceof Error ? e : new Error(String(e) || 'Failed to load model');
+      console.error('[LocalLLM] Initialization failed:', error);
+      this._error = error.message || 'Failed to load model';
       return false;
     } finally {
       this._initializing = false;
@@ -166,8 +166,10 @@ class _LocalLLMService {
 
   private async setupListeners(plugin: LLMPlugin) {
     // Clean up old listeners if they exist
-    if (this._textListenerHandle?.remove) await this._textListenerHandle.remove();
-    if (this._finishListenerHandle?.remove) await this._finishListenerHandle.remove();
+    const textHandle = this._textListenerHandle as { remove?: () => Promise<void> };
+    const finishHandle = this._finishListenerHandle as { remove?: () => Promise<void> };
+    if (textHandle?.remove) await textHandle.remove();
+    if (finishHandle?.remove) await finishHandle.remove();
 
     this._textListenerHandle = await plugin.addListener('textFromAi', (event: TextFromAiEvent) => {
       if (event.chatId !== this._chatId || !event.text) return;
@@ -220,13 +222,14 @@ class _LocalLLMService {
         message: message,
       });
 
-    } catch (e: any) {
-      console.error('[LocalLLM] Streaming error:', e);
+    } catch (e) {
+      const error = e instanceof Error ? e : new Error(String(e) || 'Generation failed');
+      console.error('[LocalLLM] Streaming error:', error);
       // Reset state on failure
       this._currentFullResponse = '';
       this._onChunk = null;
       this._onDone = null;
-      onError(e instanceof Error ? e : new Error(e?.message || 'Generation failed'));
+      onError(error);
     }
   }
 

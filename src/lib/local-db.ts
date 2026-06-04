@@ -1,21 +1,20 @@
-
 import articlesData from "../../data/articles.json";
-import chatHistoryData from "../../data/chat-history.json";
-import expensesData from "../../data/expenses.json";
-import goalsData from "../../data/goals.json";
-import profileData from "../../data/profile.json";
-import reportsData from "../../data/reports.json";
 
 // The data structure might be inside a default export or just an array.
 // I will create a simple wrapper.
 
-const DEFAULT_DATA: Record<string, any> = {
+const DEFAULT_DATA: Record<string, unknown> = {
   "articles": articlesData,
-  "chat-history": chatHistoryData,
-  "expenses": expensesData,
-  "goals": goalsData,
-  "profile": profileData,
-  "reports": reportsData
+  "chat-history": [],
+  "expenses": [],
+  "goals": [],
+  "profile": {
+    "name": "User",
+    "email": "",
+    "monthlyIncome": 0,
+    "currency": "USD"
+  },
+  "reports": []
 };
 
 export const getLocalData = <T>(key: string): T => {

@@ -36,7 +36,10 @@ export function SearchDialog({ open, onOpenChange }: SearchDialogProps) {
 
   // Reset query when modal closes
   useEffect(() => {
-    if (!open) setQuery("");
+    if (!open) {
+      const t = setTimeout(() => setQuery(""), 0);
+      return () => clearTimeout(t);
+    }
   }, [open]);
 
   const filteredItems = SEARCH_ITEMS.filter((item) =>
@@ -66,7 +69,7 @@ export function SearchDialog({ open, onOpenChange }: SearchDialogProps) {
         <ScrollArea className="max-h-[60vh]">
           {filteredItems.length === 0 ? (
             <div className="py-14 px-4 text-center text-sm text-muted-foreground">
-              No results found for "{query}".
+              No results found for &quot;{query}&quot;.
             </div>
           ) : (
             <div className="p-2 space-y-1">

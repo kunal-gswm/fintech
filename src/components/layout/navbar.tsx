@@ -42,7 +42,8 @@ export function Navbar() {
   const [searchOpen, setSearchOpen] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    const t = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(t);
   }, []);
 
   useEffect(() => {

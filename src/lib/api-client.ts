@@ -3,6 +3,12 @@ import { generateExpenseAnalytics } from "./engines/analytics";
 import { calculateHealthScore } from "./engines/health";
 import type { Expense, Goal } from "@/types";
 
+interface MockArticle {
+  slug: string;
+  relatedSlugs?: string[];
+  [key: string]: unknown;
+}
+
 export class ApiError extends Error {
   constructor(message: string, public status: number, public data?: unknown) {
     super(message);
@@ -39,7 +45,7 @@ export async function apiClient<T>(url: string, options?: ApiClientOptions): Pro
   await new Promise((res) => setTimeout(res, 200));
 
   if (path.startsWith("/api/expenses")) {
-    const expenses = getLocalData<any[]>("expenses");
+    const expenses = getLocalData<Expense[]>("expenses");
     if (method === "GET") return expenses as T;
     if (method === "POST") {
       const body = JSON.parse(options?.body as string);
@@ -63,7 +69,7 @@ export async function apiClient<T>(url: string, options?: ApiClientOptions): Pro
   }
 
   if (path.startsWith("/api/goals")) {
-    const goals = getLocalData<any[]>("goals");
+    const goals = getLocalData<Goal[]>("goals");
     if (method === "GET") return goals as T;
     if (method === "POST") {
       const body = JSON.parse(options?.body as string);
@@ -87,7 +93,7 @@ export async function apiClient<T>(url: string, options?: ApiClientOptions): Pro
   }
 
   if (path.startsWith("/api/articles")) {
-    const articles = getLocalData<any[]>("articles");
+    const articles = getLocalData<MockArticle[]>("articles");
     if (method === "GET") {
       const slug = path.split("/").pop();
       if (slug && slug !== "articles") {
@@ -107,12 +113,12 @@ export async function apiClient<T>(url: string, options?: ApiClientOptions): Pro
   }
 
   if (path.startsWith("/api/reports")) {
-    const reports = getLocalData<any[]>("reports");
+    const reports = getLocalData<Record<string, unknown>[]>("reports");
     if (method === "GET") return reports as T;
   }
 
   if (path.startsWith("/api/profile")) {
-    const profile = getLocalData<any>("profile");
+    const profile = getLocalData<Record<string, unknown>>("profile");
     if (method === "GET") return profile as T;
     if (method === "PUT") {
       const body = JSON.parse(options?.body as string);
@@ -123,7 +129,7 @@ export async function apiClient<T>(url: string, options?: ApiClientOptions): Pro
   }
 
   if (path.startsWith("/api/ai/chat")) {
-    const history = getLocalData<any[]>("chat-history");
+    const history = getLocalData<Record<string, unknown>[]>("chat-history");
     if (method === "GET") return history as T;
     if (method === "POST") {
       const body = JSON.parse(options?.body as string);
@@ -162,7 +168,7 @@ export async function apiClient<T>(url: string, options?: ApiClientOptions): Pro
   }
 
   if (path.startsWith("/api/health")) {
-    const profile = getLocalData<any>("profile");
+    const profile = getLocalData<Record<string, unknown>>("profile");
     const expenses = getLocalData<Expense[]>("expenses");
     const goals = getLocalData<Goal[]>("goals");
 
