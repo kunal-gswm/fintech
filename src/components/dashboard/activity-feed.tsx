@@ -54,7 +54,7 @@ export function ActivityFeed() {
         });
       });
 
-      setActivities(feed.sort(() => Math.random() - 0.5)); // shuffle for visual variety
+      setActivities(feed.sort(() => Math.random() - 0.5).slice(0, 5)); // shuffle for visual variety and limit to 5
     }).catch(console.error);
   }, []);
 

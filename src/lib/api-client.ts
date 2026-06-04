@@ -113,8 +113,47 @@ export async function apiClient<T>(url: string, options?: ApiClientOptions): Pro
   }
 
   if (path.startsWith("/api/reports")) {
-    const reports = getLocalData<Record<string, unknown>[]>("reports");
-    if (method === "GET") return reports as T;
+    const expenses = getLocalData<Expense[]>("expenses");
+    const profile = getLocalData<Record<string, unknown>>("profile");
+    
+    if (method === "GET") {
+      const monthlyIncome = typeof profile.monthlyIncome === "number" ? profile.monthlyIncome : 85000;
+      const reports = [];
+      const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      const now = new Date();
+      
+      for (let i = 5; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const mName = monthNames[d.getMonth()];
+        const year = d.getFullYear();
+        
+        const monthExpenses = expenses
+          .filter(e => new Date(e.date).getMonth() === d.getMonth() && new Date(e.date).getFullYear() === d.getFullYear())
+          .reduce((sum, e) => sum + e.amount, 0);
+          
+        const savings = monthlyIncome - monthExpenses;
+        const savingsRate = Math.round((savings / monthlyIncome) * 100);
+        
+        let insights = [];
+        if (savingsRate >= 20) insights.push(`Great job! You saved ${savingsRate}% of your income this month.`);
+        else insights.push(`You saved ${savingsRate}% this month. Try to aim for at least 20%.`);
+        
+        if (monthExpenses > 0) insights.push(`You spent ₹${monthExpenses.toLocaleString("en-IN")} across various categories.`);
+        else insights.push("You didn't track any expenses this month.");
+
+        reports.push({
+          id: `rep-${year}-${d.getMonth() + 1}`,
+          month: mName,
+          year: year.toString(),
+          totalIncome: monthlyIncome,
+          totalExpenses: monthExpenses,
+          totalSavings: savings,
+          savingsRate: savingsRate > 0 ? savingsRate : 0,
+          insights: insights
+        });
+      }
+      return reports.reverse() as T; // Return most recent first
+    }
   }
 
   if (path.startsWith("/api/profile")) {

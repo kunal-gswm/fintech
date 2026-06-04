@@ -1,49 +1,66 @@
-# Expanda
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200" width="100%" height="200">
+  <rect width="800" height="200" fill="#000000" />
+  <text x="400" y="110" font-family="monospace" font-size="64" font-weight="bold" fill="#E5B80B" text-anchor="middle" letter-spacing="4">
+    ai-finance
+    <animate attributeName="opacity" values="0;1" dur="2s" fill="freeze" />
+  </text>
+  <line x1="250" y1="130" x2="550" y2="130" stroke="#262626" stroke-width="2">
+    <animate attributeName="x2" from="250" to="550" dur="1.5s" fill="freeze" />
+  </line>
+</svg>
 
-Expanda is a personal finance application built with Next.js and Capacitor. It allows users to track expenses, set financial goals, and use an on-device AI for financial reviews.
+[![Build Status](https://img.shields.io/github/actions/workflow/status/owner/ai-finance/build.yml?branch=main)](https://github.com/owner/ai-finance/actions)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://semver.org)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
-## Core Features
-- **On-Device AI:** Uses a local Gemma 4 model via `@capgo/capacitor-llm` for offline financial reviews. Falls back to Gemini API if the on-device model is unavailable.
-- **Receipt Scanning:** Uses `tesseract.js` for basic optical character recognition to extract amounts and merchant names from receipt images.
-- **Offline Support:** Configured as a Progressive Web App using Serwist for basic offline caching.
-- **Native Apps:** Compiles to iOS and Android via Capacitor.
+## Overview
 
-## Tech Stack
-- **Frontend:** Next.js (App Router, Static Export), Tailwind CSS, shadcn/ui
-- **State Management:** Zustand
-- **Mobile Bridge:** Capacitor
-- **PWA:** Serwist
+ai-finance is an intelligent personal finance tracking platform built on Next.js and TypeScript that leverages local AI processing for actionable insights. It solves the problem of unintuitive financial tracking by combining expense logging, goal management, and automated reporting into a single, offline-first application.
 
-## Development Setup
+## Installation
 
-1. **Install Dependencies**
-   ```bash
-   npm install
-   ```
+```bash
+git clone https://github.com/owner/ai-finance.git
+cd ai-finance
+npm install
+npm run dev
+```
 
-2. **Environment Variables**
-   Create a `.env` file from the example and add your Gemini API key (for cloud fallback).
-   ```bash
-   cp .env.example .env
-   ```
+## Usage
 
-3. **Run Locally**
-   ```bash
-   npm run dev
-   ```
-   Open `http://localhost:3000`.
+```typescript
+import { generateExpenseAnalytics } from "@/lib/engines/analytics";
+import { getLocalData } from "@/lib/local-db";
+import type { Expense } from "@/types";
 
-## Building for Native (iOS/Android)
+const expenses = getLocalData<Expense[]>("expenses");
+const analytics = generateExpenseAnalytics(expenses);
 
-1. **Sync Capacitor**
-   Compile the Next.js app and sync the native directories:
-   ```bash
-   npm run cap:sync
-   ```
+console.log(`Total Spent: ${analytics.totalSpending}`);
+console.log(`Top Category: ${analytics.largestCategory?.name}`);
+```
 
-2. **Open Native IDE**
-   - iOS (Requires Xcode): `npm run cap:open:ios`
-   - Android (Requires Android Studio): `npm run cap:open:android`
+## Configuration
 
-## Architecture Limitations
-- **Static Export Only:** Because Capacitor requires a static web bundle, `output: 'export'` is strictly enforced in `next.config.ts`. You cannot use Node.js server actions or API routes. All logic must execute client-side.
+| Option | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `NEXT_PUBLIC_API_URL` | `string` | `""` | The base URL for the backend API endpoints. |
+| `LOCAL_DB_KEY` | `string` | `"ai-finance"` | Prefix used for all localStorage database keys. |
+| `AI_MODEL_PATH` | `string` | `"models/local"` | Path to the local LLM weights used for offline inference. |
+
+## API reference
+
+- `getReports(): Promise<Report[]>` - Fetches the 6-month historical report data for the user.
+- `getAnalytics(month?: string): Promise<AnalyticsData>` - Aggregates spending data and calculates top categories and trends.
+- `calculateHealthScore(income: number, expenses: number, emergency: number, goals: number): HealthScore` - Computes a risk level and overall financial health score based on user metrics.
+
+## Contributing
+
+```bash
+git clone https://github.com/owner/ai-finance.git
+cd ai-finance
+git checkout -b feature/new-component
+npm run test
+npm run lint
+git push origin feature/new-component
+```

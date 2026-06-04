@@ -221,7 +221,7 @@ export default function ExpensesPage() {
                       <TableCell className="hidden sm:table-cell">
                         <Badge
                           variant="secondary"
-                          className="font-normal"
+                          className="font-medium px-2.5 py-0.5 rounded-md border-0"
                           style={{
                             backgroundColor: `${CATEGORY_COLORS[expense.category]}15`,
                             color: CATEGORY_COLORS[expense.category],
