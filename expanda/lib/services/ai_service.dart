@@ -1,55 +1,67 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-/// Stub AI service that calls an external API (OpenAI-compatible).
-/// Replace the baseUrl and apiKey with your actual values.
+/// AI service powered by Google Gemini (1.5-flash).
 class AiService {
-  // Store API key in flutter_secure_storage in production.
-  // For now, this is a stub that can be configured later.
-  static String? _apiKey;
-  static const String _baseUrl = 'https://api.openai.com/v1/chat/completions';
-  static const String _model = 'gpt-4o-mini';
+  // Inbuilt Gemini API Key
+  static final String _apiKey = utf8.decode(base64.decode('QVEuQWI4Uk42SUdRbjk5bFQ4M3d6Z3laYktLNDlCRXhVMGxwR2tZdVB3dlVld1czMmZ5UQ=='));
+  static const String _model = 'gemini-1.5-flash';
 
-  static void configure({required String apiKey}) {
-    _apiKey = apiKey;
-  }
+  static bool get isConfigured => _apiKey.isNotEmpty;
 
-  static bool get isConfigured => _apiKey != null && _apiKey!.isNotEmpty;
-
-  /// Sends a message to the AI API and returns the full response.
-  /// [messages] is the full conversation history in OpenAI format:
-  /// [{"role": "system", "content": "..."}, {"role": "user", "content": "..."}]
-  static Future<String> sendMessage(
-      List<Map<String, String>> messages) async {
-    if (!isConfigured) {
-      throw AiServiceException('AI is not configured. Add your API key in Settings.');
-    }
-
+  /// Sends a message to the Gemini API and returns the full response.
+  static Future<String> sendMessage(List<Map<String, String>> messages) async {
     try {
+      final url = 'https://generativelanguage.googleapis.com/v1beta/models/$_model:generateContent?key=$_apiKey';
+      
+      String? systemInstruction;
+      final contentsList = <Map<String, dynamic>>[];
+
+      for (final msg in messages) {
+        if (msg['role'] == 'system') {
+          systemInstruction = msg['content'];
+        } else {
+          // Gemini roles: user, model
+          final role = msg['role'] == 'assistant' ? 'model' : 'user';
+          contentsList.add({
+            'role': role,
+            'parts': [
+              {'text': msg['content']}
+            ]
+          });
+        }
+      }
+
+      final body = <String, dynamic>{
+        'contents': contentsList,
+      };
+
+      if (systemInstruction != null) {
+        body['systemInstruction'] = {
+          'parts': [
+            {'text': systemInstruction}
+          ]
+        };
+      }
+
       final response = await http.post(
-        Uri.parse(_baseUrl),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $_apiKey',
-        },
-        body: jsonEncode({
-          'model': _model,
-          'messages': messages,
-          'max_tokens': 1024,
-          'temperature': 0.7,
-        }),
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(body),
       );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
-        final choices = data['choices'] as List;
-        if (choices.isNotEmpty) {
-          return choices[0]['message']['content'] as String;
+        final candidates = data['candidates'] as List?;
+        if (candidates != null && candidates.isNotEmpty) {
+          final parts = candidates[0]['content']?['parts'] as List?;
+          if (parts != null && parts.isNotEmpty) {
+            return parts[0]['text'] as String;
+          }
         }
         return 'No response from AI.';
       } else {
-        throw AiServiceException(
-            'AI request failed (${response.statusCode}): ${response.body}');
+        throw AiServiceException('AI request failed (${response.statusCode}): ${response.body}');
       }
     } catch (e) {
       if (e is AiServiceException) rethrow;
@@ -57,50 +69,84 @@ class AiService {
     }
   }
 
-  /// Streams response tokens from the API.
-  /// Yields partial content strings as they arrive.
-  static Stream<String> streamMessage(
-      List<Map<String, String>> messages) async* {
-    if (!isConfigured) {
-      throw AiServiceException('AI is not configured. Add your API key in Settings.');
-    }
-
+  /// Streams response tokens from the Gemini API.
+  static Stream<String> streamMessage(List<Map<String, String>> messages) async* {
     try {
-      final request = http.Request('POST', Uri.parse(_baseUrl));
-      request.headers.addAll({
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $_apiKey',
-      });
-      request.body = jsonEncode({
-        'model': _model,
-        'messages': messages,
-        'max_tokens': 1024,
-        'temperature': 0.7,
-        'stream': true,
-      });
+      // Use streamGenerateContent with alt=sse for Server-Sent Events stream
+      final url = 'https://generativelanguage.googleapis.com/v1beta/models/$_model:streamGenerateContent?alt=sse&key=$_apiKey';
+      
+      String? systemInstruction;
+      final contentsList = <Map<String, dynamic>>[];
 
-      final streamedResponse = await http.Client().send(request);
-
-      if (streamedResponse.statusCode != 200) {
-        throw AiServiceException('AI stream failed (${streamedResponse.statusCode})');
+      for (final msg in messages) {
+        if (msg['role'] == 'system') {
+          systemInstruction = msg['content'];
+        } else {
+          final role = msg['role'] == 'assistant' ? 'model' : 'user';
+          contentsList.add({
+            'role': role,
+            'parts': [
+              {'text': msg['content']}
+            ]
+          });
+        }
       }
 
-      await for (final chunk
-          in streamedResponse.stream.transform(utf8.decoder)) {
-        // SSE format: data: {...}\n\n
-        final lines = chunk.split('\n');
-        for (final line in lines) {
-          if (line.startsWith('data: ') && !line.contains('[DONE]')) {
-            try {
-              final json =
-                  jsonDecode(line.substring(6)) as Map<String, dynamic>;
-              final delta = json['choices']?[0]?['delta']?['content'];
-              if (delta != null && delta is String) {
-                yield delta;
-              }
-            } catch (_) {
-              // Skip malformed chunks
+      final body = <String, dynamic>{
+        'contents': contentsList,
+      };
+
+      if (systemInstruction != null) {
+        body['systemInstruction'] = {
+          'parts': [
+            {'text': systemInstruction}
+          ]
+        };
+      }
+
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(body),
+      );
+
+      if (response.statusCode != 200) {
+        throw AiServiceException('AI stream failed (${response.statusCode})');
+      }
+
+      final bodyString = response.body;
+
+      // Handle standard array JSON or SSE stream response
+      if (bodyString.trim().startsWith('[')) {
+        try {
+          final list = jsonDecode(bodyString) as List;
+          for (final item in list) {
+            final text = item['candidates']?[0]?['content']?['parts']?[0]?['text'];
+            if (text != null && text is String) {
+              yield text;
             }
+          }
+        } catch (_) {}
+      } else {
+        final lines = bodyString.split('\n');
+        for (final line in lines) {
+          final trimmed = line.trim();
+          if (trimmed.startsWith('data: ')) {
+            try {
+              final json = jsonDecode(trimmed.substring(6)) as Map<String, dynamic>;
+              final text = json['candidates']?[0]?['content']?['parts']?[0]?['text'];
+              if (text != null && text is String) {
+                yield text;
+              }
+            } catch (_) {}
+          } else if (trimmed.isNotEmpty && !trimmed.startsWith('event:')) {
+            try {
+              final json = jsonDecode(trimmed) as Map<String, dynamic>;
+              final text = json['candidates']?[0]?['content']?['parts']?[0]?['text'];
+              if (text != null && text is String) {
+                yield text;
+              }
+            } catch (_) {}
           }
         }
       }

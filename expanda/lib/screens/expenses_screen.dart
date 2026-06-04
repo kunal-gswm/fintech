@@ -109,6 +109,7 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
                   child: FilterChip(
                     label: const Text('All'),
                     selected: _categoryFilter == 'All',
+                    showCheckmark: false,
                     onSelected: (_) =>
                         setState(() => _categoryFilter = 'All'),
                   ),
@@ -118,6 +119,7 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
                       child: FilterChip(
                         label: Text(cat),
                         selected: _categoryFilter == cat,
+                        showCheckmark: false,
                         onSelected: (_) =>
                             setState(() => _categoryFilter = cat),
                       ),

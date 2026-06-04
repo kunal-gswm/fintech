@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../services/auth_service.dart';
+import '../providers/settings_provider.dart';
 
-class LockScreen extends StatefulWidget {
+class LockScreen extends ConsumerStatefulWidget {
   const LockScreen({super.key});
 
   @override
-  State<LockScreen> createState() => _LockScreenState();
+  ConsumerState<LockScreen> createState() => _LockScreenState();
 }
 
-class _LockScreenState extends State<LockScreen> {
+class _LockScreenState extends ConsumerState<LockScreen> {
   String _pin = '';
   int _failedAttempts = 0;
   bool _coolingDown = false;
@@ -20,6 +22,20 @@ class _LockScreenState extends State<LockScreen> {
   @override
   void initState() {
     super.initState();
+    _checkPinAndBiometric();
+  }
+
+  Future<void> _checkPinAndBiometric() async {
+    final pinSet = await AuthService.isPinSet();
+    if (!pinSet) {
+      // Auto-disable lock options in settings to prevent user lockout
+      await ref.read(settingsProvider.notifier).toggleBiometric(false);
+      await ref.read(settingsProvider.notifier).togglePin(false);
+      if (mounted) {
+        context.go('/home');
+      }
+      return;
+    }
     _tryBiometric();
   }
 

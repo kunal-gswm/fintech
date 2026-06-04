@@ -65,12 +65,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(settings.fullName,
+                        Text(settings.firstName.isEmpty ? 'User' : settings.firstName,
                             style: theme.textTheme.titleMedium),
-                        Text(settings.email.isEmpty
-                            ? 'Tap to add email'
-                            : settings.email,
-                            style: theme.textTheme.bodySmall),
                       ],
                     ),
                   ),
@@ -138,10 +134,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   List<Widget> _buildProfile(ThemeData theme, dynamic settings) {
-    final firstC = TextEditingController(text: settings.firstName);
-    final lastC = TextEditingController(text: settings.lastName);
-    final emailC = TextEditingController(text: settings.email);
-    final phoneC = TextEditingController(text: settings.phone);
+    final usernameC = TextEditingController(text: settings.firstName);
 
     return [
       Center(
@@ -183,32 +176,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       ),
       const SizedBox(height: 24),
       TextField(
-          controller: firstC,
-          decoration: const InputDecoration(labelText: 'First Name')),
-      const SizedBox(height: 12),
-      TextField(
-          controller: lastC,
-          decoration: const InputDecoration(labelText: 'Last Name')),
-      const SizedBox(height: 12),
-      TextField(
-          controller: emailC,
-          keyboardType: TextInputType.emailAddress,
-          decoration: const InputDecoration(labelText: 'Email')),
-      const SizedBox(height: 12),
-      TextField(
-          controller: phoneC,
-          keyboardType: TextInputType.phone,
-          decoration: const InputDecoration(labelText: 'Phone')),
+          controller: usernameC,
+          decoration: const InputDecoration(labelText: 'Username')),
       const SizedBox(height: 24),
       ElevatedButton(
         onPressed: () {
           HapticFeedback.mediumImpact();
           ref.read(settingsProvider.notifier).updateProfile(
-                firstName: firstC.text,
-                lastName: lastC.text,
-                email: emailC.text,
-                phone: phoneC.text,
+                firstName: usernameC.text,
+                lastName: '',
+                email: '',
+                phone: '',
               );
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Profile updated successfully.')),
+          );
           setState(() => _activeSection = null);
         },
         child: const Text('Save Profile'),
@@ -304,6 +286,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   weeklyDigest: weekly,
                 ),
               );
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Preferences updated successfully.')),
+          );
           setState(() => _activeSection = null);
         },
         child: const Text('Save Preferences'),
@@ -322,6 +307,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               value: settings.biometricEnabled,
               onChanged: (v) async {
                 if (v) {
+                  if (!settings.pinEnabled) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content:
+                                Text('Please enable and set a PIN lock first before enabling biometric lock.')),
+                      );
+                    }
+                    return;
+                  }
                   final available = await AuthService.isBiometricAvailable();
                   if (!available) {
                     if (mounted) {
@@ -336,10 +331,20 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   final authed =
                       await AuthService.authenticateWithBiometrics();
                   if (authed) {
-                    ref.read(settingsProvider.notifier).toggleBiometric(true);
+                    await ref.read(settingsProvider.notifier).toggleBiometric(true);
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Biometric lock enabled.')),
+                      );
+                    }
                   }
                 } else {
-                  ref.read(settingsProvider.notifier).toggleBiometric(false);
+                  await ref.read(settingsProvider.notifier).toggleBiometric(false);
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Biometric lock disabled.')),
+                    );
+                  }
                 }
               },
             ),
@@ -353,7 +358,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   _showPinSetup();
                 } else {
                   await AuthService.removePin();
-                  ref.read(settingsProvider.notifier).togglePin(false);
+                  await ref.read(settingsProvider.notifier).togglePin(false);
+                  await ref.read(settingsProvider.notifier).toggleBiometric(false);
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Security locks disabled.')),
+                    );
+                  }
                 }
               },
             ),
@@ -433,10 +444,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         }
                         HapticFeedback.mediumImpact();
                         await AuthService.setPin(pinC.text);
-                        ref
+                        await ref
                             .read(settingsProvider.notifier)
                             .togglePin(true);
-                        if (mounted) Navigator.pop(ctx);
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('PIN lock enabled successfully.')),
+                          );
+                          Navigator.pop(ctx);
+                        }
                       },
                       child: const Text('Set PIN'),
                     ),

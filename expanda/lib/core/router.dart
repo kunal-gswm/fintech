@@ -13,7 +13,7 @@ import '../screens/ai_chat_screen.dart';
 import '../screens/reports_screen.dart';
 import '../screens/settings_screen.dart';
 import '../screens/notifications_screen.dart';
-import '../screens/learning_placeholder_screen.dart';
+import '../screens/learning_hub_screen.dart';
 import '../screens/splash_screen.dart';
 import '../providers/settings_provider.dart';
 
@@ -21,9 +21,8 @@ final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
 final routerProvider = Provider<GoRouter>((ref) {
-  // We keep watching settings to ensure the router recreates on changes if needed,
-  // but the absolute starting point is now always the animated splash screen.
-  final _ = ref.watch(settingsProvider);
+  // Use read instead of watch to prevent router recreation (and redirecting to splash) when settings are updated.
+  final _ = ref.read(settingsProvider);
 
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
@@ -68,7 +67,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/learn',
         name: 'learn',
-        builder: (context, state) => const LearningPlaceholderScreen(),
+        builder: (context, state) => const LearningHubScreen(),
       ),
 
       // ── Shell route with bottom nav bar ──

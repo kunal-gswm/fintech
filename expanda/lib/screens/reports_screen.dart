@@ -151,6 +151,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                     child: FilterChip(
                       label: Text(label),
                       selected: selected,
+                      showCheckmark: false,
                       onSelected: (_) =>
                           setState(() => _selectedMonth = m),
                     ),

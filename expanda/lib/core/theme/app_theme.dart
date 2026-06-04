@@ -110,6 +110,7 @@ class AppTheme {
           borderRadius: BorderRadius.circular(20),
         ),
         labelStyle: const TextStyle(fontSize: 13),
+        showCheckmark: false,
       ),
       dividerTheme: const DividerThemeData(
         color: borderColor,

@@ -121,6 +121,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                     child: FilterChip(
                       label: Text(f),
                       selected: selected,
+                      showCheckmark: false,
                       onSelected: (_) {
                         HapticFeedback.lightImpact();
                         setState(() {
@@ -141,6 +142,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                     ],
                   ),
                   selected: _customRange != null,
+                  showCheckmark: false,
                   onSelected: (_) => _pickDateRange(),
                 ),
               ],

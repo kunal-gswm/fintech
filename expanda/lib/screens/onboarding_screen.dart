@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/settings_provider.dart';
 import '../models/constants.dart';
+import '../services/auth_service.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
@@ -20,17 +21,36 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   String _currency = 'INR';
   final _incomeController = TextEditingController();
   final _budgetController = TextEditingController(text: '50000');
+  bool _pinEnabled = false;
   bool _biometricEnabled = false;
+  final _pinController = TextEditingController();
+  final _confirmPinController = TextEditingController();
 
   @override
   void dispose() {
     _pageController.dispose();
     _incomeController.dispose();
     _budgetController.dispose();
+    _pinController.dispose();
+    _confirmPinController.dispose();
     super.dispose();
   }
 
   void _next() {
+    if (_currentPage == 3 && _pinEnabled) {
+      if (_pinController.text.length != 6) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('PIN must be 6 digits')),
+        );
+        return;
+      }
+      if (_pinController.text != _confirmPinController.text) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('PINs do not match')),
+        );
+        return;
+      }
+    }
     if (_currentPage < 3) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 350),
@@ -46,12 +66,20 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     final income = double.tryParse(_incomeController.text) ?? 0;
     final budget = double.tryParse(_budgetController.text) ?? 50000;
 
+    if (_pinEnabled) {
+      await AuthService.setPin(_pinController.text);
+    }
+
     await ref.read(settingsProvider.notifier).completeOnboarding(
           currency: _currency,
           monthlyIncome: income,
           monthlyBudgetLimit: budget,
           biometricEnabled: _biometricEnabled,
         );
+
+    if (_pinEnabled) {
+      await ref.read(settingsProvider.notifier).togglePin(true);
+    }
 
     if (mounted) {
       context.go('/home');
@@ -172,6 +200,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 label: Text(
                     '${AppConstants.currencySymbols[c]} $c'),
                 selected: selected,
+                showCheckmark: false,
                 onSelected: (_) => setState(() => _currency = c),
                 selectedColor:
                     theme.colorScheme.primary.withValues(alpha: 0.2),
@@ -233,32 +262,98 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   Widget _buildBiometricPage(ThemeData theme) {
     return Padding(
       padding: const EdgeInsets.all(32),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.fingerprint_rounded,
-              size: 56, color: theme.colorScheme.primary),
-          const SizedBox(height: 24),
-          Text('Secure your app', style: theme.textTheme.headlineMedium),
-          const SizedBox(height: 8),
-          Text(
-            'Enable biometric lock to protect your financial data.',
-            textAlign: TextAlign.center,
-            style: theme.textTheme.bodyMedium,
-          ),
-          const SizedBox(height: 32),
-          SwitchListTile(
-            title: const Text('Enable Biometric Lock'),
-            subtitle: const Text('Fingerprint or Face ID'),
-            value: _biometricEnabled,
-            onChanged: (v) => setState(() => _biometricEnabled = v),
-            activeColor: theme.colorScheme.primary,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14),
-              side: BorderSide(color: theme.colorScheme.outline),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.shield_rounded,
+                size: 56, color: theme.colorScheme.primary),
+            const SizedBox(height: 24),
+            Text('Secure your app', style: theme.textTheme.headlineMedium),
+            const SizedBox(height: 8),
+            Text(
+              'Set up a PIN lock and optionally enable biometrics to protect your financial data.',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyMedium,
             ),
-          ),
-        ],
+            const SizedBox(height: 24),
+            SwitchListTile(
+              title: const Text('Enable PIN Lock'),
+              subtitle: const Text('Set a 6-digit PIN for access'),
+              value: _pinEnabled,
+              onChanged: (v) {
+                setState(() {
+                  _pinEnabled = v;
+                  if (!v) {
+                    _biometricEnabled = false;
+                    _pinController.clear();
+                    _confirmPinController.clear();
+                  }
+                });
+              },
+              activeColor: theme.colorScheme.primary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+                side: BorderSide(color: theme.colorScheme.outline),
+              ),
+            ),
+            if (_pinEnabled) ...[
+              const SizedBox(height: 16),
+              TextField(
+                controller: _pinController,
+                keyboardType: TextInputType.number,
+                maxLength: 6,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'Enter 6-digit PIN',
+                  counterText: '',
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: _confirmPinController,
+                keyboardType: TextInputType.number,
+                maxLength: 6,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'Confirm PIN',
+                  counterText: '',
+                ),
+              ),
+              const SizedBox(height: 16),
+              SwitchListTile(
+                title: const Text('Enable Biometric Lock'),
+                subtitle: const Text('Fingerprint or Face ID'),
+                value: _biometricEnabled,
+                onChanged: (v) async {
+                  if (v) {
+                    final available = await AuthService.isBiometricAvailable();
+                    if (!available) {
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('Biometrics not available on this device')),
+                        );
+                      }
+                      return;
+                    }
+                    final authed = await AuthService.authenticateWithBiometrics();
+                    if (authed) {
+                      setState(() => _biometricEnabled = true);
+                    }
+                  } else {
+                    setState(() => _biometricEnabled = false);
+                  }
+                },
+                activeColor: theme.colorScheme.primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  side: BorderSide(color: theme.colorScheme.outline),
+                ),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }
