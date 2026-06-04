@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 /// AI service powered by Google Gemini (1.5-flash).
 class AiService {
   // Inbuilt Gemini API Key
-  static final String _apiKey = utf8.decode(base64.decode('QVEuQWI4Uk42SUdRbjk5bFQ4M3d6Z3laYktLNDlCRXhVMGxwR2tZdVB3dlVld1czMmZ5UQ=='));
+  static final String _apiKey = utf8.decode(base64.decode('QVEuQWI4Uk42TFZDWUVNTmhPMmRJQk12eTllT3BMSEpudWY2Ujl5VDRxTkVUN3gwZ3c1a3c='));
   static const String _model = 'gemini-2.5-flash';
 
   static bool get isConfigured => _apiKey.isNotEmpty;

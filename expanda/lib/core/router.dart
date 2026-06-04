@@ -55,9 +55,9 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const ReportsScreen(),
       ),
       GoRoute(
-        path: '/settings',
-        name: 'settings',
-        builder: (context, state) => const SettingsScreen(),
+        path: '/goals',
+        name: 'goals',
+        builder: (context, state) => const GoalsScreen(),
       ),
       GoRoute(
         path: '/notifications',
@@ -97,10 +97,10 @@ final routerProvider = Provider<GoRouter>((ref) {
             ),
           ),
           GoRoute(
-            path: '/goals',
-            name: 'goals',
+            path: '/settings',
+            name: 'settings',
             pageBuilder: (context, state) => const NoTransitionPage(
-              child: GoalsScreen(),
+              child: SettingsScreen(),
             ),
           ),
           GoRoute(

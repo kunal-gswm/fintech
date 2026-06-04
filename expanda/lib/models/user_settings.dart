@@ -54,7 +54,7 @@ class UserSettings extends HiveObject {
   UserSettings({
     this.currency = 'INR',
     this.monthlyIncome = 0,
-    this.monthlyBudgetLimit = 50000,
+    this.monthlyBudgetLimit = 0,
     this.savingsGoalPercent = 30,
     this.emergencyFundMonths = 6,
     this.biometricEnabled = false,
@@ -156,7 +156,7 @@ class UserSettings extends HiveObject {
         currency: json['currency'] as String? ?? 'INR',
         monthlyIncome: (json['monthlyIncome'] as num?)?.toDouble() ?? 0,
         monthlyBudgetLimit:
-            (json['monthlyBudgetLimit'] as num?)?.toDouble() ?? 50000,
+            (json['monthlyBudgetLimit'] as num?)?.toDouble() ?? 0,
         savingsGoalPercent:
             (json['savingsGoalPercent'] as num?)?.toDouble() ?? 30,
         emergencyFundMonths: json['emergencyFundMonths'] as int? ?? 6,

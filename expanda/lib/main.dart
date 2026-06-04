@@ -4,9 +4,12 @@ import 'core/theme/app_theme.dart';
 import 'core/router.dart';
 import 'services/hive_service.dart';
 
+import 'services/seed_data_service.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await HiveService.init();
+  await SeedDataService.seedDatabase();
 
   runApp(
     const ProviderScope(

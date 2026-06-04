@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 /// Main shell with a custom, premium bottom navigation bar.
-/// Tabs: Home, Expenses, Logo Menu (Central), Analytics, Goals.
+/// Tabs: Home, Expenses, Logo Menu (Central), Analytics, Settings.
 class MainShell extends StatefulWidget {
   final Widget child;
   const MainShell({super.key, required this.child});
@@ -26,7 +26,7 @@ class _MainShellState extends State<MainShell> with SingleTickerProviderStateMix
     '/expenses',
     'logo',
     '/analytics',
-    '/goals',
+    '/settings',
   ];
 
   @override
@@ -81,7 +81,7 @@ class _MainShellState extends State<MainShell> with SingleTickerProviderStateMix
     if (location == '/home') return 0;
     if (location == '/expenses') return 1;
     if (location == '/analytics') return 3;
-    if (location == '/goals') return 4;
+    if (location == '/settings') return 4;
     return 0;
   }
 
@@ -90,8 +90,12 @@ class _MainShellState extends State<MainShell> with SingleTickerProviderStateMix
       _toggleMenu();
       return;
     }
+    // Always close the menu when navigating to a tab
     if (_isMenuOpen) {
-      _toggleMenu();
+      setState(() {
+        _isMenuOpen = false;
+        _menuController.reverse();
+      });
     }
     context.go(_tabs[index]);
   }
@@ -199,12 +203,12 @@ class _MainShellState extends State<MainShell> with SingleTickerProviderStateMix
                                   const Divider(height: 16),
                                   _buildMenuItem(
                                     theme: theme,
-                                    icon: Icons.settings_rounded,
-                                    label: 'Settings',
+                                    icon: Icons.flag_rounded,
+                                    label: 'Goals',
                                     color: const Color(0xFF8B5CF6), // Purple
                                     onTap: () {
                                       _toggleMenu();
-                                      context.push('/settings');
+                                      context.push('/goals');
                                     },
                                   ),
                                 ],
@@ -300,7 +304,7 @@ class _MainShellState extends State<MainShell> with SingleTickerProviderStateMix
                 ),
 
                 _buildTabItem(context, 3, Icons.analytics_rounded, 'Analytics', activeIndex == 3),
-                _buildTabItem(context, 4, Icons.flag_rounded, 'Goals', activeIndex == 4),
+                _buildTabItem(context, 4, Icons.settings_rounded, 'Settings', activeIndex == 4),
               ],
             ),
           ),
