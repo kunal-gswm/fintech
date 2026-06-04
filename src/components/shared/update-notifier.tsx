@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { Download, Rocket } from "lucide-react";
-import { APP_CONFIG } from "@/lib/config";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -13,59 +12,46 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 
-interface GitHubRelease {
-  tag_name: string;
-  name: string;
-  body: string;
-  assets: {
-    name: string;
-    browser_download_url: string;
-  }[];
-}
-
 export function UpdateNotifier() {
   const [isOpen, setIsOpen] = useState(false);
-  const [releaseInfo, setReleaseInfo] = useState<GitHubRelease | null>(null);
+  const [updateVersion, setUpdateVersion] = useState<string | null>(null);
 
   useEffect(() => {
-    async function checkForUpdates() {
+    let listener: { remove: () => void } | null = null;
+    
+    async function setupUpdater() {
       try {
-        const response = await fetch(`https://api.github.com/repos/${APP_CONFIG.GITHUB_REPO}/releases/latest`);
-        if (!response.ok) return;
-
-        const data: GitHubRelease = await response.json();
+        const { CapacitorUpdater } = await import('@capgo/capacitor-updater');
         
-        // If the latest tag is different from our current version, an update is available!
-        if (data.tag_name && data.tag_name !== APP_CONFIG.APP_VERSION) {
-          setReleaseInfo(data);
+        // Listen for successful background update downloads
+        listener = await CapacitorUpdater.addListener('download', (info: { version: string }) => {
+          setUpdateVersion(info.version);
           setIsOpen(true);
-        }
+        });
       } catch (error) {
-        console.error("Failed to check for updates", error);
+        console.error("Capgo Updater not available", error);
       }
     }
 
-    // Only check once on mount
-    checkForUpdates();
+    setupUpdater();
+    return () => {
+      if (listener) listener.remove();
+    };
   }, []);
 
-  if (!releaseInfo) return null;
-
-  // Find the APK file from the release assets
-  const apkAsset = releaseInfo.assets.find(a => a.name.endsWith('.apk'));
-
-  const handleUpdate = async () => {
-    const url = apkAsset ? apkAsset.browser_download_url : `https://github.com/${APP_CONFIG.GITHUB_REPO}/releases/latest`;
-    setIsOpen(false);
-    
+  const handleApplyUpdate = async () => {
     try {
-      const { Browser } = await import('@capacitor/browser');
-      await Browser.open({ url });
-    } catch {
-      // Fallback for web
-      window.open(url, '_blank');
+      const { CapacitorUpdater } = await import('@capgo/capacitor-updater');
+      if (updateVersion) {
+        // This will immediately restart the app with the new version
+        await CapacitorUpdater.set({ id: updateVersion }); 
+      }
+    } catch (error) {
+      console.error("Failed to apply update", error);
     }
   };
+
+  if (!updateVersion) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -73,27 +59,20 @@ export function UpdateNotifier() {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
             <Rocket className="w-5 h-5 text-primary" />
-            Update Available!
+            Update Ready!
           </DialogTitle>
           <DialogDescription>
-            A new version of AI Finance ({releaseInfo.tag_name}) is ready to download.
+            A new version of AI Finance has been downloaded in the background.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="bg-muted/50 rounded-md p-4 max-h-40 overflow-y-auto text-sm my-2 border">
-          <p className="font-semibold mb-2">What&apos;s New in {releaseInfo.name}:</p>
-          <div className="whitespace-pre-wrap text-muted-foreground">
-            {releaseInfo.body || "Various improvements and bug fixes."}
-          </div>
-        </div>
-
         <DialogFooter className="flex flex-col sm:flex-row gap-2 mt-2">
           <Button variant="outline" onClick={() => setIsOpen(false)} className="w-full sm:w-auto">
-            Remind Me Later
+            Apply on Next Restart
           </Button>
-          <Button onClick={handleUpdate} className="w-full sm:w-auto gap-2">
+          <Button onClick={handleApplyUpdate} className="w-full sm:w-auto gap-2">
             <Download className="w-4 h-4" />
-            Download Update
+            Restart & Update Now
           </Button>
         </DialogFooter>
       </DialogContent>

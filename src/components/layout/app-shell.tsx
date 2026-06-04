@@ -8,6 +8,13 @@ import { LocalLLMService } from "@/services/local-llm.service";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
+    // Notify Capgo OTA updater that the app successfully booted
+    import('@capgo/capacitor-updater').then((mod) => {
+      mod.CapacitorUpdater.notifyAppReady().catch(console.error);
+    }).catch(() => {
+      // Ignored on web
+    });
+
     // Preload the AI model in the background so it's ready instantly when the user navigates to the chat
     LocalLLMService.initialize().catch(console.error);
   }, []);

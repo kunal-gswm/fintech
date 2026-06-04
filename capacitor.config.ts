@@ -12,6 +12,10 @@ const config: CapacitorConfig = {
       showSpinner: false,
       splashFullScreen: true,
       splashImmersive: true,
+    },
+    CapacitorUpdater: {
+      autoUpdate: true,
+      appReadyTimeout: 10000,
     }
   }
 };

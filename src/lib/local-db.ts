@@ -1,4 +1,5 @@
 import articlesData from "../../data/articles.json";
+import { generateStudentMockData, STUDENT_PROFILE } from "./mock-data";
 
 // The data structure might be inside a default export or just an array.
 // I will create a simple wrapper.
@@ -6,14 +7,9 @@ import articlesData from "../../data/articles.json";
 const DEFAULT_DATA: Record<string, unknown> = {
   "articles": articlesData,
   "chat-history": [],
-  "expenses": [],
+  "expenses": generateStudentMockData(),
   "goals": [],
-  "profile": {
-    "name": "User",
-    "email": "",
-    "monthlyIncome": 0,
-    "currency": "USD"
-  },
+  "profile": STUDENT_PROFILE,
   "reports": []
 };
 
