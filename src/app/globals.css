@@ -141,11 +141,9 @@
   body {
     @apply bg-background text-foreground;
     -webkit-tap-highlight-color: transparent;
-    overscroll-behavior-y: none; /* Prevent elastic bounce on the whole page */
   }
   html {
     @apply font-sans scroll-smooth;
-    overscroll-behavior-y: none;
   }
   /* Improve native feel on interactive elements */
   button, a, input, [role="button"] {
@@ -198,7 +196,6 @@
 }
 
 body, html {
-  overflow-x: hidden;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
