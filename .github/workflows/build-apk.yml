@@ -17,53 +17,51 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: Install Dependencies
-        run: npm install
-
-      - name: Generate Version Tag
-        id: version
-        run: echo "tag=v1.3.${{ github.run_number }}" >> $GITHUB_OUTPUT
-
-      - name: Build Next.js App
-        run: npm run build
-        env:
-          NEXT_PUBLIC_APP_VERSION: ${{ steps.version.outputs.tag }}
-
-      - name: Sync Capacitor
-        run: npx cap sync android
-
-      - name: Set up JDK 21
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '21'
+          java-version: '17'
 
-      - name: Make gradlew executable
-        run: chmod +x ./android/gradlew
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
 
-      - name: Build Debug APK
-        working-directory: ./android
-        run: ./gradlew assembleDebug
+      - name: Generate Version Tag
+        id: version
+        run: echo "tag=v2.0.${{ github.run_number }}" >> $GITHUB_OUTPUT
+
+      - name: Install Dependencies
+        working-directory: ./expanda
+        run: flutter pub get
+
+      - name: Run Tests
+        working-directory: ./expanda
+        run: flutter test
+
+      - name: Build Release APK
+        working-directory: ./expanda
+        run: flutter build apk --release
 
       - name: Rename APK
-        run: mv android/app/build/outputs/apk/debug/app-debug.apk android/app/build/outputs/apk/debug/expanda.apk
+        run: mv expanda/build/app/outputs/flutter-apk/app-release.apk expanda/build/app/outputs/flutter-apk/expanda.apk
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: expanda-apk
-          path: android/app/build/outputs/apk/debug/expanda.apk
+          path: expanda/build/app/outputs/flutter-apk/expanda.apk
 
       - name: Upload APK to Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version.outputs.tag }}
-          name: Release ${{ steps.version.outputs.tag }}
-          files: android/app/build/outputs/apk/debug/expanda.apk
+          name: EXPANDA v2.0.${{ github.run_number }}
+          body: |
+            Automated production build for EXPANDA Mobile (Flutter Migration).
+            Download the APK below to install on your mobile device.
+          files: expanda/build/app/outputs/flutter-apk/expanda.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
