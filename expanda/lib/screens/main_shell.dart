@@ -224,6 +224,28 @@ class _MainShellState extends State<MainShell> with SingleTickerProviderStateMix
                                       context.push('/news');
                                     },
                                   ),
+                                  const Divider(height: 16),
+                                  _buildMenuItem(
+                                    theme: theme,
+                                    icon: Icons.money_off_rounded,
+                                    label: 'Impulse Graveyard',
+                                    color: const Color(0xFFEF4444), // Red
+                                    onTap: () {
+                                      _toggleMenu();
+                                      context.push('/impulse-graveyard');
+                                    },
+                                  ),
+                                  const Divider(height: 16),
+                                  _buildMenuItem(
+                                    theme: theme,
+                                    icon: Icons.account_balance_wallet_rounded,
+                                    label: 'Debt Escape',
+                                    color: const Color(0xFF8B5CF6), // Purple
+                                    onTap: () {
+                                      _toggleMenu();
+                                      context.push('/debt-visualizer');
+                                    },
+                                  ),
                                 ],
                               ),
                             ),

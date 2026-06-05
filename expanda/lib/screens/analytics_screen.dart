@@ -415,11 +415,61 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
           const SizedBox(height: 16),
           _buildInsights(theme, catEntries, filtered, sym),
 
+          // Subscription Vampire Detection
+          const SizedBox(height: 16),
+          _buildVampireInsight(theme, filtered, sym),
+
           if (ref.watch(insight503020Provider)) ...[
             const SizedBox(height: 16),
             _build503020Insight(theme, filtered, settings, sym),
           ],
         ],
+      ),
+    );
+  }
+
+  Widget _buildVampireInsight(ThemeData theme, List<dynamic> filtered, String sym) {
+    // Find subscriptions (category == 'Subscriptions' or 'Bills' with isRecurring == true)
+    final subs = filtered.where((e) => 
+      e.category == 'Subscriptions' || 
+      (e.category == 'Bills' && e.isRecurring) || 
+      e.title.toLowerCase().contains('subscription')
+    ).toList();
+
+    if (subs.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final monthlyCost = subs.fold(0.0, (s, e) => s + e.amount);
+    final annualCost = monthlyCost * 12;
+    final decadeCost = annualCost * 10;
+
+    return Card(
+      color: theme.colorScheme.errorContainer.withOpacity(0.3),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.bloodtype_rounded, size: 20, color: theme.colorScheme.error),
+                const SizedBox(width: 8),
+                Text('Subscription Vampires', style: theme.textTheme.titleMedium?.copyWith(color: theme.colorScheme.error)),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'You are paying $sym${monthlyCost.toStringAsFixed(0)} a month for subscriptions. Over 10 years, this will cost you $sym${decadeCost.toStringAsFixed(0)}.',
+              style: theme.textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Do you really need all of them?',
+              style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
       ),
     );
   }

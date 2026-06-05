@@ -16,6 +16,8 @@ import '../screens/notifications_screen.dart';
 import '../screens/learning_hub_screen.dart';
 import '../screens/splash_screen.dart';
 import '../screens/news_screen.dart';
+import '../screens/impulse_graveyard_screen.dart';
+import '../screens/debt_visualizer_screen.dart';
 import '../providers/settings_provider.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -74,6 +76,16 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/news',
         name: 'news',
         builder: (context, state) => const NewsScreen(),
+      ),
+      GoRoute(
+        path: '/impulse-graveyard',
+        name: 'impulse-graveyard',
+        builder: (context, state) => const ImpulseGraveyardScreen(),
+      ),
+      GoRoute(
+        path: '/debt-visualizer',
+        name: 'debt-visualizer',
+        builder: (context, state) => const DebtVisualizerScreen(),
       ),
 
       // ── Shell route with bottom nav bar ──

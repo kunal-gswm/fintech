@@ -9,6 +9,10 @@ import '../models/app_notification.dart';
 import '../models/app_notification.g.dart';
 import '../models/user_settings.dart';
 import '../models/user_settings.g.dart';
+import '../models/impulse_item.dart';
+import '../models/impulse_item.g.dart';
+import '../models/debt_item.dart';
+import '../models/debt_item.g.dart';
 import '../models/constants.dart';
 
 /// Initializes Hive and registers all type adapters.
@@ -23,6 +27,8 @@ class HiveService {
     Hive.registerAdapter(ChatMessageAdapter());
     Hive.registerAdapter(AppNotificationAdapter());
     Hive.registerAdapter(UserSettingsAdapter());
+    Hive.registerAdapter(ImpulseItemAdapter());
+    Hive.registerAdapter(DebtItemAdapter());
 
     // Open boxes
     await Hive.openBox<Expense>(AppConstants.expensesBox);
@@ -30,6 +36,8 @@ class HiveService {
     await Hive.openBox<ChatMessage>(AppConstants.chatBox);
     await Hive.openBox<AppNotification>(AppConstants.notificationsBox);
     await Hive.openBox<UserSettings>(AppConstants.settingsBox);
+    await Hive.openBox<ImpulseItem>(AppConstants.impulseBox);
+    await Hive.openBox<DebtItem>(AppConstants.debtBox);
   }
 
   // ── Expenses ──────────────────────────────────────────────────────────
@@ -150,6 +158,44 @@ class HiveService {
 
   static Future<void> saveSettings(UserSettings settings) async {
     await settingsBox.put('user_settings', settings);
+  }
+
+  // ── Impulse Graveyard ──────────────────────────────────────────────────
+
+  static Box<ImpulseItem> get impulseBox =>
+      Hive.box<ImpulseItem>(AppConstants.impulseBox);
+
+  static List<ImpulseItem> getAllImpulseItems() {
+    final list = impulseBox.values.toList();
+    list.sort((a, b) => b.dateSkipped.compareTo(a.dateSkipped));
+    return list;
+  }
+
+  static Future<void> addImpulseItem(ImpulseItem item) async {
+    await impulseBox.put(item.id, item);
+  }
+
+  static Future<void> deleteImpulseItem(String id) async {
+    await impulseBox.delete(id);
+  }
+
+  // ── Debt Items ─────────────────────────────────────────────────────────
+
+  static Box<DebtItem> get debtBox =>
+      Hive.box<DebtItem>(AppConstants.debtBox);
+
+  static List<DebtItem> getAllDebtItems() {
+    final list = debtBox.values.toList();
+    list.sort((a, b) => b.interestRate.compareTo(a.interestRate)); // Avalanche method
+    return list;
+  }
+
+  static Future<void> addDebtItem(DebtItem item) async {
+    await debtBox.put(item.id, item);
+  }
+
+  static Future<void> deleteDebtItem(String id) async {
+    await debtBox.delete(id);
   }
 
   // ── Export / Import ───────────────────────────────────────────────────

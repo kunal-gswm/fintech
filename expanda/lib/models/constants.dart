@@ -84,4 +84,6 @@ class AppConstants {
   static const String chatBox = 'chat_history';
   static const String notificationsBox = 'notifications';
   static const String settingsBox = 'settings';
+  static const String impulseBox = 'impulse';
+  static const String debtBox = 'debt_box';
 }
