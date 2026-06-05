@@ -1,13 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-final insight503020Provider = StateNotifierProvider<Insight503020Notifier, bool>((ref) {
+final insight503020Provider = NotifierProvider<Insight503020Notifier, bool>(() {
   return Insight503020Notifier();
 });
 
-class Insight503020Notifier extends StateNotifier<bool> {
-  Insight503020Notifier() : super(false) {
+class Insight503020Notifier extends Notifier<bool> {
+  @override
+  bool build() {
     _load();
+    return false; // Default synchronous state
   }
 
   Future<void> _load() async {
