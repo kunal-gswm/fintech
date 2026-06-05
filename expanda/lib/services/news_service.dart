@@ -32,7 +32,7 @@ class NewsService {
               final cleanDesc = _cleanText(description);
 
               // Basic filter to ensure we get relevant news if any slips through
-              final combinedText = '\$cleanTitle \$cleanDesc'.toLowerCase();
+              final combinedText = '\${cleanTitle.toLowerCase()} \${cleanDesc.toLowerCase()}';
               final isRelevant = combinedText.contains('finance') || 
                                  combinedText.contains('bank') ||
                                  combinedText.contains('market') ||
