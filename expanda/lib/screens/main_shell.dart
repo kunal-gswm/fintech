@@ -117,10 +117,12 @@ class _MainShellState extends State<MainShell> with SingleTickerProviderStateMix
               child: AnimatedBuilder(
                 animation: _menuController,
                 builder: (context, child) {
-                  return FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: Stack(
-                      children: [
+                  return IgnorePointer(
+                    ignoring: !_isMenuOpen,
+                    child: FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: Stack(
+                        children: [
                         // Tap-to-dismiss blury glass overlay
                         GestureDetector(
                           onTap: _toggleMenu,
@@ -218,7 +220,8 @@ class _MainShellState extends State<MainShell> with SingleTickerProviderStateMix
                         ),
                       ],
                     ),
-                  );
+                  ),
+                );
                 },
               ),
             ),
@@ -226,7 +229,14 @@ class _MainShellState extends State<MainShell> with SingleTickerProviderStateMix
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: theme.colorScheme.surface.withOpacity(0.95),
+          color: theme.colorScheme.surface.withOpacity(0.98),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.15),
+              blurRadius: 20,
+              offset: const Offset(0, -4),
+            ),
+          ],
           border: Border(
             top: BorderSide(
               color: theme.colorScheme.outline.withOpacity(0.2),

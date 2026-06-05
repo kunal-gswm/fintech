@@ -89,6 +89,18 @@ export default function ExpensesPage() {
     page * ITEMS_PER_PAGE
   );
 
+  const groupedExpenses = paginated.reduce((acc, expense) => {
+    const d = new Date(expense.date).toLocaleDateString("en-IN", {
+      weekday: "long",
+      day: "numeric",
+      month: "short",
+      year: "numeric"
+    });
+    if (!acc[d]) acc[d] = [];
+    acc[d].push(expense);
+    return acc;
+  }, {} as Record<string, Expense[]>);
+
   const openAdd = () => {
     setEditingExpense(null);
     setFormData({ title: "", category: "", amount: "", date: "", notes: "" });
@@ -209,142 +221,62 @@ export default function ExpensesPage() {
               </div>
             </Card>
 
-            {/* Desktop Table */}
-            <div className="hidden sm:block">
-              <Card>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Title</TableHead>
-                    <TableHead className="hidden sm:table-cell">Category</TableHead>
-                    <TableHead className="text-right">Amount</TableHead>
-                    <TableHead className="hidden sm:table-cell">Date</TableHead>
-                    <TableHead className="hidden md:table-cell">Notes</TableHead>
-                    <TableHead className="w-24">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {paginated.map((expense) => (
-                    <TableRow key={expense.id} className="group">
-                      <TableCell className="font-medium">{expense.title}</TableCell>
-                      <TableCell className="hidden sm:table-cell">
-                        <Badge
-                          variant="secondary"
-                          className="font-medium px-2.5 py-0.5 rounded-md border-0"
-                          style={{
-                            backgroundColor: `${CATEGORY_COLORS[expense.category]}15`,
-                            color: CATEGORY_COLORS[expense.category],
-                          }}
-                        >
-                          {expense.category}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right font-semibold">
-                        ₹{expense.amount.toLocaleString("en-IN")}
-                      </TableCell>
-                      <TableCell className="hidden sm:table-cell text-muted-foreground">
-                        {new Date(expense.date).toLocaleDateString("en-IN", {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric",
-                        })}
-                      </TableCell>
-                      <TableCell className="hidden max-w-[200px] truncate text-muted-foreground md:table-cell">
-                        {expense.notes || "—"}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8"
-                            onClick={() => openEdit(expense)}
-                          >
-                            <Pencil className="h-3.5 w-3.5" />
+            {/* Timeline View */}
+            <div className="relative border-l-2 border-border/50 ml-4 pl-6 sm:ml-6 sm:pl-8 py-2 mt-6">
+              {Object.entries(groupedExpenses).map(([dateStr, dayExpenses], index) => (
+                <div key={dateStr} className="mb-10 relative">
+                  <div className="absolute -left-[31px] sm:-left-[39px] top-1.5 h-4 w-4 rounded-full bg-primary ring-4 ring-background shadow-sm" />
+                  <h3 className="font-bold text-lg mb-4 text-foreground/90">{dateStr}</h3>
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {dayExpenses.map((expense) => (
+                      <Card
+                        key={expense.id}
+                        className="p-4 hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
+                        onClick={() => openEdit(expense)}
+                      >
+                        <div>
+                          <div className="flex justify-between items-start mb-2">
+                            <span className="font-bold text-foreground group-hover:text-primary transition-colors">{expense.title}</span>
+                            <span className={`font-bold ${expense.amount > 0 ? "text-emerald-500" : "text-red-500"}`}>
+                              ₹{expense.amount.toLocaleString("en-IN")}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2 mb-2">
+                            <Badge
+                              variant="secondary"
+                              className="font-medium px-2 py-0.5 rounded-md border-0"
+                              style={{
+                                backgroundColor: `${CATEGORY_COLORS[expense.category]}15`,
+                                color: CATEGORY_COLORS[expense.category],
+                              }}
+                            >
+                              {expense.category}
+                            </Badge>
+                          </div>
+                          {expense.notes && (
+                            <p className="text-sm text-muted-foreground line-clamp-2">
+                              {expense.notes}
+                            </p>
+                          )}
+                        </div>
+                        <div className="mt-4 flex gap-2 opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                          <Button variant="outline" size="sm" className="h-7 px-2" onClick={(e) => { e.stopPropagation(); openEdit(expense); }}>
+                            <Pencil className="h-3 w-3 mr-1" /> Edit
                           </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-destructive hover:text-destructive"
-                            onClick={() => {
-                              setDeleteTarget(expense.id);
-                              setIsDeleteOpen(true);
-                            }}
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
+                          <Button variant="outline" size="sm" className="h-7 px-2 text-destructive hover:text-destructive" onClick={(e) => { e.stopPropagation(); setDeleteTarget(expense.id); setIsDeleteOpen(true); }}>
+                            <Trash2 className="h-3 w-3 mr-1" /> Delete
                           </Button>
                         </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                  {paginated.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
-                        No expenses found.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </Card>
-            </div>
-
-            {/* Mobile Cards View */}
-            <div className="block sm:hidden">
-              <div className="flex flex-col gap-3">
-                <AnimatePresence mode="popLayout">
-                  {paginated.map((expense, i) => (
-                    <motion.div
-                      key={expense.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.95 }}
-                      transition={{ delay: i * 0.05 }}
-                      className="flex flex-col gap-3 rounded-xl border border-[#262626] bg-[#0A0A0A] p-4 shadow-sm"
-                      onClick={() => openEdit(expense)}
-                    >
-                      <div className="flex justify-between items-start">
-                        <span className="font-bold text-[#E2E8F0]">{expense.title}</span>
-                        <span className={`font-bold ${expense.amount > 0 ? "text-[#E5B80B]" : "text-[#EF4444]"}`}>
-                          ₹{expense.amount.toLocaleString("en-IN")}
-                        </span>
-                      </div>
-                      
-                      <div className="flex items-center gap-2 text-sm">
-                        <Badge
-                          variant="secondary"
-                          className="font-medium px-2 py-0.5 rounded-md border-0"
-                          style={{
-                            backgroundColor: `${CATEGORY_COLORS[expense.category]}15`,
-                            color: CATEGORY_COLORS[expense.category],
-                          }}
-                        >
-                          {expense.category}
-                        </Badge>
-                        <span className="text-[#A1A1AA]">·</span>
-                        <span className="text-[#A1A1AA]">
-                          {new Date(expense.date).toLocaleDateString("en-IN", {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                          })}
-                        </span>
-                      </div>
-
-                      {expense.notes && (
-                        <p className="truncate text-xs text-[#A1A1AA]">
-                          {expense.notes}
-                        </p>
-                      )}
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-                {paginated.length === 0 && (
-                  <div className="h-32 flex items-center justify-center text-[#A1A1AA]">
-                    No expenses found.
+                      </Card>
+                    ))}
                   </div>
-                )}
-              </div>
+                </div>
+              ))}
+              {paginated.length === 0 && (
+                <div className="py-10 text-center text-muted-foreground">
+                  No expenses found for this month.
+                </div>
+              )}
             </div>
 
               {/* Pagination */}

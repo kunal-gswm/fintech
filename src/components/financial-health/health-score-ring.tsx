@@ -35,8 +35,13 @@ export function HealthScoreRing({
   return (
     <div className="flex flex-col items-center">
       <div className="relative" style={{ width: size, height: size }}>
+        {/* Glowing Aura Backdrop */}
+        <div 
+          className="absolute inset-0 rounded-full opacity-20 blur-2xl" 
+          style={{ backgroundColor: getColor() }} 
+        />
         <svg
-          className="-rotate-90"
+          className="relative -rotate-90"
           width={size}
           height={size}
           viewBox={`0 0 ${size} ${size}`}
@@ -79,15 +84,17 @@ export function HealthScoreRing({
         </div>
       </div>
       <div className="mt-4 text-center">
-        <div
-          className="inline-flex rounded-full px-4 py-1.5 text-sm font-medium"
+        <motion.div
+          animate={{ scale: [1, 1.05, 1] }}
+          transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+          className="inline-flex rounded-full px-4 py-1.5 text-sm font-medium shadow-sm"
           style={{
             backgroundColor: `${getColor()}15`,
             color: getColor(),
           }}
         >
           {getLabel()}
-        </div>
+        </motion.div>
       </div>
     </div>
   );

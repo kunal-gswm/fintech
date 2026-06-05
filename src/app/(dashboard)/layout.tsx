@@ -1,5 +1,4 @@
 import { AppShell } from "@/components/layout/app-shell";
-import { UpdateNotifier } from "@/components/shared/update-notifier";
 
 export default function DashboardLayout({
   children,
@@ -8,7 +7,6 @@ export default function DashboardLayout({
 }) {
   return (
     <>
-      <UpdateNotifier />
       <AppShell>{children}</AppShell>
     </>
   );

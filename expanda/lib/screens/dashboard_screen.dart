@@ -23,8 +23,11 @@ class DashboardScreen extends ConsumerWidget {
     // KPI calculations
     final now = DateTime.now();
     final monthStart = DateTime(now.year, now.month, 1);
+    final monthEnd = DateTime(now.year, now.month + 1, 1);
     final monthExpenses = expenses
-        .where((e) => e.date.isAfter(monthStart.subtract(const Duration(days: 1))))
+        .where((e) => 
+            e.date.isAfter(monthStart.subtract(const Duration(days: 1))) &&
+            e.date.isBefore(monthEnd))
         .toList();
     final totalExpenses =
         monthExpenses.fold(0.0, (sum, e) => sum + e.amount);
@@ -53,10 +56,6 @@ class DashboardScreen extends ConsumerWidget {
               child: const Icon(Icons.notifications_outlined),
             ),
           ),
-          IconButton(
-            onPressed: () => context.push('/settings'),
-            icon: const Icon(Icons.settings_outlined),
-          ),
         ],
       ),
       body: RefreshIndicator(
@@ -69,16 +68,6 @@ class DashboardScreen extends ConsumerWidget {
             : ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
-                  // Auto Update Banner (if available)
-                  updateState.when(
-                    data: (info) => info.hasUpdate
-                        ? _buildUpdateBanner(theme, info)
-                        : const SizedBox.shrink(),
-                    loading: () => const SizedBox.shrink(),
-                    error: (_, __) => const SizedBox.shrink(),
-                  ),
-                  if (updateState.value?.hasUpdate == true) const SizedBox(height: 16),
-
                   // AI Monthly Review card
                   _buildAiReviewCard(theme, totalExpenses, income, savingsRate, sym),
                   const SizedBox(height: 20),
@@ -347,80 +336,6 @@ class DashboardScreen extends ConsumerWidget {
       'Subscriptions': Icons.subscriptions_rounded,
     };
     return icons[cat] ?? Icons.more_horiz_rounded;
-  }
-
-  Widget _buildUpdateBanner(ThemeData theme, UpdateInfo updateInfo) {
-    return Card(
-      color: theme.colorScheme.primaryContainer,
-      margin: EdgeInsets.zero,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: theme.colorScheme.primary.withValues(alpha: 0.3)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primary.withValues(alpha: 0.15),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.system_update_alt_rounded,
-                color: theme.colorScheme.primary,
-                size: 24,
-              ),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Update Available (${updateInfo.latestVersion})',
-                    style: theme.textTheme.labelLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: theme.colorScheme.onPrimaryContainer,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    updateInfo.releaseNotes.isNotEmpty
-                        ? updateInfo.releaseNotes
-                        : 'A new version of EXPANDA is available. Update now to get the latest features.',
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onPrimaryContainer.withValues(alpha: 0.8),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      ElevatedButton.icon(
-                        onPressed: () {
-                          UpdateService.launchUpdateUrl(updateInfo.downloadUrl);
-                        },
-                        icon: const Icon(Icons.download_rounded, size: 16),
-                        label: const Text('Update Now'),
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          minimumSize: Size.zero,
-                          textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 
   IconData _getIconData(String name) {

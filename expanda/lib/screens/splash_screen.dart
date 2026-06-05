@@ -28,7 +28,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2500),
+      duration: const Duration(milliseconds: 3500),
     );
 
     // 1. Coin pops out from ear position to head center (bouncy curve)

@@ -47,7 +47,12 @@ export function FAB() {
                 initial={{ opacity: 0, y: 20, scale: 0.8 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 20, scale: 0.8 }}
-                transition={{ delay: (actions.length - 1 - i) * 0.05 }}
+                transition={{ 
+                  delay: (actions.length - 1 - i) * 0.05,
+                  type: "spring",
+                  stiffness: 400,
+                  damping: 25
+                }}
                 className="flex items-center gap-2 rounded-full bg-[#0A0A0A] border border-[#262626] px-4 py-2 shadow-lg hover:bg-[#1A1A1A] transition-colors"
                 onClick={() => {
                   setOpen(false);
@@ -62,14 +67,16 @@ export function FAB() {
         )}
       </AnimatePresence>
 
-      <button
+      <motion.button
         onClick={() => setOpen(!open)}
-        className="flex h-14 w-14 items-center justify-center rounded-full bg-[#E5B80B] text-[#0F172A] shadow-lg transition-transform active:scale-95"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className="flex h-14 w-14 items-center justify-center rounded-full bg-[#E5B80B] text-[#0F172A] shadow-lg transition-colors"
       >
         <motion.div animate={{ rotate: open ? 45 : 0 }} transition={{ type: "spring", stiffness: 300, damping: 20 }}>
           <Plus className="h-6 w-6 stroke-[2.5px]" />
         </motion.div>
-      </button>
+      </motion.button>
     </div>
   );
 }

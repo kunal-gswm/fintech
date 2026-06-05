@@ -24,20 +24,20 @@ export function AnimatedSplash() {
     };
     hideNativeSplash();
 
-    // 1. Show logo for 1.2 seconds
+    // 1. Show logo for 1.8 seconds
     const t1 = setTimeout(() => {
       setStage("zooming");
-    }, 1200);
+    }, 1800);
 
-    // 2. Zoom out for 0.4s, then split
+    // 2. Zoom out for 0.6s, then split
     const t2 = setTimeout(() => {
       setStage("splitting");
-    }, 1600);
+    }, 2400);
 
-    // 3. Remove from DOM after split finishes (0.8s)
+    // 3. Remove from DOM after split finishes (1.2s)
     const t3 = setTimeout(() => {
       setStage("done");
-    }, 2400);
+    }, 3600);
 
     return () => {
       clearTimeout(t1);
@@ -52,7 +52,7 @@ export function AnimatedSplash() {
     <div className="fixed inset-0 z-[100] overflow-hidden pointer-events-none">
       {/* Top Left Triangle */}
       <div
-        className={`absolute inset-0 bg-background transition-transform duration-[800ms] ease-in-out z-10
+        className={`absolute inset-0 bg-background transition-transform duration-[1200ms] ease-in-out z-10
           ${stage === "splitting" ? "-translate-x-full -translate-y-full" : "translate-x-0 translate-y-0"}
         `}
         style={{ clipPath: 'polygon(0 0, 100% 0, 0 100%)' }}
@@ -60,7 +60,7 @@ export function AnimatedSplash() {
       
       {/* Bottom Right Triangle */}
       <div
-        className={`absolute inset-0 bg-background transition-transform duration-[800ms] ease-in-out z-10
+        className={`absolute inset-0 bg-background transition-transform duration-[1200ms] ease-in-out z-10
           ${stage === "splitting" ? "translate-x-full translate-y-full" : "translate-x-0 translate-y-0"}
         `}
         style={{ clipPath: 'polygon(100% 0, 100% 100%, 0 100%)' }}
@@ -68,7 +68,7 @@ export function AnimatedSplash() {
 
       {/* Center Logo container (Sits above the doors during loading, fades/zooms during split) */}
       <div 
-        className={`absolute inset-0 flex items-center justify-center z-20 transition-all duration-500
+        className={`absolute inset-0 flex items-center justify-center z-20 transition-all duration-700
           ${stage === "loading" ? "scale-100 opacity-100" : ""}
           ${stage === "zooming" ? "scale-50 opacity-100" : ""}
           ${stage === "splitting" ? "scale-[5] opacity-0" : ""}

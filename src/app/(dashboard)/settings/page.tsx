@@ -213,7 +213,7 @@ export default function SettingsPage() {
                     </div>
                     <span className="font-medium">{item.label}</span>
                   </div>
-                  <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                  {item.id !== "profile" && <ChevronRight className="h-5 w-5 text-muted-foreground" />}
                 </button>
                 {index < menuItems.length - 1 && <Separator className="ml-14" />}
               </React.Fragment>

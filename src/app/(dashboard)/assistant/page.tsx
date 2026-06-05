@@ -25,16 +25,17 @@ import { cn } from "@/lib/utils";
 
 function TypingIndicator() {
   return (
-    <div className="flex items-center gap-1 px-1 py-2">
+    <div className="flex items-center gap-1.5 px-2 py-3">
       {[0, 1, 2].map((i) => (
         <motion.div
           key={i}
-          className="h-2 w-2 rounded-full bg-muted-foreground/40"
-          animate={{ y: [0, -6, 0] }}
+          className="h-2.5 w-2.5 rounded-full bg-muted-foreground/60"
+          animate={{ y: [0, -4, 0], opacity: [0.4, 1, 0.4], scale: [0.8, 1, 0.8] }}
           transition={{
-            duration: 0.6,
+            duration: 0.8,
             repeat: Infinity,
             delay: i * 0.15,
+            ease: "easeInOut",
           }}
         />
       ))}
@@ -252,13 +253,13 @@ export default function AssistantPage() {
 
           {/* Input Area */}
           <div className="border-t p-4">
-            <div className="relative">
+            <div className="relative rounded-xl transition-all duration-200 focus-within:ring-2 focus-within:ring-primary/50 focus-within:ring-offset-2 focus-within:ring-offset-background">
               <Textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Ask about budgeting, investments, taxes..."
-                className="min-h-[52px] resize-none pr-14"
+                className="min-h-[52px] resize-none pr-14 bg-muted/50 border-0 focus-visible:ring-0 shadow-none rounded-xl"
                 rows={1}
               />
               <Button

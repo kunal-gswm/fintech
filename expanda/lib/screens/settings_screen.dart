@@ -70,8 +70,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       ],
                     ),
                   ),
-                  Icon(Icons.chevron_right_rounded,
-                      color: theme.colorScheme.outline),
                 ],
               ),
             ),

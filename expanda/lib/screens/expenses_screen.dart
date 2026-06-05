@@ -31,7 +31,7 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
           (e.notes?.toLowerCase().contains(_search.toLowerCase()) ?? false);
       final matchesCat = _categoryFilter == 'All' || e.category == _categoryFilter;
       return matchesSearch && matchesCat;
-    }).toList();
+    }).toList()..sort((a, b) => b.date.compareTo(a.date));
 
     return Scaffold(
       appBar: AppBar(
@@ -157,179 +157,241 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
                     ),
                   )
                 : ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: filtered.length,
-                    itemBuilder: (_, i) {
-                      final expense = filtered[i];
-                      final selected = selection.contains(expense.id);
-                      final catColor =
-                          AppConstants.categoryColors[expense.category] ??
-                              Colors.grey;
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      itemCount: filtered.length,
+                      itemBuilder: (_, i) {
+                        final expense = filtered[i];
+                        final selected = selection.contains(expense.id);
+                        final catColor =
+                            AppConstants.categoryColors[expense.category] ??
+                                Colors.grey;
 
-                      return Dismissible(
-                        key: Key(expense.id),
-                        direction: isSelecting
-                            ? DismissDirection.none
-                            : DismissDirection.endToStart,
-                        confirmDismiss: (_) async {
-                          HapticFeedback.mediumImpact();
-                          return await showDialog<bool>(
-                            context: context,
-                            builder: (ctx) => AlertDialog(
-                              title: const Text('Delete expense'),
-                              content: Text(
-                                  'Delete "${expense.title}"?'),
-                              actions: [
-                                TextButton(
-                                    onPressed: () =>
-                                        Navigator.pop(ctx, false),
-                                    child: const Text('Cancel')),
-                                TextButton(
-                                    onPressed: () =>
-                                        Navigator.pop(ctx, true),
-                                    child: const Text('Delete',
-                                        style: TextStyle(
-                                            color: Colors.red))),
-                              ],
-                            ),
-                          );
-                        },
-                        onDismissed: (_) => ref
-                            .read(expenseListProvider.notifier)
-                            .delete(expense.id),
-                        background: Container(
-                          alignment: Alignment.centerRight,
-                          padding: const EdgeInsets.only(right: 20),
-                          margin: const EdgeInsets.only(bottom: 8),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.error
-                                .withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          child: Icon(Icons.delete_outline_rounded,
-                              color: theme.colorScheme.error),
-                        ),
-                        child: GestureDetector(
-                          onLongPress: () {
-                            HapticFeedback.mediumImpact();
-                            ref
-                                .read(expenseSelectionProvider.notifier)
-                                .toggle(expense.id);
-                          },
-                          onTap: () {
-                            if (isSelecting) {
-                              ref
-                                  .read(expenseSelectionProvider.notifier)
-                                  .toggle(expense.id);
-                            } else {
-                              _showAddEditSheet(
-                                  context, ref, theme, sym,
-                                  existing: expense);
-                            }
-                          },
-                          child: Container(
-                            margin: const EdgeInsets.only(bottom: 8),
-                            padding: const EdgeInsets.all(14),
-                            decoration: BoxDecoration(
-                              color: selected
-                                  ? theme.colorScheme.primary
-                                      .withValues(alpha: 0.1)
-                                  : theme.cardTheme.color,
-                              borderRadius: BorderRadius.circular(14),
-                              border: Border.all(
-                                color: selected
-                                    ? theme.colorScheme.primary
-                                    : theme.colorScheme.outline,
-                                width: selected ? 1.5 : 0.5,
+                        final showDateHeader = i == 0 ||
+                            filtered[i - 1].date.year != expense.date.year ||
+                            filtered[i - 1].date.month != expense.date.month ||
+                            filtered[i - 1].date.day != expense.date.day;
+
+                        final isLastInDay = i == filtered.length - 1 ||
+                            filtered[i + 1].date.day != expense.date.day ||
+                            filtered[i + 1].date.month != expense.date.month ||
+                            filtered[i + 1].date.year != expense.date.year;
+
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (showDateHeader)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 20, bottom: 12),
+                                child: Text(
+                                  _formatDateHeader(expense.date),
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: theme.colorScheme.primary,
+                                  ),
+                                ),
+                              ),
+                            IntrinsicHeight(
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  // Timeline vertical line
+                                  SizedBox(
+                                    width: 28,
+                                    child: Column(
+                                      children: [
+                                        const SizedBox(height: 32), // Align circle with card center roughly
+                                        Container(
+                                          width: 10,
+                                          height: 10,
+                                          decoration: BoxDecoration(
+                                            color: theme.colorScheme.primary.withValues(alpha: 0.6),
+                                            shape: BoxShape.circle,
+                                            border: Border.all(color: theme.colorScheme.surface, width: 2),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Container(
+                                            width: 2,
+                                            color: isLastInDay
+                                                ? Colors.transparent
+                                                : theme.colorScheme.primary.withValues(alpha: 0.15),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Dismissible(
+                                      key: Key(expense.id),
+                                      direction: isSelecting
+                                          ? DismissDirection.none
+                                          : DismissDirection.endToStart,
+                                      confirmDismiss: (_) async {
+                                        HapticFeedback.mediumImpact();
+                                        return await showDialog<bool>(
+                                          context: context,
+                                          builder: (ctx) => AlertDialog(
+                                            title: const Text('Delete expense'),
+                                            content: Text(
+                                                'Delete "${expense.title}"?'),
+                                            actions: [
+                                              TextButton(
+                                                  onPressed: () =>
+                                                      Navigator.pop(ctx, false),
+                                                  child: const Text('Cancel')),
+                                              TextButton(
+                                                  onPressed: () =>
+                                                      Navigator.pop(ctx, true),
+                                                  child: const Text('Delete',
+                                                      style: TextStyle(
+                                                          color: Colors.red))),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                      onDismissed: (_) => ref
+                                          .read(expenseListProvider.notifier)
+                                          .delete(expense.id),
+                                      background: Container(
+                                        alignment: Alignment.centerRight,
+                                        padding: const EdgeInsets.only(right: 20),
+                                        margin: const EdgeInsets.only(bottom: 8),
+                                        decoration: BoxDecoration(
+                                          color: theme.colorScheme.error
+                                              .withValues(alpha: 0.12),
+                                          borderRadius: BorderRadius.circular(14),
+                                        ),
+                                        child: Icon(Icons.delete_outline_rounded,
+                                            color: theme.colorScheme.error),
+                                      ),
+                                      child: GestureDetector(
+                                        onLongPress: () {
+                                          HapticFeedback.mediumImpact();
+                                          ref
+                                              .read(expenseSelectionProvider.notifier)
+                                              .toggle(expense.id);
+                                        },
+                                        onTap: () {
+                                          if (isSelecting) {
+                                            ref
+                                                .read(expenseSelectionProvider.notifier)
+                                                .toggle(expense.id);
+                                          } else {
+                                            _showAddEditSheet(
+                                                context, ref, theme, sym,
+                                                existing: expense);
+                                          }
+                                        },
+                                        child: Container(
+                                          margin: const EdgeInsets.only(bottom: 12),
+                                          padding: const EdgeInsets.all(14),
+                                          decoration: BoxDecoration(
+                                            color: selected
+                                                ? theme.colorScheme.primary
+                                                    .withValues(alpha: 0.1)
+                                                : theme.cardTheme.color,
+                                            borderRadius: BorderRadius.circular(14),
+                                            border: Border.all(
+                                              color: selected
+                                                  ? theme.colorScheme.primary
+                                                  : theme.colorScheme.outline,
+                                              width: selected ? 1.5 : 0.5,
+                                            ),
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              if (isSelecting)
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(right: 12),
+                                                  child: Icon(
+                                                    selected
+                                                        ? Icons.check_circle_rounded
+                                                        : Icons.circle_outlined,
+                                                    color: selected
+                                                        ? theme.colorScheme.primary
+                                                        : theme.colorScheme.outline,
+                                                    size: 22,
+                                                  ),
+                                                ),
+                                               Container(
+                                                width: 40,
+                                                height: 40,
+                                                decoration: BoxDecoration(
+                                                  color: catColor.withValues(alpha: 0.12),
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                ),
+                                                child: Icon(
+                                                  expense.iconName != null
+                                                      ? _getIconData(expense.iconName!)
+                                                      : (AppConstants.categoryIcons[
+                                                              expense.category] ??
+                                                          Icons.more_horiz_rounded),
+                                                  color: catColor,
+                                                  size: 20,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 12),
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(expense.title,
+                                                        style:
+                                                            theme.textTheme.labelLarge,
+                                                        maxLines: 1,
+                                                        overflow:
+                                                            TextOverflow.ellipsis),
+                                                    Row(
+                                                      children: [
+                                                        Text(expense.category,
+                                                            style: theme
+                                                                .textTheme.bodySmall),
+                                                        if (expense.isRecurring) ...[
+                                                          const SizedBox(width: 6),
+                                                          Icon(Icons.repeat_rounded,
+                                                              size: 12,
+                                                              color: theme.colorScheme
+                                                                  .primary),
+                                                        ],
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                               Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.end,
+                                                children: [
+                                                  Text(
+                                                    settings.privacyModeEnabled ? '••••' : '$sym${expense.amount.toStringAsFixed(0)}',
+                                                    style: theme.textTheme.labelLarge
+                                                        ?.copyWith(
+                                                            color: const Color(
+                                                                0xFFE5B80B)),
+                                                  ),
+                                                  Text(
+                                                    '${expense.date.hour.toString().padLeft(2, '0')}:${expense.date.minute.toString().padLeft(2, '0')}',
+                                                    style: theme.textTheme.bodySmall,
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            child: Row(
-                              children: [
-                                if (isSelecting)
-                                  Padding(
-                                    padding:
-                                        const EdgeInsets.only(right: 12),
-                                    child: Icon(
-                                      selected
-                                          ? Icons.check_circle_rounded
-                                          : Icons.circle_outlined,
-                                      color: selected
-                                          ? theme.colorScheme.primary
-                                          : theme.colorScheme.outline,
-                                      size: 22,
-                                    ),
-                                  ),
-                                 Container(
-                                  width: 40,
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                    color: catColor.withValues(alpha: 0.12),
-                                    borderRadius:
-                                        BorderRadius.circular(10),
-                                  ),
-                                  child: Icon(
-                                    expense.iconName != null
-                                        ? _getIconData(expense.iconName!)
-                                        : (AppConstants.categoryIcons[
-                                                expense.category] ??
-                                            Icons.more_horiz_rounded),
-                                    color: catColor,
-                                    size: 20,
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(expense.title,
-                                          style:
-                                              theme.textTheme.labelLarge,
-                                          maxLines: 1,
-                                          overflow:
-                                              TextOverflow.ellipsis),
-                                      Row(
-                                        children: [
-                                          Text(expense.category,
-                                              style: theme
-                                                  .textTheme.bodySmall),
-                                          if (expense.isRecurring) ...[
-                                            const SizedBox(width: 6),
-                                            Icon(Icons.repeat_rounded,
-                                                size: 12,
-                                                color: theme.colorScheme
-                                                    .primary),
-                                          ],
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                 Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.end,
-                                  children: [
-                                    Text(
-                                      settings.privacyModeEnabled ? '••••' : '$sym${expense.amount.toStringAsFixed(0)}',
-                                      style: theme.textTheme.labelLarge
-                                          ?.copyWith(
-                                              color: const Color(
-                                                  0xFFE5B80B)),
-                                    ),
-                                    Text(
-                                      '${expense.date.day}/${expense.date.month}',
-                                      style: theme.textTheme.bodySmall,
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+                          ],
+                        );
+                      },
+                    ),
           ),
         ],
       ),
@@ -607,5 +669,18 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
       default:
         return Icons.more_horiz_rounded;
     }
+  }
+
+  String _formatDateHeader(DateTime date) {
+    final now = DateTime.now();
+    if (date.year == now.year && date.month == now.month && date.day == now.day) {
+      return 'Today';
+    }
+    final yesterday = now.subtract(const Duration(days: 1));
+    if (date.year == yesterday.year && date.month == yesterday.month && date.day == yesterday.day) {
+      return 'Yesterday';
+    }
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }
 }

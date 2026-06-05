@@ -49,7 +49,19 @@ export function KPICards() {
         
         const currentMonthData = analytics.monthlyTrend?.[analytics.monthlyTrend.length - 1];
         const income = currentMonthData ? currentMonthData.income : (profile.monthlyIncome || 85000);
-        const expenses = currentMonthData ? currentMonthData.expenses : (analytics.totalSpent || 42350);
+        
+        // Compute expenses directly from store for real-time accuracy
+        const allExpenses = useExpenseStore.getState().expenses;
+        const currentMonth = new Date().getMonth();
+        const currentYear = new Date().getFullYear();
+        const storeExpenses = allExpenses
+          .filter(e => {
+            const d = new Date(e.date);
+            return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+          })
+          .reduce((acc, curr) => acc + curr.amount, 0);
+          
+        const expenses = storeExpenses > 0 ? storeExpenses : (currentMonthData ? currentMonthData.expenses : (analytics.totalSpent || 42350));
         
         setData([
           {
@@ -109,7 +121,14 @@ export function KPICards() {
             className="shrink-0 w-[85%] snap-center sm:w-auto"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.08 }}
+            whileHover={{ y: -4, scale: 1.01 }}
+            whileTap={{ scale: 0.98 }}
+            transition={{ 
+              delay: i * 0.08, 
+              type: "spring", 
+              stiffness: 300, 
+              damping: 20 
+            }}
           >
             <Card className="group relative overflow-hidden p-5 transition-all duration-300 hover:shadow-md hover:shadow-primary/5">
               <div className="flex items-start justify-between">

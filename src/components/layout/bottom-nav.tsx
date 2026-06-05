@@ -79,7 +79,7 @@ export function BottomNav() {
 
   return (
     <>
-      <div className="fixed bottom-0 left-0 right-0 z-40 pb-[env(safe-area-inset-bottom)] bg-background border-t border-border shadow-[0_-4px_30px_rgba(0,0,0,0.05)]">
+      <div className="fixed bottom-0 left-0 right-0 z-40 pb-[env(safe-area-inset-bottom)] bg-background/95 backdrop-blur-xl border-t border-border shadow-[0_-8px_30px_rgba(0,0,0,0.15)]">
         <div className="flex h-16 items-center justify-around px-2 relative">
           
           {MAIN_NAV.map((item) => (
@@ -88,9 +88,9 @@ export function BottomNav() {
 
           {/* Central Menu FAB */}
           <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
-            <SheetTrigger className="relative -top-5 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 ring-4 ring-background transition-transform active:scale-95">
+            <button onClick={() => setMenuOpen(!menuOpen)} className="relative -top-5 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 ring-4 ring-background transition-transform active:scale-95">
               <Grid className="h-6 w-6" />
-            </SheetTrigger>
+            </button>
             <SheetContent side="bottom" className="h-[60vh] rounded-t-3xl px-6 pb-8 pt-6">
               <SheetHeader className="mb-6 text-left">
                 <SheetTitle className="text-xl font-bold">Menu</SheetTitle>
