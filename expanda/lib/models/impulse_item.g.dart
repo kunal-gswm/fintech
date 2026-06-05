@@ -1,9 +1,7 @@
 // GENERATED CODE - hand-written Hive adapter for ImpulseItem
 // Replaces build_runner generation for simplicity
 
-import 'package:hive/hive.dart';
-import 'impulse_item.dart';
-
+part of 'impulse_item.dart';
 class ImpulseItemAdapter extends TypeAdapter<ImpulseItem> {
   @override
   final int typeId = 5;

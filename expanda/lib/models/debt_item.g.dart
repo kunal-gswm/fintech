@@ -1,9 +1,7 @@
 // GENERATED CODE - hand-written Hive adapter for DebtItem
 // Replaces build_runner generation for simplicity
 
-import 'package:hive/hive.dart';
-import 'debt_item.dart';
-
+part of 'debt_item.dart';
 class DebtItemAdapter extends TypeAdapter<DebtItem> {
   @override
   final int typeId = 6;

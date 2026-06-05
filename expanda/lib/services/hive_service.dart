@@ -10,9 +10,7 @@ import '../models/app_notification.g.dart';
 import '../models/user_settings.dart';
 import '../models/user_settings.g.dart';
 import '../models/impulse_item.dart';
-import '../models/impulse_item.g.dart';
 import '../models/debt_item.dart';
-import '../models/debt_item.g.dart';
 import '../models/constants.dart';
 
 /// Initializes Hive and registers all type adapters.
