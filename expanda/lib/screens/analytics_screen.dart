@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../providers/expense_provider.dart';
 import '../providers/settings_provider.dart';
+import '../providers/insight_provider.dart';
 import '../models/constants.dart';
 
 class AnalyticsScreen extends ConsumerStatefulWidget {
@@ -413,8 +414,101 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
           // AI Insights
           const SizedBox(height: 16),
           _buildInsights(theme, catEntries, filtered, sym),
+
+          if (ref.watch(insight503020Provider)) ...[
+            const SizedBox(height: 16),
+            _build503020Insight(theme, filtered, settings, sym),
+          ],
         ],
       ),
+    );
+  }
+
+  Widget _build503020Insight(ThemeData theme, List<dynamic> filtered, dynamic settings, String sym) {
+    if (settings.monthlyIncome == 0) {
+      return Card(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('50/30/20 Budgeting Insight', style: theme.textTheme.titleMedium),
+              const SizedBox(height: 8),
+              Text('Set your monthly income in Preferences to see your 50/30/20 breakdown.', style: theme.textTheme.bodyMedium),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final needsCats = ['Food', 'Bills', 'Education', 'Healthcare'];
+    double needs = 0;
+    double wants = 0;
+
+    for (final e in filtered) {
+      if (needsCats.contains(e.category)) {
+        needs += e.amount;
+      } else {
+        wants += e.amount;
+      }
+    }
+
+    final income = settings.monthlyIncome;
+    final needsTarget = income * 0.5;
+    final wantsTarget = income * 0.3;
+    final savingsTarget = income * 0.2;
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.pie_chart_outline_rounded, size: 20, color: theme.colorScheme.primary),
+                const SizedBox(width: 8),
+                Text('50/30/20 Budgeting Insight', style: theme.textTheme.titleMedium),
+              ],
+            ),
+            const SizedBox(height: 16),
+            _buildBudgetBar(theme, 'Needs (50%)', needs, needsTarget, sym),
+            const SizedBox(height: 12),
+            _buildBudgetBar(theme, 'Wants (30%)', wants, wantsTarget, sym),
+            const SizedBox(height: 12),
+            _buildBudgetBar(theme, 'Savings (20%)', income - needs - wants, savingsTarget, sym, isSavings: true),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBudgetBar(ThemeData theme, String title, double actual, double target, String sym, {bool isSavings = false}) {
+    final pct = target > 0 ? (actual / target).clamp(0.0, 1.0) : 0.0;
+    final overBudget = actual > target && !isSavings;
+    final color = isSavings 
+        ? (actual >= target ? Colors.green : Colors.orange)
+        : (overBudget ? Colors.red : theme.colorScheme.primary);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(title, style: theme.textTheme.bodyMedium),
+            Text('$sym${actual.toStringAsFixed(0)} / $sym${target.toStringAsFixed(0)}', style: theme.textTheme.bodySmall),
+          ],
+        ),
+        const SizedBox(height: 6),
+        LinearProgressIndicator(
+          value: pct,
+          color: color,
+          backgroundColor: theme.colorScheme.outline.withOpacity(0.2),
+          minHeight: 8,
+          borderRadius: BorderRadius.circular(4),
+        ),
+      ],
     );
   }
 

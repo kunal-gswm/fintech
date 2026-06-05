@@ -60,6 +60,8 @@ dependencies:
   path: ^1.9.1
   package_info_plus: ^8.1.2
   url_launcher: ^6.3.0
+  xml: ^6.6.1
+  html_unescape: ^2.0.0
 
 dev_dependencies:
   flutter_test:

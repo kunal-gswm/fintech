@@ -11,6 +11,7 @@ import '../providers/settings_provider.dart';
 import '../services/auth_service.dart';
 import '../services/hive_service.dart';
 import '../models/constants.dart';
+import '../providers/insight_provider.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -260,6 +261,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               subtitle: const Text('Receive a weekly summary'),
               value: weekly,
               onChanged: (v) => setSB(() => weekly = v),
+              contentPadding: EdgeInsets.zero,
+            ),
+            SwitchListTile(
+              title: const Text('50/30/20 Insights'),
+              subtitle: const Text('Analyze your budget rule on analytics screen'),
+              value: ref.watch(insight503020Provider),
+              onChanged: (v) {
+                ref.read(insight503020Provider.notifier).toggle(v);
+                setSB(() {});
+              },
               contentPadding: EdgeInsets.zero,
             ),
           ],

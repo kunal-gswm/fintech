@@ -373,10 +373,6 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
                                                             color: const Color(
                                                                 0xFFE5B80B)),
                                                   ),
-                                                  Text(
-                                                    '${expense.date.hour.toString().padLeft(2, '0')}:${expense.date.minute.toString().padLeft(2, '0')}',
-                                                    style: theme.textTheme.bodySmall,
-                                                  ),
                                                 ],
                                               ),
                                             ],

@@ -63,5 +63,16 @@ jobs:
             Automated production build for EXPANDA Mobile (Flutter Migration).
             Download the APK below to install on your mobile device.
           files: expanda/build/app/outputs/flutter-apk/expanda.apk
+      - name: Keep Only Current Release
+        run: |
+          current_tag="${{ steps.version.outputs.tag }}"
+          tags=$(gh release list --json tagName -q '.[].tagName')
+          for tag in $tags; do
+            if [ "$tag" != "$current_tag" ]; then
+              echo "Deleting old release $tag"
+              gh release delete "$tag" -y --cleanup-tag || true
+            fi
+          done
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+

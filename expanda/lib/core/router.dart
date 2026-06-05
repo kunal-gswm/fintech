@@ -15,6 +15,7 @@ import '../screens/settings_screen.dart';
 import '../screens/notifications_screen.dart';
 import '../screens/learning_hub_screen.dart';
 import '../screens/splash_screen.dart';
+import '../screens/news_screen.dart';
 import '../providers/settings_provider.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -68,6 +69,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/learn',
         name: 'learn',
         builder: (context, state) => const LearningHubScreen(),
+      ),
+      GoRoute(
+        path: '/news',
+        name: 'news',
+        builder: (context, state) => const NewsScreen(),
       ),
 
       // ── Shell route with bottom nav bar ──

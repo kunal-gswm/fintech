@@ -9,7 +9,7 @@ import 'services/seed_data_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await HiveService.init();
-  await SeedDataService.seedDatabase();
+  // await SeedDataService.seedDatabase(); // Removed hardcoded seed data
 
   runApp(
     const ProviderScope(

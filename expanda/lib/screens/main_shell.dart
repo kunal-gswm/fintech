@@ -213,6 +213,17 @@ class _MainShellState extends State<MainShell> with SingleTickerProviderStateMix
                                       context.push('/goals');
                                     },
                                   ),
+                                  const Divider(height: 16),
+                                  _buildMenuItem(
+                                    theme: theme,
+                                    icon: Icons.newspaper_rounded,
+                                    label: 'Market News',
+                                    color: const Color(0xFFF59E0B), // Amber
+                                    onTap: () {
+                                      _toggleMenu();
+                                      context.push('/news');
+                                    },
+                                  ),
                                 ],
                               ),
                             ),
